@@ -1,5 +1,22 @@
 `default_nettype none
 
+`define is_indirect_address 	9'bxxx000000
+
+`define tmr0_address 			9'bx00000001
+`define option_address			9'bx10000001
+`define pcl_address				9'bxx0000010
+`define status_address			9'bxx0000011
+`define fsr_address				9'bxx0000100
+
+`define pclath_address			9'bxx0001010
+`define intcon_address			9'bxx0001011
+
+`define portb_address			9'bx00000110
+`define trisb_address			9'bx10000110
+
+`define porta_address			9'h05
+`define trisa_address			9'h85
+
 module picmicro_midrange_core(
 	input wire clk,
 	input wire rst
@@ -48,8 +65,9 @@ program_memory progmem (
 	.instr(instr_current)
 );
 
-ram_file_address_mux rfam(
-	.mode_indirect(is_memory_addr_indirect_addr_sel(13'd0)), //todo
+ram_file_address_mux #(
+	.IS_INDIRECT_ADDRESS(`is_indirect_address)
+) rfam (
 	.status_rp(status_rp),
 	.opcode_address(0), //todo
 	.status_irp(status_irp),
