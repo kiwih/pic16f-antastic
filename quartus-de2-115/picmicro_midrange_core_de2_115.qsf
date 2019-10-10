@@ -42,7 +42,7 @@ set_global_assignment -name DEVICE EP4CE115F29C7
 set_global_assignment -name TOP_LEVEL_ENTITY program_memory
 set_global_assignment -name ORIGINAL_QUARTUS_VERSION 16.0.0
 set_global_assignment -name PROJECT_CREATION_TIME_DATE "15:41:05  OCTOBER 10, 2019"
-set_global_assignment -name LAST_QUARTUS_VERSION 16.0.0
+set_global_assignment -name LAST_QUARTUS_VERSION "17.0.0 Lite Edition"
 set_global_assignment -name PROJECT_OUTPUT_DIRECTORY output_files
 set_global_assignment -name MIN_CORE_JUNCTION_TEMP 0
 set_global_assignment -name MAX_CORE_JUNCTION_TEMP 85
@@ -57,4 +57,8 @@ set_global_assignment -name VERILOG_FILE ../verilog/program_memory.v
 set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
 set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
 set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
+set_global_assignment -name VERILOG_FILE ../verilog/ram_file_registers.v
+set_global_assignment -name VERILOG_FILE ../verilog/hardware_stack.v
+set_global_assignment -name VERILOG_FILE ../verilog/instruction_decoder.v
+set_global_assignment -name VERILOG_FILE ../verilog/status_register.v
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
