@@ -1,7 +1,8 @@
 `default_nettype none
 
 module picmicro_midrange_core(
-	input wire clk
+	input wire clk,
+	input wire rst
 );
 
 //most instructions take 4 clock cycles
@@ -35,6 +36,10 @@ wire status_z;
 wire status_dc;
 wire status_c;
 
+
+wire fsr_wr_en;
+wire [7:0] fsr_out;
+
 //includes a register to save the current output(and only update upon rd_en)
 program_memory progmem (
 	.clk(clk),
@@ -43,6 +48,15 @@ program_memory progmem (
 	.instr(instr_current)
 );
 
+ram_file_address_mux rfam(
+	.mode_indirect(is_memory_addr_indirect_addr_sel(13'd0)), //todo
+	.status_rp(status_rp),
+	.opcode_address(0), //todo
+	.status_irp(status_irp),
+	.fsr(fsr_out),
+	.ram_file_address(regfile_addr)
+);
+	
 ram_file_registers regfile (
 	.clk(clk),
 	.addr(regfile_addr),
@@ -53,6 +67,7 @@ ram_file_registers regfile (
 
 status_register streg (
 	.clk(clk),
+	.rst(rst),
 	.status_wr(status_wr),
 	.status_reg_in(status_reg_in),
 	.status_reg_out(status_reg_out), 
@@ -65,4 +80,20 @@ status_register streg (
 	.c(status_c)				
 );
 
+generic_register fsrreg(
+	.clk(clk),
+	.rst(rst),
+	.wr_en(fsr_wr_en),
+	.d(0), //todo
+	.q(fsr_out)
+);
+
+generic_register pclath(
+	.clk(clk),
+	.rst(rst),
+);
+	
+memory_map_signals mmap(
+	
+);
 endmodule

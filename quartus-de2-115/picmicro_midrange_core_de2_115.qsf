@@ -61,4 +61,7 @@ set_global_assignment -name VERILOG_FILE ../verilog/ram_file_registers.v
 set_global_assignment -name VERILOG_FILE ../verilog/hardware_stack.v
 set_global_assignment -name VERILOG_FILE ../verilog/instruction_decoder.v
 set_global_assignment -name VERILOG_FILE ../verilog/status_register.v
+set_global_assignment -name VERILOG_FILE ../verilog/ram_file_address_mux.v
+set_global_assignment -name VERILOG_FILE ../verilog/generic_register.v
+set_global_assignment -name VERILOG_FILE ../verilog/is_memory_addr_functions.v
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top

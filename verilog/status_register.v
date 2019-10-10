@@ -1,5 +1,6 @@
 module status_register(
 	input wire clk,
+	input wire rst,
 	input wire status_wr,
 	input wire [7:0] status_reg_in,
 	
@@ -40,6 +41,7 @@ module status_register(
 
 reg [7:0] internalStatus;
 
+//todo: finish this properly
 always @(posedge clk)
 	if(status_wr)
 		internalStatus <= status_reg_in;
