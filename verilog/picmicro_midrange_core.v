@@ -109,9 +109,16 @@ generic_register fsrreg(
 generic_register pclath(
 	.clk(clk),
 	.rst(rst),
+	.wr_en(regfile_addr == `pcl_address & regfile_wr_en),
 );
 	
-memory_map_signals mmap(
+instruction_decoder control(
+	.clk(clk),
 	
+	.instr_current(instr_current),
+	
+	.instr_rd_en(instr_rd_en)
+
+
 );
 endmodule
