@@ -2,7 +2,11 @@
 
 module picmicro_midrange_core(
 	input wire clk,
-	input wire rst
+	input wire rst,
+	
+	output wire [8:0] extern_peripherals_addr,
+	output wire [7:0] extern_peripherals_data_in,
+	input wire [7:0] extern_peripherals_data_out
 );
 
 //most instructions take 4 clock cycles
@@ -28,7 +32,8 @@ assign instr_b = instr_current[9:7];
 wire [7:0] instr_k;  //in an instruction with a k, this will contain the k slice
 assign instr_k = instr_current[7:0];
 
-wire [7:0] data_in_bus; //this is based on a whole load of muxes
+wire [7:0] core_registers_out; 	//this is based on a whole load of muxes from our core register set (e.g. status, fsr, etc)
+											//select lines are based on the current regfile_addr
 
 wire regfile_wr_en;
 wire [8:0] regfile_addr;
@@ -72,13 +77,16 @@ ram_file_address_mux #(
 	.ram_file_address(regfile_addr)
 );
 
-//todo: three sets of generic_register_arrays 
 ram_file_registers regfile (
 	.clk(clk),
 	.addr(regfile_addr),
 	.wr_en(regfile_wr_en),
 	.data_in(regfile_data_in),
-	.data_out(regfile_data_out)
+	.data_out(regfile_data_out),
+	
+	//other sources of data
+	.core_registers_out(core_registers_out),				  //when the regfile_addr points at an internal register (e.g. STATUS) we'll need to load from them instead
+	.extern_peripherals_out(extern_peripherals_data_out) //when the regfile_addr points at something non-core we'll attempt to load it externally
 );
 
 status_register streg (
