@@ -1,22 +1,5 @@
 `default_nettype none
 
-`define is_indirect_address 	9'bxxx000000
-
-`define tmr0_address 			9'bx00000001
-`define option_address			9'bx10000001
-`define pcl_address				9'bxx0000010
-`define status_address			9'bxx0000011
-`define fsr_address				9'bxx0000100
-
-`define pclath_address			9'bxx0001010
-`define intcon_address			9'bxx0001011
-
-`define portb_address			9'bx00000110
-`define trisb_address			9'bx10000110
-
-`define porta_address			9'h05
-`define trisa_address			9'h85
-
 module picmicro_midrange_core(
 	input wire clk,
 	input wire rst
@@ -32,8 +15,20 @@ module picmicro_midrange_core(
 
 //
 
+`include "memory_map.vh"
+
 wire instr_rd_en;
 wire [13:0] instr_current;
+wire [6:0] instr_f; 	//in an instruction with an f, this will contain the f slice
+assign instr_f = instr_current[6:0];
+wire instr_d;			//in an instruction with a d, this will contain the d slice
+assign instr_d = instr_current[7];
+wire [2:0] instr_b;	//in an instruction with a b, this will contain the b slice
+assign instr_b = instr_current[9:7];
+wire [7:0] instr_k;  //in an instruction with a k, this will contain the k slice
+assign instr_k = instr_current[7:0];
+
+wire [7:0] data_in_bus; //this is based on a whole load of muxes
 
 wire regfile_wr_en;
 wire [8:0] regfile_addr;
@@ -41,6 +36,7 @@ wire [7:0] regfile_data_in;
 wire [7:0] regfile_data_out;
 
 wire [12:0] pc_out;
+wire incr_pc_en;
 
 wire status_wr;
 wire [7:0] status_reg_in;
@@ -53,6 +49,7 @@ wire status_z;
 wire status_dc;
 wire status_c;
 
+wire [7:0] alu_out;
 
 wire fsr_wr_en;
 wire [7:0] fsr_out;
@@ -66,7 +63,7 @@ program_memory progmem (
 );
 
 ram_file_address_mux #(
-	.IS_INDIRECT_ADDRESS(`is_indirect_address)
+	.IS_INDIRECT_ADDRESS(is_indirect_address)
 ) rfam (
 	.status_rp(status_rp),
 	.opcode_address(0), //todo
@@ -74,7 +71,8 @@ ram_file_address_mux #(
 	.fsr(fsr_out),
 	.ram_file_address(regfile_addr)
 );
-	
+
+//todo: three sets of generic_register_arrays 
 ram_file_registers regfile (
 	.clk(clk),
 	.addr(regfile_addr),
@@ -106,19 +104,33 @@ generic_register fsrreg(
 	.q(fsr_out)
 );
 
-generic_register pclath(
+program_counter pc(
 	.clk(clk),
 	.rst(rst),
-	.wr_en(regfile_addr == `pcl_address & regfile_wr_en),
+	.pc_out(pc_out),
+	.pclath_wr_en(regfile_addr == pclath_address & regfile_wr_en),
+	.pclath_in(alu_out[4:0]),
+	.pcl_wr_en(regfile_addr == pcl_address & regfile_wr_en),
+	.pcl_in(alu_out),
+	.incr_pc_en(incr_pc_en),
 );
+
+
 	
 instruction_decoder control(
 	.clk(clk),
 	
 	.instr_current(instr_current),
 	
-	.instr_rd_en(instr_rd_en)
+	.instr_rd_en(instr_rd_en),
+	
+	.incr_pc_en(incr_pc_en),
 
+
+);
+
+alu a(
+	
 
 );
 endmodule

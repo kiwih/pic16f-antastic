@@ -15,7 +15,7 @@ reg [INSTR_WIDTH - 1:0] instrMemory [2**ADDR_WIDTH - 1:0];
 
 always @(posedge clk)
 	if(rst)
-		instr = {INSTR_WIDTH{0}};
+		instr = {INSTR_WIDTH{1'b0}};
 	else if(rd_en)
 		instr = instrMemory[addr];
 

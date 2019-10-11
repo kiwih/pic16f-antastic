@@ -3,7 +3,9 @@ module instruction_decoder(
 	
 	input wire [13:0] instr_current,
 	
-	output wire instr_rd_en
+	output reg instr_rd_en,
+	
+	output reg incr_pc_en
 );
 
 //takes 4 clock cycles to execute a command
@@ -14,6 +16,13 @@ module instruction_decoder(
 //2: instruction read or nop
 //3: process data
 //4: instruction write cycle or nop
+
+//imagine that the instruction memory is just full of NOPs
+//cycle n-1: NOP loaded into instruction memory register
+//cycle n: nothing
+//cycle n+1: nothing
+//cycle n+2: nothing
+//cycle n+3: PC = PC+1
 
 //branch instructions take 8
 

@@ -54,6 +54,6 @@ assign n_to = internalStatus[4];
 assign n_pd = internalStatus[3];
 assign z = internalStatus[2];
 assign dc = internalStatus[1];
-assign z = internalStatus[0];
+assign c = internalStatus[0];
 
 endmodule
