@@ -84,6 +84,14 @@ always @* begin
 				alu_out_z <= 1'b1;
 		end
 		
+		alu_op_or: begin //inclusive OR W with f
+			alu_out_z_wr_en <= alu_status_wr_en;
+			alu_out = op_w | op_lf;
+			
+			if(alu_out == 8'h0) 
+				alu_out_z <= 1'b1;
+		end
+		
 		alu_op_passlf: begin //pass thru f (used for movf)
 			alu_out_z_wr_en <= alu_status_wr_en;
 			alu_out = op_lf;
@@ -141,6 +149,10 @@ always @* begin
 			
 			if(alu_out == 8'h0) 
 				alu_out_z <= 1'b1;		
+		end
+		
+		default: begin
+			alu_out = 8'h0;
 		end
 	endcase
 

@@ -49,14 +49,18 @@ reg [7:0] internalStatus;
 
 //todo: finish this properly
 always @(posedge clk) begin
-	if(status_wr)
-		internalStatus <= status_reg_in;
-	if(z_wr_en)
-		internalStatus[2] <= z_in;
-	if(dc_wr_en)
-		internalStatus[1] <= dc_in;
-	if(c_wr_en)
-		internalStatus[0] <= c_in;
+	if(rst)
+		internalStatus <= 8'd0;
+	else begin
+		if(status_wr)
+			internalStatus <= status_reg_in;
+		if(z_wr_en)
+			internalStatus[2] <= z_in;
+		if(dc_wr_en)
+			internalStatus[1] <= dc_in;
+		if(c_wr_en)
+			internalStatus[0] <= c_in;
+	end
 end
 		
 assign status_reg_out = internalStatus;

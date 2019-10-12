@@ -11,6 +11,14 @@ module program_memory #(
 
 reg [INSTR_WIDTH - 1:0] instrMemory [2**ADDR_WIDTH - 1:0];
 
+initial begin
+	instr = {INSTR_WIDTH{1'b0}};
+	
+   instrMemory[0] = 14'b00_0000_0000_0000; //nop
+	instrMemory[1] = 14'b11_0000_1010_1011; //movlw 0xAB
+	instrMemory[2] = 14'b10_1000_0000_0000; //goto 0x000
+end
+
 //TODO: mif
 
 always @(posedge clk)

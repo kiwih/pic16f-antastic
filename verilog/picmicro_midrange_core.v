@@ -32,9 +32,6 @@ assign instr_b = instr_current[9:7];
 wire [7:0] instr_k;  //in an instruction with a k, this will contain the k slice
 assign instr_k = instr_current[7:0];
 
-wire [7:0] core_registers_out; 	//this is based on a whole load of muxes from our core register set (e.g. status, fsr, etc)
-											//select lines are based on the current regfile_addr
-
 wire regfile_wr_en;
 wire [8:0] regfile_addr;
 wire [7:0] regfile_data_out;
@@ -137,15 +134,18 @@ ram_file_registers regfile (
 	.extern_peripherals_out(extern_peripherals_data_out) //when the regfile_addr points at something non-core we'll attempt to load it externally
 );
 
-generic_register fsrreg(
+program_counter pc(
 	.clk(clk),
 	.rst(rst),
-	.wr_en(fsr_reg_wr_en),
-	.d(alu_out), 
-	.q(fsr_reg_out)
+	.pc_out(pc_out),
+	
+	.pclath_wr_en(pclath_reg_wr_en),
+	.pclath_in(alu_out[4:0]),
+	.pcl_wr_en(pcl_reg_wr_en),
+	.pcl_in(alu_out),
+	
+	.incr_pc_en(incr_pc_en)
 );
-
-
 
 status_register streg (
 	.clk(clk),
@@ -171,22 +171,49 @@ status_register streg (
 	.c_in(alu_out_c)
 );
 
-
-program_counter pc(
+generic_register fsrreg(
 	.clk(clk),
 	.rst(rst),
-	.pc_out(pc_out),
-	.pclath_wr_en(regfile_addr == pclath_address & regfile_wr_en),
-	.pclath_in(alu_out[4:0]),
-	.pcl_wr_en(regfile_addr == pcl_address & regfile_wr_en),
-	.pcl_in(alu_out),
-	.incr_pc_en(incr_pc_en),
+	.wr_en(fsr_reg_wr_en),
+	.d(alu_out), 
+	.q(fsr_reg_out)
 );
 
+generic_register intconreg(
+	.clk(clk),
+	.rst(rst),
+	.wr_en(intcon_reg_wr_en),
+	.d(alu_out), 
+	.q(intcon_reg_out)
+);
 
+generic_register pir1reg(
+	.clk(clk),
+	.rst(rst),
+	.wr_en(pir1_reg_wr_en),
+	.d(alu_out), 
+	.q(pir1_reg_out)
+);
+
+generic_register pie1reg(
+	.clk(clk),
+	.rst(rst),
+	.wr_en(pie1_reg_wr_en),
+	.d(alu_out), 
+	.q(pie1_reg_out)
+);
+
+generic_register pconreg(
+	.clk(clk),
+	.rst(rst),
+	.wr_en(pcon_reg_wr_en),
+	.d(alu_out), 
+	.q(pcon_reg_out)
+);
 	
 instruction_decoder control(
 	.clk(clk),
+	.rst(rst),
 	
 	.instr_current(instr_current),
 	
@@ -198,7 +225,7 @@ instruction_decoder control(
 	
 	.incr_pc_en(incr_pc_en),
 	
-	.w_reg_wr_en(w_reg_wr_en),
+	.w_reg_wr_en(w_reg_wr_en)
 
 	
 );
