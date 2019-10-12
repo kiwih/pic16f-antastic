@@ -17,10 +17,10 @@ reg [4:0] pclath = 5'd0;
 reg [12:0] pc = 13'd0;
 
 always @(posedge clk) begin
-	if(rst) 
+	if(rst) begin
 		pclath <= 5'd0;
 		pc <= 13'd0;
-	else begin
+	end else begin
 		if(incr_pc_en) begin
 			pc <= pc + 13'd1;
 		end 

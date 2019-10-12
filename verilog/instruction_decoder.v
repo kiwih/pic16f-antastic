@@ -3,9 +3,15 @@ module instruction_decoder(
 	
 	input wire [13:0] instr_current,
 	
+	output reg alu_sel_l,
+	output reg [3:0] alu_op,
+	output reg alu_status_wr_en,
+	
 	output reg instr_rd_en,
 	
-	output reg incr_pc_en
+	output reg incr_pc_en,
+	
+	output reg w_reg_wr_en
 );
 
 //takes 4 clock cycles to execute a command

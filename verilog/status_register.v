@@ -23,15 +23,21 @@ module status_register(
 	output wire n_pd,			//not Power-down bit (read only)
 									//1 = After power-up or by the CLRWDT instruction
 									//0 = By execution of the SLEEP instruction
-									
+	
+	input wire z_wr_en,
+	input wire z_in,
 	output wire z,				//Zero bit
 									//1 = the result of an arithmetic or logic operation is zero
 									//0 = the result of an arithmetic or logic operation is not zero
 	
+	input wire dc_wr_en,
+	input wire dc_in,
 	output wire dc,			//Digit Carry (not Borrow) bit
 									//1 = A carry-out from the 4th low order bit of the result occurred
 									//0 No carry-out from the 4th low order bit of the result
-									
+	
+	input wire c_wr_en,
+	input wire c_in,
 	output wire c				//Carry (not Borrow) bit
 									//1 = A carry-out from the MSB of the result occurred
 									//0 = No carry-out from the MSB of the result occurred
@@ -42,9 +48,16 @@ module status_register(
 reg [7:0] internalStatus;
 
 //todo: finish this properly
-always @(posedge clk)
+always @(posedge clk) begin
 	if(status_wr)
 		internalStatus <= status_reg_in;
+	if(z_wr_en)
+		internalStatus[2] <= z_in;
+	if(dc_wr_en)
+		internalStatus[1] <= dc_in;
+	if(c_wr_en)
+		internalStatus[0] <= c_in;
+end
 		
 assign status_reg_out = internalStatus;
 
