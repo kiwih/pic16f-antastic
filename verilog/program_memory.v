@@ -17,9 +17,11 @@ initial begin
 	
    instrMemory[0] = 14'b00_0000_0000_0000; //nop
 	instrMemory[1] = 14'b11_0000_1010_1011; //movlw 0xAB
+	instrMemory[3] = 14'b00_0000_1010_0000; //movwf 0x20
 	instrMemory[2] = 14'b11_0000_1100_1101; //movlw 0xCD
-	instrMemory[3] = 14'b10_1000_0000_0001; //goto 0x001 (the movlw instruction)
-	instrMemory[4] = 14'b11_0000_1110_1111; //movlw 0xEF
+	instrMemory[4] = 14'b00_1000_0010_0000; //movf(w) 0x20 
+	instrMemory[5] = 14'b10_1000_0000_0001; //goto 0x001 (the movlw instruction)
+	instrMemory[6] = 14'b11_0000_1110_1111; //movlw 0xEF
 end
 
 //TODO: mif

@@ -4,17 +4,17 @@ module instruction_decoder(
 	
 	input wire [13:0] instr_current,
 	
-	output reg alu_sel_l,
-	output reg [3:0] alu_op,
 	output reg alu_status_wr_en,
+	output reg alu_sel_l,
+	output reg alu_d,
+	output reg [3:0] alu_op,
+	output reg alu_d_wr_en,
 	
 	output reg instr_rd_en,
 	output reg instr_flush,
 	
 	output reg pc_incr_en,
-	output reg pc_j_en,
-	
-	output reg w_reg_wr_en
+	output reg pc_j_en
 );
 
 `include "isa.vh"
@@ -62,14 +62,15 @@ always @(posedge clk) begin
 end
 
 always @* begin
+	alu_d <= instr_current[7]; //This is the default case. 0 = W register, 1 = F register
 	alu_sel_l <= 1'd0;
 	alu_op <= 4'd0;
+	alu_d_wr_en <= 1'd0;
 	alu_status_wr_en <= 1'd0;
 	instr_rd_en <= 1'd0;
 	instr_flush <= 1'd0;
 	pc_incr_en <= 1'd0;
 	pc_j_en <= 1'd0;
-	w_reg_wr_en <= 1'd0;
 	set_stall <= 1'd0;
 	clr_stall <= 1'd0;
 	
@@ -95,8 +96,45 @@ always @* begin
 		
 		2'd1: begin
 			alu_sel_l <= 1'd1;
+			alu_d <= 1'd0;
 			alu_op <= alu_op_passlf;
-			w_reg_wr_en <= 1'd1;
+			alu_d_wr_en <= 1'd1;
+		end
+		//2'd2:
+			//
+		//2'd3:
+		
+		2'd3: begin
+			instr_rd_en <= 1'd1;
+			pc_incr_en <= 1'd1;
+		end
+		endcase
+	end
+		
+	isa_movwf: begin
+		case(q_count)
+		2'd1: begin
+			alu_op <= alu_op_passw;
+			alu_status_wr_en <= 1'd1;
+			alu_d_wr_en <= 1'd1;
+		end
+		//2'd2:
+			//
+		//2'd3:
+		
+		2'd3: begin
+			instr_rd_en <= 1'd1;
+			pc_incr_en <= 1'd1;
+		end
+		endcase
+	end
+	
+	isa_movf: begin
+		case(q_count)
+		2'd1: begin
+			alu_sel_l <= 1'd0; //pass f, not l
+			alu_op <= alu_op_passlf;
+			alu_d_wr_en <= 1'd1;
 		end
 		//2'd2:
 			//
@@ -118,7 +156,7 @@ always @* begin
 		
 		2'd3: begin
 			instr_flush <= 1'd1;
-			pc_j_en <= 1'd1;
+			pc_j_en <= 1'd1; //the PC will load the j address
 		end
 		endcase
 	end

@@ -2,10 +2,11 @@ module alu (
 	input wire [7:0] op_w,  //this is always the w register
 	input wire [7:0] op_lf, //this is either a literal or a regfile register f
 	input wire [3:0] op,
-	input wire alu_status_wr_en,
 	
 	input wire alu_d_wr_en,	//write status for alu operations will pass thru ALU
 	input wire alu_d,			//d sets the destination, either w (if 0) or f (if 1)
+	
+	input wire alu_status_wr_en,
 	
 	output reg alu_out_w_wr_en,
 	output reg alu_out_f_wr_en,
