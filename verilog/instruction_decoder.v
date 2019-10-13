@@ -11,7 +11,8 @@ module instruction_decoder(
 	output reg instr_rd_en,
 	output reg instr_flush,
 	
-	output reg incr_pc_en,
+	output reg pc_incr_en,
+	output reg pc_j_en,
 	
 	output reg w_reg_wr_en
 );
@@ -66,7 +67,8 @@ always @* begin
 	alu_status_wr_en <= 1'd0;
 	instr_rd_en <= 1'd0;
 	instr_flush <= 1'd0;
-	incr_pc_en <= 1'd0;
+	pc_incr_en <= 1'd0;
+	pc_j_en <= 1'd0;
 	w_reg_wr_en <= 1'd0;
 	set_stall <= 1'd0;
 	clr_stall <= 1'd0;
@@ -81,7 +83,7 @@ always @* begin
 		//2'd3:
 		
 		2'd3: begin
-			incr_pc_en <= 1'd1;
+			pc_incr_en <= 1'd1;
 			instr_rd_en <= 1'd1;
 		end
 			
@@ -102,13 +104,13 @@ always @* begin
 		
 		2'd3: begin
 			instr_rd_en <= 1'd1;
-			incr_pc_en <= 1'd1;
+			pc_incr_en <= 1'd1;
 		end
 		endcase
 	end
 		
 	isa_goto: begin
-		case(q_count):
+		case(q_count)
 		
 		//2'd1:
 		
@@ -116,7 +118,7 @@ always @* begin
 		
 		2'd3: begin
 			instr_flush <= 1'd1;
-			load_pc_en <= 1'd1;
+			pc_j_en <= 1'd1;
 		end
 		endcase
 	end

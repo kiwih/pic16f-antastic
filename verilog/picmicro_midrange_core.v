@@ -32,8 +32,8 @@ wire [2:0] instr_b;	//in an instruction with a b, this will contain the b slice
 assign instr_b = instr_current[9:7];
 wire [7:0] instr_l;  //in an instruction with a l, this will contain the l slice
 assign instr_l = instr_current[7:0];
-wire [10:0] instr_dest; //in an instruction with a destination, this will contain the destination slice
-assign instr_dest = instr_current[10:0];
+wire [10:0] instr_j; //in an instruction with a destination, this will contain the destination slice (we say "j" is the "jump" address for goto, call, etc)
+assign instr_j = instr_current[10:0];
 
 wire regfile_wr_en;
 wire [8:0] regfile_addr;
@@ -56,7 +56,8 @@ wire pcon_reg_wr_en;
 wire [7:0] pcon_reg_out;
 
 wire [12:0] pc_out;
-wire incr_pc_en;
+wire pc_incr_en;
+wire pc_j_en;
 
 wire status_wr;
 wire [7:0] status_reg_in;
@@ -143,12 +144,15 @@ program_counter pc(
 	.rst(rst),
 	.pc_out(pc_out),
 	
+	.pc_j_addr(instr_j),
+	.pc_j_en(pc_j_en),
+	
 	.pclath_wr_en(pclath_reg_wr_en),
 	.pclath_in(alu_out[4:0]),
 	.pcl_wr_en(pcl_reg_wr_en),
 	.pcl_in(alu_out),
 	
-	.incr_pc_en(incr_pc_en)
+	.pc_incr_en(pc_incr_en)
 );
 
 status_register streg (
@@ -228,7 +232,8 @@ instruction_decoder control(
 	.instr_rd_en(instr_rd_en),
 	.instr_flush(instr_flush),
 	
-	.incr_pc_en(incr_pc_en),
+	.pc_incr_en(pc_incr_en),
+	.pc_j_en(pc_j_en),
 	
 	.w_reg_wr_en(w_reg_wr_en)
 
@@ -245,7 +250,7 @@ generic_register w(
 
 alu a(
 	.op_w(w_reg_out),  
-	.op_lf(alu_sel_l ? instr_k : regfile_data_out), 
+	.op_lf(alu_sel_l ? instr_l : regfile_data_out), 
 	.op(alu_op),
 	.alu_status_wr_en(alu_status_wr_en),
 	.alu_out(alu_out),
