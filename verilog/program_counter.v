@@ -2,7 +2,11 @@ module program_counter (
 	input wire clk,
 	input wire rst,
 	
-	input wire incr_pc_en,
+	input wire incr_pc_en, //set pc = pc + 1
+	
+	input wire [10:0] load_pc_dest,
+	input wire load_pc_en, //set pc = pclath[4:3],load_pc_dest //TODO: work from here
+	
 	output wire [12:0] pc_out,
 	
 	input wire pclath_wr_en,

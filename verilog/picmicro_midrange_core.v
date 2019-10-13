@@ -22,6 +22,7 @@ module picmicro_midrange_core(
 `include "memory_map.vh"
 
 wire instr_rd_en;
+wire instr_flush;
 wire [13:0] instr_current;
 wire [6:0] instr_f; 	//in an instruction with an f, this will contain the f slice
 assign instr_f = instr_current[6:0];
@@ -29,8 +30,10 @@ wire instr_d;			//in an instruction with a d, this will contain the d slice
 assign instr_d = instr_current[7];
 wire [2:0] instr_b;	//in an instruction with a b, this will contain the b slice
 assign instr_b = instr_current[9:7];
-wire [7:0] instr_k;  //in an instruction with a k, this will contain the k slice
-assign instr_k = instr_current[7:0];
+wire [7:0] instr_l;  //in an instruction with a l, this will contain the l slice
+assign instr_l = instr_current[7:0];
+wire [10:0] instr_dest; //in an instruction with a destination, this will contain the destination slice
+assign instr_dest = instr_current[10:0];
 
 wire regfile_wr_en;
 wire [8:0] regfile_addr;
@@ -84,6 +87,7 @@ wire alu_bit_test_res;
 program_memory progmem (
 	.clk(clk),
 	.rd_en(instr_rd_en),
+	.flush(instr_flush),
 	.addr(pc_out),
 	.instr(instr_current)
 );
@@ -222,6 +226,7 @@ instruction_decoder control(
 	.alu_status_wr_en(alu_status_wr_en),
 	
 	.instr_rd_en(instr_rd_en),
+	.instr_flush(instr_flush),
 	
 	.incr_pc_en(incr_pc_en),
 	
