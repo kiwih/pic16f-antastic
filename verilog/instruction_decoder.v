@@ -36,6 +36,12 @@ module instruction_decoder(
 
 //branch instructions take 8
 
+//reg two_cycle_instruction = 1'b0; //used when configuring a two-cycle instruction
+
+reg stall = 1'b0;
+reg set_stall;
+reg clr_stall;
+
 reg [1:0] q_count = 2'd0; //used to count the 4 clock cycles of executing a command
 
 always @(posedge clk) begin
@@ -45,6 +51,14 @@ always @(posedge clk) begin
 		q_count = q_count + 2'd1;
 end
 
+always @(posedge clk) begin
+	if(rst | clr_stall) begin
+		stall = 1'b0;
+	end else if (set_stall) begin
+		stall = 1'b1;
+	end
+end
+
 always @* begin
 	alu_sel_l <= 1'd0;
 	alu_op <= 4'd0;
@@ -52,32 +66,38 @@ always @* begin
 	instr_rd_en <= 1'd0;
 	incr_pc_en <= 1'd0;
 	w_reg_wr_en <= 1'd0;
+	set_stall <= 1'd0;
+	clr_stall <= 1'd0;
 	
 	casez(instr_current)
 	
 	isa_nop: begin
 		case(q_count)
-		//2'd0:
-		//2'd1:
-		2'd2:
+		2'd0: begin
 			incr_pc_en <= 1'd1;
-		2'd3:
 			instr_rd_en <= 1'd1;
+		end
+		//2'd1:
+		//2'd2:
+		//2'd3:
+			
 		endcase
 	end
 	
 	isa_movlw: begin
 		case(q_count)
 		2'd0: begin
+			instr_rd_en <= 1'd1;
+			incr_pc_en <= 1'd1;
+		end
+		2'd1: begin
 			alu_sel_l <= 1'd1;
 			alu_op <= alu_op_passlf;
 			w_reg_wr_en <= 1'd1;
 		end
-		//2'd1:
-		2'd2:
-			incr_pc_en <= 1'd1;
-		2'd3:
-			instr_rd_en <= 1'd1;
+		//2'd2:
+			//
+		//2'd3:
 		
 		
 		endcase

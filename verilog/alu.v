@@ -4,6 +4,12 @@ module alu (
 	input wire [3:0] op,
 	input wire alu_status_wr_en,
 	
+	input wire alu_d_wr_en,	//write status for alu operations will pass thru ALU
+	input wire alu_d,			//d sets the destination, either w (if 0) or f (if 1)
+	
+	output reg alu_out_w_wr_en,
+	output reg alu_out_f_wr_en,
+	
 	output reg [7:0] alu_out,
 	output reg alu_out_z_wr_en,
 	output reg alu_out_z,
@@ -18,6 +24,15 @@ module alu (
 `include "alu_ops.vh"
 
 reg [8:0] temp_add;
+
+always @* begin
+	alu_out_w_wr_en <= 1'b0;
+	alu_out_f_wr_en <= 1'b0;
+	if(!alu_d)
+		alu_out_w_wr_en <= alu_d_wr_en;
+	else //alu_d
+		alu_out_f_wr_en <= alu_d_wr_en;
+end
 
 always @* begin
 	alu_out = 8'h0;
