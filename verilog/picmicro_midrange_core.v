@@ -87,6 +87,7 @@ wire alu_bit_test_res;
 //includes a register to save the current output(and only update upon rd_en)
 program_memory progmem (
 	.clk(clk),
+	.rst(rst),
 	.rd_en(instr_rd_en),
 	.flush(instr_flush),
 	.addr(pc_out),
@@ -108,6 +109,7 @@ assign extern_peripherals_data_in = alu_out;
 
 ram_file_registers regfile (
 	.clk(clk),
+	.rst(rst),
 	.addr(regfile_addr),
 	.wr_en(regfile_wr_en),
 	.data_in(alu_out),
@@ -248,7 +250,7 @@ generic_register w(
 	.q(w_reg_out)
 );
 
-alu a(
+alu a( //TODO: add a bit test field
 	.op_w(w_reg_out),  
 	.op_lf(alu_sel_l ? instr_l : regfile_data_out), 
 	.op(alu_op),
