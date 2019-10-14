@@ -1,8 +1,18 @@
-00000000000000 //nop
-11000010101011 //movlw 0xAB	W <= 0xAB
-00000010100000 //movwf 0x20	mem[0x20] <= W = 0xAB
-11000011001101 //movlw 0xCD	W <= 0xCD
-00011100100000 //addwf 0 0x20	W <= W + mem[0x20] = 0xAB + 0xCD = Carry and 0x78
-00100000100000 //movfw 1 0x20  W <= mem[0x20]
-10100000000001 //goto 0x001 (the first movlw instruction)
-11000011101111 //movlw 0xEF
+00000000000000 //0.	nop
+11000010101011 //1.	movlw 0xAB	W <= 0xAB
+00000010100000 //2.	movwf 0x20	mem[0x20] <= W = 0xAB
+11000011001101 //3.	movlw 0xCD	W <= 0xCD
+00000010100001 //4.	movwf 0x21	mem[0x21] <= W = 0xCD
+00011100100000 //5.	addwf 0 0x20	W <= W + mem[0x20] = 0xAB + 0xCD = Carry and 0x78
+00100000100000 //6.	movfw 0 0x20	W <= mem[0x20] = 0xAB
+00010100100001 //7.	andwf 0 0x21	W <= W & mem[0x21] = 0xAB & 0xCD = 0x89
+00000110100001 //8.	clrf 0x21	mem[0x21] <= 0x00 and Z = 1
+00000110100010 //9.	clrf 0x22	mem[0x22] <= 0x00 and Z = 1
+00010100100000 //10.	andwf 0 0x20	W <= W & mem[0x20] = 0x89 & 0xAB = 0x89 and !Z
+00010110100000 //11.	andwf 1 0x20	mem[0x20] <= W & mem[0x20] = 0x89 & 0xAB = 0x89 and !Z
+00010100100010 //12.	andwf 0 0x22	W <= W & mem[0x22] = 0x89 & 0x00 = 0x00 and Z
+00000110000011 //13.	clrf STATUS	STATUS <= 0x00 and Z = 0x04
+00100000000011 //14.	movfw 0 STATUS	W <= STATUS = 0x04 and !Z
+00000100000000 //15.	clrw		W <= 0x00 and Z
+10100000000001 //16.	goto 1 		PC <= 0x01 (the first movlw instruction)
+11000011101111 //17.	movlw 0xEF	

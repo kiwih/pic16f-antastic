@@ -58,8 +58,6 @@ wire [12:0] pc_out;
 wire pc_incr_en;
 wire pc_j_en;
 
-wire status_wr;
-wire [7:0] status_reg_in;
 wire status_irp;
 wire [1:0] status_rp;
 wire status_n_to;
@@ -162,8 +160,8 @@ program_counter pc(
 status_register streg (
 	.clk(clk),
 	.rst(rst),
-	.status_wr(status_wr),
-	.status_reg_in(status_reg_in),
+	.status_wr(status_reg_wr_en),
+	.status_reg_in(alu_out),
 	.status_reg_out(status_reg_out), 
 	.irp(status_irp),       	
 	.rp(status_rp),  

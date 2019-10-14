@@ -75,11 +75,57 @@ always @* begin
 	clr_stall <= 1'd0;
 	
 	casez(instr_current)
+	
 	isa_addwf: begin
 		case(q_count)
 		2'd2: begin
 			alu_sel_l <= 1'd0;
 			alu_op <= alu_op_add;
+			alu_status_wr_en <= 1'd1;
+			alu_d_wr_en <= 1'd1;
+		end		
+		2'd3: begin
+			instr_rd_en <= 1'd1;
+			pc_incr_en <= 1'd1;
+		end
+		endcase
+	end
+	
+	isa_andwf: begin
+		case(q_count)
+		2'd2: begin
+			alu_sel_l <= 1'd0;
+			alu_op <= alu_op_and;
+			alu_status_wr_en <= 1'd1;
+			alu_d_wr_en <= 1'd1;
+		end		
+		2'd3: begin
+			instr_rd_en <= 1'd1;
+			pc_incr_en <= 1'd1;
+		end
+		endcase
+	end
+	
+	isa_clrf: begin
+		case(q_count)
+		2'd2: begin
+			alu_sel_l <= 1'd0;
+			alu_op <= alu_op_clr;
+			alu_status_wr_en <= 1'd1;
+			alu_d_wr_en <= 1'd1;
+		end		
+		2'd3: begin
+			instr_rd_en <= 1'd1;
+			pc_incr_en <= 1'd1;
+		end
+		endcase
+	end
+	
+	isa_clrw: begin
+		case(q_count)
+		2'd2: begin
+			alu_sel_l <= 1'd0;
+			alu_op <= alu_op_clr;
 			alu_status_wr_en <= 1'd1;
 			alu_d_wr_en <= 1'd1;
 		end		
@@ -117,7 +163,7 @@ always @* begin
 		case(q_count)
 		2'd2: begin
 			alu_op <= alu_op_passw;
-			alu_status_wr_en <= 1'd1;
+			alu_status_wr_en <= 1'd0; //movwf does NOT set status bits
 			alu_d_wr_en <= 1'd1;
 		end		
 		2'd3: begin
@@ -131,6 +177,7 @@ always @* begin
 		case(q_count)
 		2'd2: begin
 			alu_sel_l <= 1'd0; //pass f, not l
+			alu_status_wr_en <= 1'd1; //movf does set status bits
 			alu_op <= alu_op_passlf;
 			alu_d_wr_en <= 1'd1;
 		end		
