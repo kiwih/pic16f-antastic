@@ -4,5 +4,8 @@
 # but not things ending in *.do
 !*.do
 
+#and not things ending in *.prog
+!*.prog
+
 #and not the gitignore
 !.gitignore
