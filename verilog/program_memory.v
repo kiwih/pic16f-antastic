@@ -10,6 +10,7 @@ module program_memory #(
 	output reg [INSTR_WIDTH - 1:0] instr
 );
 
+reg [INSTR_WIDTH - 1:0] instrReg;
 reg [INSTR_WIDTH - 1:0] instrMemory [2**ADDR_WIDTH - 1:0];
 
 initial begin
@@ -34,10 +35,14 @@ end
 //TODO: mif
 
 always @(posedge clk)
+	instrReg = instrMemory[addr];
+		
+always @(posedge clk)
 	if(rst | flush)
-		instr = {INSTR_WIDTH{1'b0}};
+		instr <= {INSTR_WIDTH{1'b0}};
 	else if(rd_en)
-		instr = instrMemory[addr];
-
+		instr <= instrReg;
+	
+		
 endmodule
 
