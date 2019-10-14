@@ -14,7 +14,9 @@ module instruction_decoder(
 	output reg instr_flush,
 	
 	output reg pc_incr_en,
-	output reg pc_j_en
+	output reg pc_j_en,
+	
+	input wire status_z
 );
 
 `include "isa.vh"
@@ -165,7 +167,22 @@ always @* begin
 		end
 		endcase
 	end
-	//isa_decfsz: //Decrement f, Skip if 0
+	
+	isa_decfsz: begin
+		case(q_count)
+		2'd2: begin
+			alu_sel_l <= 1'd0;
+			alu_op <= alu_op_dec;
+			alu_status_wr_en <= 1'd1;
+			alu_d_wr_en <= 1'd1;
+		end		
+		2'd3: begin
+			instr_flush <= status_z;
+			instr_rd_en <= ~status_z;
+			pc_incr_en <= 1'd1;
+		end
+		endcase
+	end
 	
 	isa_incf: begin
 		case(q_count)

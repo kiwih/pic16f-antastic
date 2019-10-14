@@ -26,5 +26,14 @@
 00010000100000 //25.	iorwf 0 0x20	W <= W | mem[0x20] = 0x00 | 0x76 = 0x76
 00010000100010 //26.	iorwf 0 0x22	W <= W | mem[0x22] = 0x76 | 0x01 = 0x77
 00010010100000 //27.	iorwf 1 0x20	mem[0x20] <= W | mem[0x20] = 0x77 | 0x76 = 0x77
+00101110100000 //28.	decfsz 1 0x20	mem[0x20] <= mem[0x20] - 1 SZ = 0x77 - 1 SZ = 0x76, !Z, NO SKIP
+11000010101011 //29.	movlw 0xAB	W <= 0xAB
+00101100100010 //30.	decfsz 0 0x22	W <= mem[0x22] - 1 SZ = 0x01 - 1 SZ = 0x00 Z, SKIP
+11000010101011 //31.	movlw 0xAB	SKIPPED W <= 0xAB
+00101110100010 //32.	decfsz 0 0x22	mem[0x22] <= mem[0x22] - 1 SZ = 0x01 - 1 SZ = 0x00 Z, SKIP
+11000010101011 //33.	movlw 0xAB	SKIPPED W <= 0xAB
+00101110100000 //34.	decfsz 1 0x20	mem[0x20] <= mem[0x20] - 1 SZ = 0x76 - 1 SZ = 0x75, !Z, NO SKIP
+11000011001101 //35.	movlw 0xCD	W <= 0xCD
+
 10100000000001 //xx.	goto 1 		PC <= 0x01 (the first movlw instruction)
 11000011101111 //xx.	movlw 0xEF	

@@ -237,7 +237,9 @@ instruction_decoder control(
 	.instr_flush(instr_flush),
 	
 	.pc_incr_en(pc_incr_en),
-	.pc_j_en(pc_j_en)
+	.pc_j_en(pc_j_en),
+	
+	.status_z(status_z)
 
 	
 );

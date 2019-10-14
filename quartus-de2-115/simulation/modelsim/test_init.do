@@ -427,6 +427,126 @@ if {[examine -radix hexadecimal sim:/picmicro_midrange_core/status_reg_out] != {
     abort
 }
 
+#address 28, which is 00101110100000 //28.	decfsz 1 0x20	mem[0x20] <= mem[0x20] - 1 SZ = 0x77 - 1 SZ = 0x76, !Z, NO SKIP
+run
+run
+run
+run
+if {[examine -radix hexadecimal {sim:/picmicro_midrange_core/regfile/gpRegistersA[0]}] != {76}} {
+    echo "FAIL TEST 28a"
+    abort
+}
+if {[examine -radix hexadecimal sim:/picmicro_midrange_core/status_reg_out] != {00}} {
+    echo "FAIL TEST 28b"
+    abort
+}
+if {[examine -radix binary sim:/picmicro_midrange_core/instr_flush] != 0} { 
+    echo "FAIL TEST 28c"
+    abort
+}
+
+#address 29, which is 11000010101011 //29.	movlw 0xAB	W <= 0xAB
+run
+run
+run
+run
+if {[examine -radix hexadecimal sim:/picmicro_midrange_core/w_reg_out] != {ab}} {
+    echo "FAIL TEST 29a"
+    abort
+}
+
+#address 30, which is 00101100100010 //30.	decfsz 0 0x22	W <= mem[0x22] - 1 SZ = 0x01 - 1 SZ = 0x00 Z, SKIP
+run
+run
+run
+run
+if {[examine -radix hexadecimal sim:/picmicro_midrange_core/w_reg_out] != {00}} {
+    echo "FAIL TEST 29a"
+    abort
+}
+if {[examine -radix hexadecimal sim:/picmicro_midrange_core/status_reg_out] != {04}} {
+    echo "FAIL TEST 30b"
+    abort
+}
+if {[examine -radix binary sim:/picmicro_midrange_core/instr_flush] != 1} { 
+    echo "FAIL TEST 30c"
+    abort
+}
+
+#address 31, which is 11000010101011 //31.	movlw 0xAB	SKIPPED W <= 0xAB
+run
+run
+run
+run
+if {[examine -radix unsigned sim:/picmicro_midrange_core/instr_current] != 0} {
+    echo "FAIL TEST 31a"
+    abort
+}
+if {[examine -radix hexadecimal sim:/picmicro_midrange_core/w_reg_out] != {00}} {
+    echo "FAIL TEST 31b"
+    abort
+}
+
+#address 32, which is 00101110100010 //32.	decfsz 0 0x22	mem[0x22] <= mem[0x22] - 1 SZ = 0x01 - 1 SZ = 0x00 Z, SKIP
+run
+run
+run
+run
+if {[examine -radix hexadecimal {sim:/picmicro_midrange_core/regfile/gpRegistersA[2]}] != {00}} {
+    echo "FAIL TEST 32a"
+    abort
+}
+if {[examine -radix hexadecimal sim:/picmicro_midrange_core/status_reg_out] != {04}} {
+    echo "FAIL TEST 32b"
+    abort
+}
+if {[examine -radix binary sim:/picmicro_midrange_core/instr_flush] != 1} { 
+    echo "FAIL TEST 32c"
+    abort
+}
+
+#address 33, which is 11000010101011 //33.	movlw 0xAB	SKIPPED W <= 0xAB
+run
+run
+run
+run
+if {[examine -radix unsigned sim:/picmicro_midrange_core/instr_current] != 0} {
+    echo "FAIL TEST 33a"
+    abort
+}
+if {[examine -radix hexadecimal sim:/picmicro_midrange_core/w_reg_out] != {00}} {
+    echo "FAIL TEST 33b"
+    abort
+}
+
+#address 34, which is 00101110100000 //34.	decfsz 1 0x20	mem[0x20] <= mem[0x20] - 1 SZ = 0x76 - 1 SZ = 0x75, !Z, NO SKIP
+run
+run
+run
+run
+if {[examine -radix hexadecimal {sim:/picmicro_midrange_core/regfile/gpRegistersA[0]}] != {75}} {
+    echo "FAIL TEST 34a"
+    abort
+}
+if {[examine -radix hexadecimal sim:/picmicro_midrange_core/status_reg_out] != {00}} {
+    echo "FAIL TEST 34b"
+    abort
+}
+if {[examine -radix binary sim:/picmicro_midrange_core/instr_flush] != 0} { 
+    echo "FAIL TEST 34c"
+    abort
+}
+
+#address 35, which is 11000011001101 //35.	movlw 0xCD	W <= 0xCD
+run
+run
+run
+run
+if {[examine -radix hexadecimal sim:/picmicro_midrange_core/w_reg_out] != {cd}} {
+    echo "FAIL TEST 35a"
+    abort
+}
+
 #echo "ALL TESTS PASSED"
 #abort
 
