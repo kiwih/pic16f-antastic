@@ -1,5 +1,5 @@
-//byte-oriented file register operations
-localparam isa_addwf	=	14'b00_0111_zzzz_zzzz; //Add W and f
+//byte-oriented file register operations														//implemented	//tested
+localparam isa_addwf	=	14'b00_0111_zzzz_zzzz; //Add W and f	
 localparam isa_andwf	=	14'b00_0101_zzzz_zzzz; //AND W with f
 localparam isa_clrf	=	14'b00_0001_1zzz_zzzz; //Clear f
 localparam isa_clrw	= 	14'b00_0001_0zzz_zzzz; //Clear W
@@ -33,7 +33,7 @@ localparam isa_sublw	=	14'b11_110z_zzzz_zzzz; //Subtract W from literal
 localparam isa_xorlw	=	14'b11_1010_zzzz_zzzz; //Exclusive OR literal with W
 
 //control operations
-localparam isa_nop	=	14'b00_0000_0zz0_0000; //No operation
+localparam isa_nop	=	14'b00_0000_0zz0_0000; //No operation							Yes				Yes
 localparam isa_call	=	14'b10_0zzz_zzzz_zzzz; //Call subroutine
 localparam isa_clrwdt=	14'b00_0000_0110_0100; //Clear Watchdog Timer
 localparam isa_goto	=	14'b10_1zzz_zzzz_zzzz; //Go to address

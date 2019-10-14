@@ -1,7 +1,8 @@
 00000000000000 //nop
-11000010101011 //movlw 0xAB
-00000010100000 //movwf 0x20
-11000011001101 //movlw 0xCD
-00100000100000 //movf(w) 0x20 
-10100000000001 //goto 0x001 (the movlw instruction)
+11000010101011 //movlw 0xAB	W <= 0xAB
+00000010100000 //movwf 0x20	mem[0x20] <= W = 0xAB
+11000011001101 //movlw 0xCD	W <= 0xCD
+00011100100000 //addwf 0 0x20	W <= W + mem[0x20] = 0xAB + 0xCD = Carry and 0x78
+00100000100000 //movfw 1 0x20  W <= mem[0x20]
+10100000000001 //goto 0x001 (the first movlw instruction)
 11000011101111 //movlw 0xEF

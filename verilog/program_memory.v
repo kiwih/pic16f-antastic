@@ -14,7 +14,14 @@ reg [INSTR_WIDTH - 1:0] instrMemory [2**ADDR_WIDTH - 1:0];
 
 initial begin
 	instr = {INSTR_WIDTH{1'b0}};
-	$readmemb("test.prog", instrMemory);
+	`ifdef MODEL_TECH
+	  // code for simulation with modelsim
+	  $readmemb("test.prog", instrMemory);
+	`else
+	  // code for synthesis
+	  $readmemb("./simulation/modelsim/test.prog", instrMemory);
+	`endif
+	
 //   instrMemory[0] = 14'b00_0000_0000_0000; //nop
 //	instrMemory[1] = 14'b11_0000_1010_1011; //movlw 0xAB
 //	instrMemory[2] = 14'b00_0000_1010_0000; //movwf 0x20

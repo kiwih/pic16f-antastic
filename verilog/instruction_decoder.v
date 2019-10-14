@@ -75,35 +75,37 @@ always @* begin
 	clr_stall <= 1'd0;
 	
 	casez(instr_current)
+	isa_addwf: begin
+		case(q_count)
+		2'd2: begin
+			alu_sel_l <= 1'd0;
+			alu_op <= alu_op_add;
+			alu_status_wr_en <= 1'd1;
+			alu_d_wr_en <= 1'd1;
+		end		
+		2'd3: begin
+			instr_rd_en <= 1'd1;
+			pc_incr_en <= 1'd1;
+		end
+		endcase
+	end
 	
 	isa_nop: begin
-		case(q_count)
-		
-		//2'd1:
-		//2'd2:
-		//2'd3:
-		
-		2'd3: begin
+		if(q_count == 2'd3) begin
 			pc_incr_en <= 1'd1;
 			instr_rd_en <= 1'd1;
 		end
-			
-		endcase
 	end
 	
 	isa_movlw: begin
 		case(q_count)
 		
-		2'd1: begin
+		2'd2: begin
 			alu_sel_l <= 1'd1;
 			alu_d <= 1'd0;
 			alu_op <= alu_op_passlf;
 			alu_d_wr_en <= 1'd1;
-		end
-		//2'd2:
-			//
-		//2'd3:
-		
+		end		
 		2'd3: begin
 			instr_rd_en <= 1'd1;
 			pc_incr_en <= 1'd1;
@@ -113,15 +115,11 @@ always @* begin
 		
 	isa_movwf: begin
 		case(q_count)
-		2'd1: begin
+		2'd2: begin
 			alu_op <= alu_op_passw;
 			alu_status_wr_en <= 1'd1;
 			alu_d_wr_en <= 1'd1;
-		end
-		//2'd2:
-			//
-		//2'd3:
-		
+		end		
 		2'd3: begin
 			instr_rd_en <= 1'd1;
 			pc_incr_en <= 1'd1;
@@ -131,15 +129,11 @@ always @* begin
 	
 	isa_movf: begin
 		case(q_count)
-		2'd1: begin
+		2'd2: begin
 			alu_sel_l <= 1'd0; //pass f, not l
 			alu_op <= alu_op_passlf;
 			alu_d_wr_en <= 1'd1;
-		end
-		//2'd2:
-			//
-		//2'd3:
-		
+		end		
 		2'd3: begin
 			instr_rd_en <= 1'd1;
 			pc_incr_en <= 1'd1;
@@ -148,24 +142,13 @@ always @* begin
 	end
 		
 	isa_goto: begin
-		case(q_count)
-		
-		//2'd1:
-		
-		//2'd2:
-		
-		2'd3: begin
+		if(q_count == 2'd3) begin
 			instr_flush <= 1'd1;
 			pc_j_en <= 1'd1; //the PC will load the j address
 		end
-		endcase
 	end
-//	
 	
 	endcase
-
-
-
 end
 
 
