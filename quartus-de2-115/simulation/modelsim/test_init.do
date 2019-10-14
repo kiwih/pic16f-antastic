@@ -267,7 +267,170 @@ if {[examine -radix hexadecimal sim:/picmicro_midrange_core/status_reg_out] != {
     abort
 }
 
-#address 16, which is 10100000000001 //16.	goto 1 		PC <= 0x01 (the first movlw instruction)
+#address 16, which is 00100110100000 //16.	comf 1 0x20	mem[0x20] <= ~mem[0x20] = 0x76
+run
+run
+run
+run
+if {[examine -radix hexadecimal {sim:/picmicro_midrange_core/regfile/gpRegistersA[0]}] != {76}} {
+    echo "FAIL TEST 16a"
+    abort
+}
+
+#address 17, which is 00100100100001 //17.	comf 0 0x21	W <= ~mem[0x21] = 0xFF
+run
+run
+run
+run
+if {[examine -radix hexadecimal sim:/picmicro_midrange_core/w_reg_out] != {ff}} {
+    echo "FAIL TEST 17a"
+    abort
+}
+if {[examine -radix hexadecimal sim:/picmicro_midrange_core/status_reg_out] != {00}} {
+    echo "FAIL TEST 17b"
+    abort
+}
+
+#address 18, which is 00100110100001 //18.	comf 1 0x21	mem[0x21] <= ~mem[0x21] = 0xFF
+run
+run
+run
+run
+if {[examine -radix hexadecimal {sim:/picmicro_midrange_core/regfile/gpRegistersA[1]}] != {ff}} {
+    echo "FAIL TEST 18a"
+    abort
+}
+if {[examine -radix hexadecimal sim:/picmicro_midrange_core/status_reg_out] != {00}} {
+    echo "FAIL TEST 18b"
+    abort
+}
+
+#address 19, which is 00101010100000 //19.	incf 1 0x20	mem[0x20] <= mem[0x20] + 1 = 0x76 + 1 = 0x77
+run
+run
+run
+run
+if {[examine -radix hexadecimal {sim:/picmicro_midrange_core/regfile/gpRegistersA[0]}] != {77}} {
+    echo "FAIL TEST 19a"
+    abort
+}
+if {[examine -radix hexadecimal sim:/picmicro_midrange_core/status_reg_out] != {00}} {
+    echo "FAIL TEST 19b"
+    abort
+}
+
+#address 20, which is 00101000100001 //20.	incf 0 0x21	W <= mem[0x21] + 1 = 0xFF + 1 = 0x00 and Z
+run
+run
+run
+run
+if {[examine -radix hexadecimal sim:/picmicro_midrange_core/w_reg_out] != {00}} {
+    echo "FAIL TEST 20a"
+    abort
+}
+if {[examine -radix hexadecimal {sim:/picmicro_midrange_core/regfile/gpRegistersA[1]}] != {ff}} {
+    echo "FAIL TEST 20b"
+    abort
+}
+if {[examine -radix hexadecimal sim:/picmicro_midrange_core/status_reg_out] != {04}} {
+    echo "FAIL TEST 20c"
+    abort
+}
+
+#address 21, which is 11000000000001 //21.	movlw 0x01	W <= 0x01
+run
+run
+run
+run
+if {[examine -radix hexadecimal sim:/picmicro_midrange_core/w_reg_out] != {01}} {
+    echo "FAIL TEST 21a"
+    abort
+}
+
+#address 22, which is 00000010100010 //22.	movwf 0x22	mem[0x22] <= W = 0x01
+run
+run
+run
+run
+if {[examine -radix hexadecimal {sim:/picmicro_midrange_core/regfile/gpRegistersA[2]}] != {01}} {
+    echo "FAIL TEST 22a"
+    abort
+}
+
+#address 23, which is 00001110100000 //23.	decf 1 0x20	mem[0x20] <= mem[0x20] - 1 = 0x77 - 1 = 0x76
+run
+run
+run
+run
+if {[examine -radix hexadecimal {sim:/picmicro_midrange_core/regfile/gpRegistersA[0]}] != {76}} {
+    echo "FAIL TEST 23a"
+    abort
+}
+if {[examine -radix hexadecimal sim:/picmicro_midrange_core/status_reg_out] != {00}} {
+    echo "FAIL TEST 23b"
+    abort
+}
+
+#address 24, which is 00001100100010 //24.	decf 0 0x22	W <= mem[0x22] - 1 = 0x01 - 1 = 0x00 and Z
+run
+run
+run
+run
+if {[examine -radix hexadecimal sim:/picmicro_midrange_core/w_reg_out] != {00}} {
+    echo "FAIL TEST 24a"
+    abort
+}
+if {[examine -radix hexadecimal sim:/picmicro_midrange_core/status_reg_out] != {04}} {
+    echo "FAIL TEST 24b"
+    abort
+}
+
+#address 25, which is 00010000100000 //25.	iorwf 0 0x20	W <= W | mem[0x20] = 0x00 | 0x76 = 0x76
+run
+run
+run
+run
+if {[examine -radix hexadecimal sim:/picmicro_midrange_core/w_reg_out] != {76}} {
+    echo "FAIL TEST 25a"
+    abort
+}
+if {[examine -radix hexadecimal sim:/picmicro_midrange_core/status_reg_out] != {00}} {
+    echo "FAIL TEST 25b"
+    abort
+}
+
+#address 26, which is 00010000100010 //26.	iorwf 0 0x21	W <= W | mem[0x22] = 0x76 | 0x01 = 0x77
+run
+run
+run
+run
+if {[examine -radix hexadecimal sim:/picmicro_midrange_core/w_reg_out] != {77}} {
+    echo "FAIL TEST 26a"
+    abort
+}
+if {[examine -radix hexadecimal sim:/picmicro_midrange_core/status_reg_out] != {00}} {
+    echo "FAIL TEST 26b"
+    abort
+}
+
+#address 27, which is 00010010100000 //27.	iorwf 1 0x20	mem[0x20] <= W | mem[0x20] = 0x77 | 0x76 = 0x77
+run
+run
+run
+run
+if {[examine -radix hexadecimal {sim:/picmicro_midrange_core/regfile/gpRegistersA[0]}] != {77}} {
+    echo "FAIL TEST 27a"
+    abort
+}
+if {[examine -radix hexadecimal sim:/picmicro_midrange_core/status_reg_out] != {00}} {
+    echo "FAIL TEST 27b"
+    abort
+}
+
+#echo "ALL TESTS PASSED"
+#abort
+
+#address xx, which is 10100000000001 //xx.	goto 1 		PC <= 0x01 (the first movlw instruction)
 run
 run
 run

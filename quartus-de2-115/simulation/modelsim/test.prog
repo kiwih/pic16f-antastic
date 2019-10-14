@@ -14,5 +14,17 @@
 00000110000011 //13.	clrf STATUS	STATUS <= 0x00 and Z = 0x04
 00100000000011 //14.	movfw 0 STATUS	W <= STATUS = 0x04 and !Z
 00000100000000 //15.	clrw		W <= 0x00 and Z
-10100000000001 //16.	goto 1 		PC <= 0x01 (the first movlw instruction)
-11000011101111 //17.	movlw 0xEF	
+00100110100000 //16.	comf 1 0x20	mem[0x20] <= ~mem[0x20] = 0x76
+00100100100001 //17.	comf 0 0x21	W <= ~mem[0x21] = 0xFF
+00100110100001 //18.	comf 1 0x21	mem[0x21] <= ~mem[0x21] = 0xFF
+00101010100000 //19.	incf 1 0x20	mem[0x20] <= mem[0x20] + 1 = 0x76 + 1 = 0x77
+00101000100001 //20.	incf 0 0x21	W <= mem[0x21] + 1 = 0xFF + 1 = 0x00 and Z
+11000000000001 //21.	movlw 0x01	W <= 0x01
+00000010100010 //22.	movwf 0x22	mem[0x22] <= W = 0x01
+00001110100000 //23.	decf 1 0x20	mem[0x20] <= mem[0x20] - 1 = 0x77 - 1 = 0x76
+00001100100010 //24.	decf 0 0x22	W <= mem[0x22] - 1 = 0x01 - 1 = 0x00 and Z
+00010000100000 //25.	iorwf 0 0x20	W <= W | mem[0x20] = 0x00 | 0x76 = 0x76
+00010000100010 //26.	iorwf 0 0x22	W <= W | mem[0x22] = 0x76 | 0x01 = 0x77
+00010010100000 //27.	iorwf 1 0x20	mem[0x20] <= W | mem[0x20] = 0x77 | 0x76 = 0x77
+10100000000001 //xx.	goto 1 		PC <= 0x01 (the first movlw instruction)
+11000011101111 //xx.	movlw 0xEF	

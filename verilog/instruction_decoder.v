@@ -136,20 +136,12 @@ always @* begin
 		endcase
 	end
 	
-	isa_nop: begin
-		if(q_count == 2'd3) begin
-			pc_incr_en <= 1'd1;
-			instr_rd_en <= 1'd1;
-		end
-	end
-	
-	isa_movlw: begin
+	isa_comf: begin
 		case(q_count)
-		
 		2'd2: begin
-			alu_sel_l <= 1'd1;
-			alu_d <= 1'd0;
-			alu_op <= alu_op_passlf;
+			alu_sel_l <= 1'd0;
+			alu_op <= alu_op_com;
+			alu_status_wr_en <= 1'd1;
 			alu_d_wr_en <= 1'd1;
 		end		
 		2'd3: begin
@@ -158,12 +150,45 @@ always @* begin
 		end
 		endcase
 	end
-		
-	isa_movwf: begin
+	
+	isa_decf: begin
 		case(q_count)
 		2'd2: begin
-			alu_op <= alu_op_passw;
-			alu_status_wr_en <= 1'd0; //movwf does NOT set status bits
+			alu_sel_l <= 1'd0;
+			alu_op <= alu_op_dec;
+			alu_status_wr_en <= 1'd1;
+			alu_d_wr_en <= 1'd1;
+		end		
+		2'd3: begin
+			instr_rd_en <= 1'd1;
+			pc_incr_en <= 1'd1;
+		end
+		endcase
+	end
+	//isa_decfsz: //Decrement f, Skip if 0
+	
+	isa_incf: begin
+		case(q_count)
+		2'd2: begin
+			alu_sel_l <= 1'd0;
+			alu_op <= alu_op_inc;
+			alu_status_wr_en <= 1'd1;
+			alu_d_wr_en <= 1'd1;
+		end		
+		2'd3: begin
+			instr_rd_en <= 1'd1;
+			pc_incr_en <= 1'd1;
+		end
+		endcase
+	end
+	//isa_incfsz: //Increment f, Skip if 0
+	
+	isa_iorwf: begin
+		case(q_count)
+		2'd2: begin
+			alu_sel_l <= 1'd0;
+			alu_op <= alu_op_or;
+			alu_status_wr_en <= 1'd1;
 			alu_d_wr_en <= 1'd1;
 		end		
 		2'd3: begin
@@ -187,6 +212,48 @@ always @* begin
 		end
 		endcase
 	end
+	
+	isa_movwf: begin
+		case(q_count)
+		2'd2: begin
+			alu_op <= alu_op_passw;
+			alu_status_wr_en <= 1'd0; //movwf does NOT set status bits
+			alu_d_wr_en <= 1'd1;
+		end		
+		2'd3: begin
+			instr_rd_en <= 1'd1;
+			pc_incr_en <= 1'd1;
+		end
+		endcase
+	end
+	
+	////////////////
+	
+	isa_nop: begin
+		if(q_count == 2'd3) begin
+			pc_incr_en <= 1'd1;
+			instr_rd_en <= 1'd1;
+		end
+	end
+	
+	isa_movlw: begin
+		case(q_count)
+		
+		2'd2: begin
+			alu_sel_l <= 1'd1;
+			alu_d <= 1'd0;
+			alu_op <= alu_op_passlf;
+			alu_d_wr_en <= 1'd1;
+		end		
+		2'd3: begin
+			instr_rd_en <= 1'd1;
+			pc_incr_en <= 1'd1;
+		end
+		endcase
+	end
+		
+	
+	
 		
 	isa_goto: begin
 		if(q_count == 2'd3) begin
