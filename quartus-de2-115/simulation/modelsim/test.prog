@@ -48,18 +48,21 @@
 //test rlf
 00000010100010 //45.    movwf 0x22          mem[0x22] <= W = 0xAB
 00110110100010 //46.    rlf 1 0x22          mem[0x22] <= mem[0x22] << 1 = 0x56 and C (Z not affected)
-00110100100010 //47.    rlf 0 0x22          W <= mem[0x22] << 1 = 0xAC and !C (Z not affected)
+00110100100010 //47.    rlf 0 0x22          W <= mem[0x22] << 1 = 0xAD and !C (Z not affected)
 //test rrf
 11000010101011 //48.    movlw 0xAB          W <= 0xAB
 00000010100010 //49.    movwf 0x22          mem[0x22] <= W = 0xAB
 00110010100010 //50.    rrf 1 0x22          mem[0x22] <= mem[0x22] << 1 = 0x55 and C (Z not affected)
-00110010100010 //51.    rrf 1 0x22          mem[0x22] <= mem[0x22] << 1 = 0x2A and C (Z not affected)
-00110000100010 //52.    rrf 0 0x22          W <= mem[0x22] << 1 = 0x15 and !C (Z not affected)
+00110010100010 //51.    rrf 1 0x22          mem[0x22] <= mem[0x22] << 1 = 0xaa and C (Z not affected)
+00110000100010 //52.    rrf 0 0x22          W <= mem[0x22] << 1 = 0xd5 and !C (Z not affected)
 //test subwf
-00001010100010 //53.    subwf 1 0x22        mem[0x22] <= mem[0x22] - W = 0x2A - 0x15 = 0x15 !Z !C 
-00001000100010 //54.    subwf 0 0x22        W         <= mem[0x22] - W = 0x15 - 0x15 = 0x0 Z !C 
-11000010101011 //55.    movlw 0xAB          W         <= 0xAB
-00001010100010 //56.    subwf 1 0x22        mem[0x22] <= mem[0x22] - W = 0x15 - 0xAB = 0x6a !Z C 
+11000000101010 //53a.   movlw 0x2A          W <= 0x2A
+00000010100010 //53b.   movwf 0x22          mem[0x22] <= W = 0x2A
+11000000010101 //53c.   movlw 0x15          W <= 0x15
+00001010100010 //54.    subwf 1 0x22        mem[0x22] <= mem[0x22] - W = 0x2A - 0x15 = 0x15 !Z !C 
+00001000100010 //55.    subwf 0 0x22        W         <= mem[0x22] - W = 0x15 - 0x15 = 0x0 Z !C 
+11000010101011 //56.    movlw 0xAB          W         <= 0xAB
+00001010100010 //57.    subwf 1 0x22        mem[0x22] <= mem[0x22] - W = 0x15 - 0xAB = 0x6a !Z C 
 
 
 10100000000001 //xx.    goto 1              PC <= 0x01 (the first movlw instruction)

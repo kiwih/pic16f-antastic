@@ -8,6 +8,8 @@ module alu (
 	
 	input wire alu_status_wr_en,
 	
+	input wire alu_c_in,		//carry bit from the status register
+	
 	output reg alu_out_w_wr_en,
 	output reg alu_out_f_wr_en,
 	
@@ -125,7 +127,7 @@ always @* begin
 		alu_op_rlf: begin //rotate f left thru carry
 			alu_out_c_wr_en <= alu_status_wr_en;
 			
-			temp_add = {op_lf, 1'd0};
+			temp_add = {op_lf, alu_c_in};
 			alu_out_c <= temp_add[8];
 			
 			alu_out = temp_add[7:0];
@@ -133,7 +135,7 @@ always @* begin
 		alu_op_rrf: begin //rotate f right thru carry
 			alu_out_c_wr_en <= alu_status_wr_en;
 			
-			temp_add = {1'd0, op_lf};
+			temp_add = {alu_c_in, op_lf};
 			alu_out_c <= temp_add[0];
 			
 			alu_out = temp_add[8:1];

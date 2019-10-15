@@ -303,7 +303,24 @@ always @* begin
 		end
 		endcase	
 	end
-	//isa_swapf: //Swap nibbles in f
+	
+	isa_swapf: begin //Swap nibbles in f
+		case(q_count)
+		2'd2: begin
+			alu_sel_l <= 1'd0;
+			alu_op <= alu_op_swapf;
+			alu_status_wr_en <= 1'd1;
+			alu_d_wr_en <= 1'd1;
+		end		
+		2'd3: begin
+			instr_rd_en <= 1'd1;
+			pc_incr_en <= 1'd1;
+		end
+		endcase	
+	end
+	
+	
+	
 	//isa_xorwf: //Exclusive OR W with f
 	
 	////////////////

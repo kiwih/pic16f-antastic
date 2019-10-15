@@ -265,6 +265,8 @@ alu a( //TODO: add a bit test field
 	
 	.alu_status_wr_en(alu_status_wr_en),
 	
+	.alu_c_in(status_c),
+	
 	.alu_out(alu_out),
 	.alu_out_z(alu_out_z),
 	.alu_out_z_wr_en(alu_out_z_wr_en),
