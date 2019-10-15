@@ -788,6 +788,72 @@ if {[examine -radix hexadecimal sim:/picmicro_midrange_core/status_reg_out] != {
     abort
 }
 
+# # # # # # # # # # # # subwf # # # # # # # # # # # # #
+
+#address 53, which is 00001010100010 //53.    subwf 1 0x22        mem[0x22] <= mem[0x22] - W = 0x2A - 0x15 = 0x15 !Z !C 
+run
+run
+run
+run
+if {[examine -radix hexadecimal {sim:/picmicro_midrange_core/regfile/gpRegistersA[2]}] != {15}} {
+    echo "FAIL TEST 53a"
+    abort
+}
+if {[examine -radix binary sim:/picmicro_midrange_core/status_z] != 0} { 
+    echo "FAIL TEST 53b"
+    abort
+}
+if {[examine -radix binary sim:/picmicro_midrange_core/status_c] != 0} { 
+    echo "FAIL TEST 53c"
+    abort
+}
+
+#address 54, which is 00001000100010 //54.    subwf 0 0x22        W         <= mem[0x22] - W = 0x15 - 0x15 = 0x0 Z !C 
+run
+run
+run
+run
+if {[examine -radix hexadecimal sim:/picmicro_midrange_core/w_reg_out] != {00}} {
+    echo "FAIL TEST 54a"
+    abort
+}
+if {[examine -radix binary sim:/picmicro_midrange_core/status_z] != 1} { 
+    echo "FAIL TEST 54b"
+    abort
+}
+if {[examine -radix binary sim:/picmicro_midrange_core/status_c] != 0} { 
+    echo "FAIL TEST 54c"
+    abort
+}
+
+#address 55, which is 11000010101011 //44.    movlw 0xAB          W <= 0xAB
+run
+run
+run
+run
+if {[examine -radix hexadecimal sim:/picmicro_midrange_core/w_reg_out] != {ab}} {
+    echo "FAIL TEST 55a"
+    abort
+} 
+
+#address 56, which is 00001010100010 //56.    subwf 1 0x22        mem[0x22] <= mem[0x22] - W = 0x15 - 0xAB = 0x6a !Z C 
+run
+run
+run
+run
+if {[examine -radix hexadecimal {sim:/picmicro_midrange_core/regfile/gpRegistersA[2]}] != {6a}} {
+    echo "FAIL TEST 56a"
+    abort
+}
+if {[examine -radix binary sim:/picmicro_midrange_core/status_z] != 0} { 
+    echo "FAIL TEST 56b"
+    abort
+}
+if {[examine -radix binary sim:/picmicro_midrange_core/status_c] != 1} { 
+    echo "FAIL TEST 56c"
+    abort
+}
+
 echo "ALL TESTS PASSED"
 abort
 
