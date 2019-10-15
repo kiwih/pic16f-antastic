@@ -78,7 +78,7 @@ always @* begin
 	
 	casez(instr_current)
 	
-	isa_addwf: begin
+	isa_addwf: begin //Add W and f	
 		case(q_count)
 		2'd2: begin
 			alu_sel_l <= 1'd0;
@@ -93,7 +93,7 @@ always @* begin
 		endcase
 	end
 	
-	isa_andwf: begin
+	isa_andwf: begin //AND W with f		
 		case(q_count)
 		2'd2: begin
 			alu_sel_l <= 1'd0;
@@ -108,7 +108,7 @@ always @* begin
 		endcase
 	end
 	
-	isa_clrf: begin
+	isa_clrf: begin //Clear f		
 		case(q_count)
 		2'd2: begin
 			alu_sel_l <= 1'd0;
@@ -123,7 +123,7 @@ always @* begin
 		endcase
 	end
 	
-	isa_clrw: begin
+	isa_clrw: begin //Clear W	
 		case(q_count)
 		2'd2: begin
 			alu_sel_l <= 1'd0;
@@ -138,7 +138,7 @@ always @* begin
 		endcase
 	end
 	
-	isa_comf: begin
+	isa_comf: begin //Complement f
 		case(q_count)
 		2'd2: begin
 			alu_sel_l <= 1'd0;
@@ -153,7 +153,7 @@ always @* begin
 		endcase
 	end
 	
-	isa_decf: begin
+	isa_decf: begin //Decrement f
 		case(q_count)
 		2'd2: begin
 			alu_sel_l <= 1'd0;
@@ -168,7 +168,7 @@ always @* begin
 		endcase
 	end
 	
-	isa_decfsz: begin
+	isa_decfsz: begin //Decrement f, Skip if 0	
 		case(q_count)
 		2'd2: begin
 			alu_sel_l <= 1'd0;
@@ -184,7 +184,7 @@ always @* begin
 		endcase
 	end
 	
-	isa_incf: begin
+	isa_incf: begin //Increment f	
 		case(q_count)
 		2'd2: begin
 			alu_sel_l <= 1'd0;
@@ -198,9 +198,24 @@ always @* begin
 		end
 		endcase
 	end
-	//isa_incfsz: //Increment f, Skip if 0
 	
-	isa_iorwf: begin
+	isa_incfsz: begin //Increment f, Skip if 0
+		case(q_count)
+		2'd2: begin
+			alu_sel_l <= 1'd0;
+			alu_op <= alu_op_inc;
+			alu_status_wr_en <= 1'd1;
+			alu_d_wr_en <= 1'd1;
+		end		
+		2'd3: begin
+			instr_flush <= status_z;
+			instr_rd_en <= ~status_z;
+			pc_incr_en <= 1'd1;
+		end
+		endcase
+	end
+	
+	isa_iorwf: begin //Inclusive OR W with f
 		case(q_count)
 		2'd2: begin
 			alu_sel_l <= 1'd0;
@@ -215,7 +230,7 @@ always @* begin
 		endcase
 	end
 	
-	isa_movf: begin
+	isa_movf: begin //Move f
 		case(q_count)
 		2'd2: begin
 			alu_sel_l <= 1'd0; //pass f, not l
@@ -230,7 +245,7 @@ always @* begin
 		endcase
 	end
 	
-	isa_movwf: begin
+	isa_movwf: begin //Move W to f
 		case(q_count)
 		2'd2: begin
 			alu_op <= alu_op_passw;
@@ -243,6 +258,25 @@ always @* begin
 		end
 		endcase
 	end
+	
+	isa_rlf: begin //Rotate Left f through Carry
+		case(q_count)
+		2'd2: begin
+			alu_sel_l <= 1'd0;
+			alu_op <= alu_op_rlf;
+			alu_status_wr_en <= 1'd1;
+			alu_d_wr_en <= 1'd1;
+		end		
+		2'd3: begin
+			instr_rd_en <= 1'd1;
+			pc_incr_en <= 1'd1;
+		end
+		endcase
+	end
+	//isa_rrf: //Rotate Right f through Carry
+	//isa_subwf: //Subtract W from f
+	//isa_swapf: //Swap nibbles in f
+	//isa_xorwf: //Exclusive OR W with f
 	
 	////////////////
 	

@@ -177,7 +177,7 @@ status_register streg (
 	.dc_in(alu_out_dc),
 	
 	.c(status_c),
-	.c_wr_en(alu_out_z_wr_en),
+	.c_wr_en(alu_out_c_wr_en),
 	.c_in(alu_out_c)
 );
 

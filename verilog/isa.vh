@@ -1,20 +1,20 @@
 //byte-oriented file register operations														//implemented	//tested
-localparam isa_addwf	=	14'b00_0111_zzzz_zzzz; //Add W and f	
-localparam isa_andwf	=	14'b00_0101_zzzz_zzzz; //AND W with f
-localparam isa_clrf	=	14'b00_0001_1zzz_zzzz; //Clear f
-localparam isa_clrw	= 	14'b00_0001_0zzz_zzzz; //Clear W
-localparam isa_comf	=	14'b00_1001_zzzz_zzzz; //Complement f
-localparam isa_decf	=	14'b00_0011_zzzz_zzzz; //Decrement f
-localparam isa_decfsz=	14'b00_1011_zzzz_zzzz; //Decrement f, Skip if 0
-localparam isa_incf	=	14'b00_1010_zzzz_zzzz; //Increment f
-localparam isa_incfsz=	14'b00_1111_zzzz_zzzz; //Increment f, Skip if 0
-localparam isa_iorwf =	14'b00_0100_zzzz_zzzz; //Inclusive OR W with f
-localparam isa_movf	=	14'b00_1000_zzzz_zzzz; //Move f
-localparam isa_movwf =	14'b00_0000_1zzz_zzzz; //Move W to f
+localparam isa_addwf	=	14'b00_0111_zzzz_zzzz; //Add W and f							Yes				Yes
+localparam isa_andwf	=	14'b00_0101_zzzz_zzzz; //AND W with f							Yes				Yes
+localparam isa_clrf	=	14'b00_0001_1zzz_zzzz; //Clear f									Yes				Yes
+localparam isa_clrw	= 	14'b00_0001_0zzz_zzzz; //Clear W									Yes				Yes
+localparam isa_comf	=	14'b00_1001_zzzz_zzzz; //Complement f							Yes				Yes
+localparam isa_decf	=	14'b00_0011_zzzz_zzzz; //Decrement f							Yes				Yes
+localparam isa_decfsz=	14'b00_1011_zzzz_zzzz; //Decrement f, Skip if 0				Yes				Yes
+localparam isa_incf	=	14'b00_1010_zzzz_zzzz; //Increment f							Yes				Yes
+localparam isa_incfsz=	14'b00_1111_zzzz_zzzz; //Increment f, Skip if 0				Yes				Yes
+localparam isa_iorwf =	14'b00_0100_zzzz_zzzz; //Inclusive OR W with f				Yes				Yes
+localparam isa_movf	=	14'b00_1000_zzzz_zzzz; //Move f									Yes				Yes
+localparam isa_movwf =	14'b00_0000_1zzz_zzzz; //Move W to f							Yes				Yes
 localparam isa_rlf	=	14'b00_1101_zzzz_zzzz; //Rotate Left f through Carry
 localparam isa_rrf	=	14'b00_1100_zzzz_zzzz; //Rotate Right f through Carry
 localparam isa_subwf	=	14'b00_0010_zzzz_zzzz; //Subtract W from f
-localparam isa_swapwf=	14'b00_1110_zzzz_zzzz; //Swap nibbles in f
+localparam isa_swapf=	14'b00_1110_zzzz_zzzz; //Swap nibbles in f
 localparam isa_xorwf =	14'b00_0110_zzzz_zzzz; //Exclusive OR W with f
 
 //bit-oriented file register operations
