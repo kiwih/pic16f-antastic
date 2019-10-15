@@ -69,7 +69,13 @@
 00000010100000 //61.    movwf 0x20          mem[0x20] <= W = 0xAB
 00111000100000 //62.    swapf 0 0x20        W         <= swap(mem[0x20) = swap(0xAB) = 0xBA
 00111010100000 //62.    swapf 1 0x20        mem[0x20] <= swap(mem[0x20) = swap(0xAB) = 0xBA
-//
+//test xorwf
+11000010101011 //70.    movlw 0xAB          W         <= 0xAB
+00000010100000 //71.    movwf 0x20          mem[0x20] <= W = 0xAB
+11000010100101 //72.    movlw 0xA5          W         <= 0xA5
+00011010100000 //73.    xorwf 0 0x20        mem[0x20] <= mem[0x20] ^ W = 0xAB ^ 0xA5 = 0x0E, !Z
+11000000001110 //74.    movlw 0x0E          W         <= 0x0E
+00011000100000 //75.    xorwf 1 0x20        mem[0x20] <= mem[0x20] ^ W = 0xA5 ^ 0xA5 = 0x00, Z
 //
 10100000000001 //xx.    goto 1              PC <= 0x01 (the first movlw instruction)
 11000011101111 //xx.    movlw 0xEF    

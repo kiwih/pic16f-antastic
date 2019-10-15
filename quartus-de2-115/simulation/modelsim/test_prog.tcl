@@ -930,6 +930,76 @@ if {[examine -radix hexadecimal {sim:/picmicro_midrange_core/regfile/gpRegisters
     abort
 }
 
+# # # # # # # # # # # xorwf # # # # # # # # # # # #
+
+#test 70, 11000010101011 //70.    movlw 0xAB          W         <= 0xAB
+run
+run
+run
+run
+if {[examine -radix hexadecimal sim:/picmicro_midrange_core/w_reg_out] != {ab}} {
+    echo "FAIL TEST 70a"
+    abort
+}
+
+#test 71, 00000010100000 //71.    movwf 0x20          mem[0x20] <= W = 0xAB
+run
+run
+run
+run
+if {[examine -radix hexadecimal {sim:/picmicro_midrange_core/regfile/gpRegistersA[0]}] != {ab}} {
+    echo "FAIL TEST 71a"
+    abort
+}
+
+#test 72, 11000010100101 //72.    movlw 0xA5          W         <= 0xA5
+run
+run
+run
+run
+if {[examine -radix hexadecimal sim:/picmicro_midrange_core/w_reg_out] != {a5}} {
+    echo "FAIL TEST 72"
+    abort
+}
+
+#test 73, 00011010100000 //73.    xorwf 0 0x20        mem[0x20] <= mem[0x20] ^ W = 0xAB ^ 0xA5 = 0x0E, !Z
+run
+run
+run
+run
+if {[examine -radix hexadecimal {sim:/picmicro_midrange_core/regfile/gpRegistersA[0]}] != {0e}} {
+    echo "FAIL TEST 73a"
+    abort
+}
+if {[examine -radix binary sim:/picmicro_midrange_core/status_z] != 0} { 
+    echo "FAIL TEST 73b"
+    abort
+}
+
+#test 74, 11000000001110 //74.    movlw 0x0E          W         <= 0x0E
+run
+run
+run
+run
+if {[examine -radix hexadecimal sim:/picmicro_midrange_core/w_reg_out] != {0e}} {
+    echo "FAIL TEST 74a"
+    abort
+}
+
+#test 75, 00011000100000 //75.    xorwf 1 0x20        mem[0x20] <= mem[0x20] ^ W = 0xA5 ^ 0xA5 = 0x00, Z
+run
+run
+run
+run
+if {[examine -radix hexadecimal sim:/picmicro_midrange_core/w_reg_out] != {00}} {
+    echo "FAIL TEST 75a"
+    abort
+}
+if {[examine -radix binary sim:/picmicro_midrange_core/status_z] != 1} { 
+    echo "FAIL TEST 75b"
+    abort
+}
+
 
 
 echo "ALL TESTS PASSED"
