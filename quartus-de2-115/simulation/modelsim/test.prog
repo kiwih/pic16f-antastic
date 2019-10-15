@@ -59,7 +59,7 @@
 00001010100010 //53.    subwf 1 0x22        mem[0x22] <= mem[0x22] - W = 0x2A - 0x15 = 0x15 !Z !C 
 00001000100010 //54.    subwf 0 0x22        W         <= mem[0x22] - W = 0x15 - 0x15 = 0x0 Z !C 
 11000010101011 //55.    movlw 0xAB          W         <= 0xAB
-00001010100010 //56.    subwf 1 0x22        mem[0x22] <= mem[0x22] - W = 0x15 - 0xAB = 0x69 !Z C 
+00001010100010 //56.    subwf 1 0x22        mem[0x22] <= mem[0x22] - W = 0x15 - 0xAB = 0x6a !Z C 
 
 
 10100000000001 //xx.    goto 1              PC <= 0x01 (the first movlw instruction)
