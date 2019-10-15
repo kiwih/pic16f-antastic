@@ -888,6 +888,50 @@ if {[examine -radix binary sim:/picmicro_midrange_core/status_c] != 1} {
     abort
 }
 
+# # # # # # # # # # swapf # # # # # # # # # # #
+
+#test 60, 11000010101011 //60.    movlw 0xAB          W         <= 0xAB
+run
+run
+run
+run
+if {[examine -radix hexadecimal sim:/picmicro_midrange_core/w_reg_out] != {ab}} {
+    echo "FAIL TEST 60a"
+    abort
+}
+
+#test 61, which is 00000010100000 //61.    movwf 0x20          mem[0x20] <= W = 0xAB
+run
+run
+run
+run
+if {[examine -radix hexadecimal {sim:/picmicro_midrange_core/regfile/gpRegistersA[0]}] != {ab}} {
+    echo "FAIL TEST 61a"
+    abort
+}
+
+#test 62, which is 00111000100000 //62.    swapf 0 0x20        W         <= swap(mem[0x20) = swap(0xAB) = 0xBA
+run
+run
+run
+run
+if {[examine -radix hexadecimal sim:/picmicro_midrange_core/w_reg_out] != {ba}} {
+    echo "FAIL TEST 62a"
+    abort
+}
+
+#test 63, which is 00111010100000 //63.    swapf 1 0x20        mem[0x20] <= swap(mem[0x20) = swap(0xAB) = 0xBA
+run
+run
+run
+run
+if {[examine -radix hexadecimal {sim:/picmicro_midrange_core/regfile/gpRegistersA[0]}] != {ba}} {
+    echo "FAIL TEST 63a"
+    abort
+}
+
+
+
 echo "ALL TESTS PASSED"
 abort
 

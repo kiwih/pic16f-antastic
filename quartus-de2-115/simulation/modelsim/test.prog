@@ -63,7 +63,13 @@
 00001000100010 //55.    subwf 0 0x22        W         <= mem[0x22] - W = 0x15 - 0x15 = 0x0 Z !C 
 11000010101011 //56.    movlw 0xAB          W         <= 0xAB
 00001010100010 //57.    subwf 1 0x22        mem[0x22] <= mem[0x22] - W = 0x15 - 0xAB = 0x6a !Z C 
-
-
+//test swapf
+//after this point each test will start at a multiple of 10 (like I should have done all along)
+11000010101011 //60.    movlw 0xAB          W         <= 0xAB
+00000010100000 //61.    movwf 0x20          mem[0x20] <= W = 0xAB
+00111000100000 //62.    swapf 0 0x20        W         <= swap(mem[0x20) = swap(0xAB) = 0xBA
+00111010100000 //62.    swapf 1 0x20        mem[0x20] <= swap(mem[0x20) = swap(0xAB) = 0xBA
+//
+//
 10100000000001 //xx.    goto 1              PC <= 0x01 (the first movlw instruction)
 11000011101111 //xx.    movlw 0xEF    

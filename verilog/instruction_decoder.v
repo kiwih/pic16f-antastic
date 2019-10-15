@@ -309,7 +309,7 @@ always @* begin
 		2'd2: begin
 			alu_sel_l <= 1'd0;
 			alu_op <= alu_op_swapf;
-			alu_status_wr_en <= 1'd1;
+			alu_status_wr_en <= 1'd0; //swapf does not affect status
 			alu_d_wr_en <= 1'd1;
 		end		
 		2'd3: begin
