@@ -21,6 +21,7 @@ module alu (
 	output reg alu_out_c,
 	output reg alu_out_c_wr_en,
 	
+	input wire [2:0] alu_b_in,
 	output reg alu_bit_test_res
 );
 
@@ -29,16 +30,17 @@ module alu (
 reg [5:0] temp_add_low;
 reg [8:0] temp_add;
 
-always @* begin
+always @(op_w, op_lf, op, alu_d_wr_en, alu_d, alu_status_wr_en, alu_c_in, alu_b_in) begin
+	//default behaviour for ALU out
 	alu_out_w_wr_en <= 1'b0;
 	alu_out_f_wr_en <= 1'b0;
 	if(!alu_d)
 		alu_out_w_wr_en <= alu_d_wr_en;
 	else //alu_d
 		alu_out_f_wr_en <= alu_d_wr_en;
-end
+		
+	alu_bit_test_res <= 1'd0;
 
-always @* begin
 	alu_out = 8'h0;
 	alu_out_z_wr_en <= 1'b0;
 	alu_out_z <= 1'b0;
@@ -76,7 +78,7 @@ always @* begin
 				alu_out_z <= 1'b1;
 		end
 		
-		alu_op_clr: begin //clr F or clr W
+		alu_op_zero: begin //clr F or clr W
 			alu_out = 8'h0;
 			alu_out_z <= 1'b1;
 			alu_out_z_wr_en <= alu_status_wr_en;
@@ -173,6 +175,33 @@ always @* begin
 			
 			if(alu_out == 8'h0) 
 				alu_out_z <= 1'b1;		
+		end
+		
+		alu_op_bs: begin
+			alu_out_w_wr_en <= 1'b0;
+			alu_out_f_wr_en <= alu_d_wr_en;
+			
+			alu_out <= op_lf | 1'b1 << alu_b_in;
+			
+			if(op_lf[alu_b_in]) 
+				alu_bit_test_res <= 1'b1;
+			
+			//if(alu_d_wr_en)			
+			//	alu_out[alu_b_in] <= 1'b1;
+				
+		end
+		
+		alu_op_bc: begin
+			alu_out_w_wr_en <= 1'b0;
+			alu_out_f_wr_en <= alu_d_wr_en;
+			
+			alu_out <= op_lf & ~(1'b1 << alu_b_in);
+			
+			if(!op_lf[alu_b_in]) 
+				alu_bit_test_res <= 1'b1;
+			
+//			if(alu_d_wr_en)
+//				alu_out[alu_b_in] <= 1'b0;
 		end
 		
 		default: begin

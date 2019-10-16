@@ -86,7 +86,13 @@
 00000010100000 //91.    movwf 0x20          mem[0x20] <= W = 0x40
 11000000101000 //92.    movlw 0x28          W         <= 0x28
 00001000100000 //93.    SUBwf 0 0x20        W         <= mem[0x20] - W = 0x40 - 0x28 = 0x18, !C, !Z, !DC
-//
+//test BSF/BCF
+11000010101011 //100.   movlw 0xAB          W         <= 0xAB
+00000010100000 //101.   movwf 0x20          mem[0x20] <= W = 0xAB
+01001110100000 //102.   bcf 7 0x20          mem[0x20] <= clr bit 7 of mem[0x20] = 0xAB clr bit 7 = 0x2B
+01010100100000 //103.   bsf 2 0x20          mem[0x20] <= set bit 2 of mem[0x20] = 0x2B set bit 2 = 0x2F
+
+
 //
 10100000000001 //xx.    goto 1              PC <= 0x01 (the first movlw instruction)
 11000011101111 //xx.    movlw 0xEF    

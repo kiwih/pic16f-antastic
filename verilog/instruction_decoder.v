@@ -9,6 +9,7 @@ module instruction_decoder(
 	output reg alu_d,
 	output reg [3:0] alu_op,
 	output reg alu_d_wr_en,
+	input wire alu_bit_test_res,
 	
 	output reg instr_rd_en,
 	output reg instr_flush,
@@ -112,7 +113,7 @@ always @* begin
 		case(q_count)
 		2'd2: begin
 			alu_sel_l <= 1'd0;
-			alu_op <= alu_op_clr;
+			alu_op <= alu_op_zero;
 			alu_status_wr_en <= 1'd1;
 			alu_d_wr_en <= 1'd1;
 		end		
@@ -127,7 +128,7 @@ always @* begin
 		case(q_count)
 		2'd2: begin
 			alu_sel_l <= 1'd0;
-			alu_op <= alu_op_clr;
+			alu_op <= alu_op_zero;
 			alu_status_wr_en <= 1'd1;
 			alu_d_wr_en <= 1'd1;
 		end		
@@ -324,6 +325,38 @@ always @* begin
 		2'd2: begin
 			alu_sel_l <= 1'd0;
 			alu_op <= alu_op_xor;
+			alu_status_wr_en <= 1'd1;
+			alu_d_wr_en <= 1'd1;
+		end		
+		2'd3: begin
+			instr_rd_en <= 1'd1;
+			pc_incr_en <= 1'd1;
+		end
+		endcase	
+	end
+	
+	//bit-oriented file register operations
+	
+	isa_bcf: begin //Bit Clear f
+		case(q_count)
+		2'd2: begin
+			alu_sel_l <= 1'd0;
+			alu_op <= alu_op_bc;
+			alu_status_wr_en <= 1'd1;
+			alu_d_wr_en <= 1'd1;
+		end		
+		2'd3: begin
+			instr_rd_en <= 1'd1;
+			pc_incr_en <= 1'd1;
+		end
+		endcase	
+	end
+	
+	isa_bsf: begin //Bit Set f
+		case(q_count)
+		2'd2: begin
+			alu_sel_l <= 1'd0;
+			alu_op <= alu_op_bs;
 			alu_status_wr_en <= 1'd1;
 			alu_d_wr_en <= 1'd1;
 		end		

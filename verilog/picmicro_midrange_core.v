@@ -231,6 +231,7 @@ instruction_decoder control(
 	.alu_sel_l(alu_sel_l),
 	.alu_d(alu_d),
 	.alu_status_wr_en(alu_status_wr_en),
+//	.alu_bit_test_res(alu_bit_test_res),
 	.alu_d_wr_en(alu_d_wr_en),	//write info for alu operations will pass thru ALU
 	
 	.instr_rd_en(instr_rd_en),
@@ -275,6 +276,7 @@ alu a( //TODO: add a bit test field
 	.alu_out_c(alu_out_c),
 	.alu_out_c_wr_en(alu_out_c_wr_en),
 	
+	.alu_b_in(instr_b),
 	.alu_bit_test_res(alu_bit_test_res)
 
 );

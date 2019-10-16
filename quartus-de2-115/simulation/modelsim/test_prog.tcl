@@ -1112,6 +1112,49 @@ if {[examine -radix hexadecimal sim:/picmicro_midrange_core/status_reg_out] != {
     abort
 }
 
+# # # # # # # # # # # # # bcf / bsf # # # # # # # # 3 # # 3 # # # #
+
+#test 100, 11000010101011 //100.   movlw 0xAB          W         <= 0xAB
+run
+run
+run
+run
+if {[examine -radix hexadecimal sim:/picmicro_midrange_core/w_reg_out] != {ab}} {
+    echo "FAIL TEST 100a"
+    abort
+}
+
+#test 101, 00000010100000 //101.   movwf 0x20          mem[0x20] <= W = 0xAB
+run
+run
+run
+run
+if {[examine -radix hexadecimal {sim:/picmicro_midrange_core/regfile/gpRegistersA[0]}] != {ab}} {
+    echo "FAIL TEST 101a"
+    abort
+}
+
+#test 102, 01001110100000 //102.   bcf 7 0x20          mem[0x20] <= clr bit 7 of mem[0x20] = 0xAB clr bit 7 = 0x2B
+run
+run
+run
+run
+if {[examine -radix hexadecimal {sim:/picmicro_midrange_core/regfile/gpRegistersA[0]}] != {2b}} {
+    echo "FAIL TEST 102a"
+    abort
+}
+
+#test 103, 01010100100000 //103.   bsf 2 0x20          mem[0x20] <= set bit 2 of mem[0x20] = 0x2B set bit 2 = 0x2F
+run
+run
+run
+run
+if {[examine -radix hexadecimal {sim:/picmicro_midrange_core/regfile/gpRegistersA[0]}] != {2f}} {
+    echo "FAIL TEST 103a"
+    abort
+}
+
+
 
 
 echo "ALL TESTS PASSED"
