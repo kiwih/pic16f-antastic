@@ -26,6 +26,7 @@ module alu (
 
 `include "alu_ops.vh"
 
+reg [5:0] temp_add_low;
 reg [8:0] temp_add;
 
 always @* begin
@@ -46,6 +47,7 @@ always @* begin
 	alu_out_c <= 1'b0;
 	alu_out_c_wr_en <= 1'b0;
 	temp_add = 9'd0;
+	temp_add_low = 5'd0;
 	
 	case(op)
 		alu_op_add: begin //add W and f or add literal and W
@@ -54,8 +56,10 @@ always @* begin
 			alu_out_c_wr_en <= alu_status_wr_en;
 			
 			temp_add = op_w + op_lf;
+			temp_add_low = op_w[3:0] + op_lf[3:0];
+			
 			alu_out_c <= temp_add[8];
-			alu_out_dc <= temp_add[4];
+			alu_out_dc <= temp_add_low[4];
 			
 			alu_out = temp_add[7:0];
 			
@@ -147,8 +151,10 @@ always @* begin
 			alu_out_c_wr_en <= alu_status_wr_en;
 			
 			temp_add = op_lf - op_w;
-			alu_out_c <= temp_add[8];
-			alu_out_dc <= temp_add[4];
+			temp_add_low = op_lf[3:0] - op_w[3:0];
+			
+			alu_out_c <= ~temp_add[8];
+			alu_out_dc <= ~temp_add_low[4];
 			
 			alu_out = temp_add[7:0];
 			

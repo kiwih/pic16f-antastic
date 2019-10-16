@@ -3,7 +3,7 @@
 00000010100000 //2.     movwf 0x20          mem[0x20] <= W = 0xAB
 11000011001101 //3.     movlw 0xCD          W <= 0xCD
 00000010100001 //4.     movwf 0x21          mem[0x21] <= W = 0xCD
-00011100100000 //5.     addwf 0 0x20        W <= W + mem[0x20] = 0xAB + 0xCD = Carry and 0x78
+00011100100000 //5.     addwf 0 0x20        W <= W + mem[0x20] = 0xAB + 0xCD = Carry and 0x78 and DC
 00100000100000 //6.     movfw 0 0x20        W <= mem[0x20] = 0xAB
 00010100100001 //7.     andwf 0 0x21        W <= W & mem[0x21] = 0xAB & 0xCD = 0x89
 00000110100001 //8.     clrf 0x21           mem[0x21] <= 0x00 and Z = 1
@@ -59,10 +59,10 @@
 11000000101010 //53a.   movlw 0x2A          W <= 0x2A
 00000010100010 //53b.   movwf 0x22          mem[0x22] <= W = 0x2A
 11000000010101 //53c.   movlw 0x15          W <= 0x15
-00001010100010 //54.    subwf 1 0x22        mem[0x22] <= mem[0x22] - W = 0x2A - 0x15 = 0x15 !Z !C 
-00001000100010 //55.    subwf 0 0x22        W         <= mem[0x22] - W = 0x15 - 0x15 = 0x0 Z !C 
+00001010100010 //54.    subwf 1 0x22        mem[0x22] <= mem[0x22] - W = 0x2A - 0x15 = 0x15 !Z C DC
+00001000100010 //55.    subwf 0 0x22        W         <= mem[0x22] - W = 0x15 - 0x15 = 0x0 Z C DC
 11000010101011 //56.    movlw 0xAB          W         <= 0xAB
-00001010100010 //57.    subwf 1 0x22        mem[0x22] <= mem[0x22] - W = 0x15 - 0xAB = 0x6a !Z C 
+00001010100010 //57.    subwf 1 0x22        mem[0x22] <= mem[0x22] - W = 0x15 - 0xAB = 0x6a !Z !C !DC 
 //test swapf
 //after this point each test will start at a multiple of 10 (like I should have done all along)
 11000010101011 //60.    movlw 0xAB          W         <= 0xAB
@@ -76,6 +76,17 @@
 00011010100000 //73.    xorwf 0 0x20        mem[0x20] <= mem[0x20] ^ W = 0xAB ^ 0xA5 = 0x0E, !Z
 11000000001110 //74.    movlw 0x0E          W         <= 0x0E
 00011000100000 //75.    xorwf 1 0x20        mem[0x20] <= mem[0x20] ^ W = 0xA5 ^ 0xA5 = 0x00, Z
+//test DC bit for addition
+11000000101000 //80.    movlw 0x28          W         <= 0x28
+00000010100000 //81.    movwf 0x20          mem[0x20] <= W = 0x28
+11000000011000 //82.    movlw 0x18          W         <= 0x18
+00011100100000 //83.    addwf 0 0x20        W         <= W + mem[0x20] = 0x28 + 0x18 = 0x40, !C, !Z, DC
+//test DC bit for subtraction
+11000001000000 //90.    movlw 0x40          W         <= 0x40
+00000010100000 //91.    movwf 0x20          mem[0x20] <= W = 0x40
+11000000101000 //92.    movlw 0x28          W         <= 0x28
+00001000100000 //93.    SUBwf 0 0x20        W         <= mem[0x20] - W = 0x40 - 0x28 = 0x18, !C, !Z, !DC
+//
 //
 10100000000001 //xx.    goto 1              PC <= 0x01 (the first movlw instruction)
 11000011101111 //xx.    movlw 0xEF    
