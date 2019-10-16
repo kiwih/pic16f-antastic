@@ -84,6 +84,8 @@ wire alu_out_c;
 wire alu_out_c_wr_en;
 wire alu_bit_test_res;
 
+wire bit_test_reg_out;
+
 //includes a register to save the current output(and only update upon rd_en)
 program_memory progmem (
 	.clk(clk),
@@ -231,7 +233,7 @@ instruction_decoder control(
 	.alu_sel_l(alu_sel_l),
 	.alu_d(alu_d),
 	.alu_status_wr_en(alu_status_wr_en),
-//	.alu_bit_test_res(alu_bit_test_res),
+	.bit_test_res(bit_test_reg_out),
 	.alu_d_wr_en(alu_d_wr_en),	//write info for alu operations will pass thru ALU
 	
 	.instr_rd_en(instr_rd_en),
@@ -252,6 +254,19 @@ generic_register w(
 	.d(alu_out),
 	.q(w_reg_out)
 );
+
+generic_register #(
+	.WIDTH(1),
+	.RESET_VALUE(1'd0)
+) bittestreg (
+	.clk(clk),
+	.rst(rst),
+	.wr_en(1'b1),
+	.d(alu_bit_test_res),
+	.q(bit_test_reg_out)
+);
+
+
 
 alu a( //TODO: add a bit test field
 	.op_w(w_reg_out),  
