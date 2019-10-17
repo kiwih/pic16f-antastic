@@ -92,8 +92,11 @@
 01001110100000 //102.   bcf 7 0x20          mem[0x20] <= clr bit 7 of mem[0x20] = 0xAB clr bit 7 = 0x2B
 01010100100000 //103.   bsf 2 0x20          mem[0x20] <= set bit 2 of mem[0x20] = 0x2B set bit 2 = 0x2F
 01100000100000 //104.   btfsc 0 0x20        skip next if bit 0 is 0 in mem[0x20], which is 0x2F, so no skip
-01101000100000 //105.   btfsc 4 0x20        skip next if bit 0 is 4 in mem[0x20], which is 0x2F, so skip
+01101000100000 //105.   btfsc 4 0x20        skip next if bit 4 is 0 in mem[0x20], which is 0x2F, so skip
 11000010101011 //106.   movlw 0xAB          SKIPPED W <= 0xAB
+01111000100000 //107.   btfss 0 0x20        skip next if bit 4 is 1 in mem[0x20], which is 0x2F, so no skip
+01110000100000 //108.   btfss 4 0x20        skip next if bit 0 is 1 in mem[0x20], which is 0x2F, so skip
+11000010101011 //109.   movlw 0xAB          SKIPPED W <= 0xAB
 
 //
 10100000000001 //xx.    goto 1              PC <= 0x01 (the first movlw instruction)

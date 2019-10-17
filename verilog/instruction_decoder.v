@@ -374,7 +374,7 @@ always @* begin
 			alu_sel_l <= 1'd0;
 			alu_op <= alu_op_bc;
 			alu_status_wr_en <= 1'd0; //we're just testing a bit
-			alu_d_wr_en <= 1'd1;
+			alu_d_wr_en <= 1'd0;		  //we're just testing a bit
 		end		
 		2'd3: begin
 			instr_flush <= bit_test_res;
@@ -386,7 +386,21 @@ always @* begin
 	
 	end
 	
-	//isa_btfss //Bit Test f, Skip if Set
+	isa_btfss: begin //Bit Test f, Skip if Set
+		case(q_count)
+		2'd2: begin
+			alu_sel_l <= 1'd0;
+			alu_op <= alu_op_bs;
+			alu_status_wr_en <= 1'd0; //we're just testing a bit
+			alu_d_wr_en <= 1'd0;      //we're just testing a bit
+		end		
+		2'd3: begin
+			instr_flush <= bit_test_res;
+			instr_rd_en <= ~bit_test_res;
+			pc_incr_en <= 1'd1;
+		end
+		endcase
+	end
 	
 	////////////////
 	

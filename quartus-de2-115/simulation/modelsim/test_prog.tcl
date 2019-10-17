@@ -1166,7 +1166,7 @@ if {[examine -radix binary sim:/picmicro_midrange_core/instr_flush] != 0} {
     abort
 }
 
-#test 105, 01101000100000 //105.   btfsc 4 0x20        skip next if bit 0 is 4 in mem[0x20], which is 0x2F, so skip
+#test 105, 01101000100000 //105.   btfsc 4 0x20        skip next if bit 4 is 0 in mem[0x20], which is 0x2F, so skip
 run
 run
 run
@@ -1182,7 +1182,37 @@ run
 run
 run
 if {[examine -radix unsigned sim:/picmicro_midrange_core/instr_current] != 0} {
-    echo "FAIL TEST xxb"
+    echo "FAIL TEST 106a"
+    abort
+}
+
+#test 107, 01111000100000 //107.   btfsc 0 0x20        skip next if bit 4 is 1 in mem[0x20], which is 0x2F, so no skip
+run
+run
+run
+run
+if {[examine -radix binary sim:/picmicro_midrange_core/instr_flush] != 0} { 
+    echo "FAIL TEST 107a"
+    abort
+}
+
+#test 108, 01110000100000 //108.   btfsc 4 0x20        skip next if bit 0 is 1 in mem[0x20], which is 0x2F, so skip
+run
+run
+run
+run
+if {[examine -radix binary sim:/picmicro_midrange_core/instr_flush] != 1} { 
+    echo "FAIL TEST 108a"
+    abort
+}
+
+#test 106, 11000010101011 //109.   movlw 0xAB          SKIPPED W <= 0xAB
+run
+run
+run
+run
+if {[examine -radix unsigned sim:/picmicro_midrange_core/instr_current] != 0} {
+    echo "FAIL TEST 109a"
     abort
 }
 

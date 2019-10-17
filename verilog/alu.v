@@ -183,8 +183,10 @@ always @(op_w, op_lf, op, alu_d_wr_en, alu_d, alu_status_wr_en, alu_c_in, alu_b_
 			
 			alu_out <= op_lf | 1'b1 << alu_b_in;
 			
-			if(op_lf[alu_b_in]) 
-				alu_bit_test_res <= 1'b1;
+			alu_bit_test_res <= ((op_lf & (1'b1 << alu_b_in)) != 8'd0);
+			
+			//if(op_lf[alu_b_in]) 
+			//	alu_bit_test_res <= 1'b1;
 			
 			//if(alu_d_wr_en)			
 			//	alu_out[alu_b_in] <= 1'b1;
