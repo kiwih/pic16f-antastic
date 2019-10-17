@@ -69,10 +69,10 @@ wire status_c;
 wire [7:0] w_reg_out;
 
 wire alu_sel_l; //if 1, the alu selects l, if 0, it selects f
-wire alu_d_wr_en;	//write info for alu operations will pass thru ALU
-wire alu_d;			//d sets the destination, either w (if 0) or f (if 1)
-wire alu_out_f_wr_en;
-wire alu_out_w_wr_en;
+
+wire f_wr_en;
+wire w_wr_en;
+
 wire [3:0] alu_op;
 wire [7:0] alu_out;
 wire alu_status_wr_en;
@@ -113,7 +113,7 @@ ram_file_registers regfile (
 	.clk(clk),
 	.rst(rst),
 	.addr(regfile_addr),
-	.wr_en(alu_out_f_wr_en),
+	.wr_en(f_wr_en),
 	.data_in(alu_out),
 	.data_out(regfile_data_out),
 	
@@ -231,10 +231,11 @@ instruction_decoder control(
 	
 	.alu_op(alu_op),
 	.alu_sel_l(alu_sel_l),
-	.alu_d(alu_d),
 	.alu_status_wr_en(alu_status_wr_en),
 	.bit_test_res(bit_test_reg_out),
-	.alu_d_wr_en(alu_d_wr_en),	//write info for alu operations will pass thru ALU
+	
+	.w_wr_en(w_wr_en),
+	.f_wr_en(f_wr_en),
 	
 	.instr_rd_en(instr_rd_en),
 	.instr_flush(instr_flush),
@@ -250,7 +251,7 @@ instruction_decoder control(
 generic_register w(
 	.clk(clk),
 	.rst(rst),
-	.wr_en(alu_out_w_wr_en),
+	.wr_en(w_wr_en),
 	.d(alu_out),
 	.q(w_reg_out)
 );
@@ -271,13 +272,7 @@ generic_register #(
 alu a( //TODO: add a bit test field
 	.op_w(w_reg_out),  
 	.op_lf(alu_sel_l ? instr_l : regfile_data_out), 
-	.op(alu_op),
-	
-	.alu_d_wr_en(alu_d_wr_en),	//write info for alu operations will pass thru ALU
-	.alu_d(alu_d),				//d sets the destination, either w (if 0) or f (if 1)
-	
-	.alu_out_w_wr_en(alu_out_w_wr_en),
-	.alu_out_f_wr_en(alu_out_f_wr_en),
+	.op(alu_op),	
 	
 	.alu_status_wr_en(alu_status_wr_en),
 	

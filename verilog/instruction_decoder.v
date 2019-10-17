@@ -6,9 +6,10 @@ module instruction_decoder(
 	
 	output reg alu_status_wr_en,
 	output reg alu_sel_l,
-	output reg alu_d,
 	output reg [3:0] alu_op,
-	output reg alu_d_wr_en,
+
+	output reg f_wr_en,
+	output reg w_wr_en,
 	
 	input wire bit_test_res,
 	
@@ -50,6 +51,8 @@ reg clr_stall;
 
 reg [1:0] q_count = 2'd0; //used to count the 4 clock cycles of executing a command
 
+wire alu_d = instr_current[7]; //This is the default case. 0 = W register, 1 = F register
+
 always @(posedge clk) begin
 	if(rst)
 		q_count = 2'd0;
@@ -66,10 +69,8 @@ always @(posedge clk) begin
 end
 
 always @* begin
-	alu_d <= instr_current[7]; //This is the default case. 0 = W register, 1 = F register
 	alu_sel_l <= 1'd0;
 	alu_op <= 4'd0;
-	alu_d_wr_en <= 1'd0;
 	alu_status_wr_en <= 1'd0;
 	instr_rd_en <= 1'd0;
 	instr_flush <= 1'd0;
@@ -77,6 +78,8 @@ always @* begin
 	pc_j_en <= 1'd0;
 	set_stall <= 1'd0;
 	clr_stall <= 1'd0;
+	f_wr_en <= 1'd0;
+	w_wr_en <= 1'd0;
 	
 	casez(instr_current)
 	
@@ -86,7 +89,11 @@ always @* begin
 			alu_sel_l <= 1'd0;
 			alu_op <= alu_op_add;
 			alu_status_wr_en <= 1'd1;
-			alu_d_wr_en <= 1'd1;
+			
+			if(!alu_d)
+				w_wr_en <= 1'd1;
+			else //alu_d
+				f_wr_en <= 1'd1;
 		end		
 		2'd3: begin
 			instr_rd_en <= 1'd1;
@@ -101,7 +108,11 @@ always @* begin
 			alu_sel_l <= 1'd0;
 			alu_op <= alu_op_and;
 			alu_status_wr_en <= 1'd1;
-			alu_d_wr_en <= 1'd1;
+			
+			if(!alu_d)
+				w_wr_en <= 1'd1;
+			else //alu_d
+				f_wr_en <= 1'd1;
 		end		
 		2'd3: begin
 			instr_rd_en <= 1'd1;
@@ -116,7 +127,11 @@ always @* begin
 			alu_sel_l <= 1'd0;
 			alu_op <= alu_op_zero;
 			alu_status_wr_en <= 1'd1;
-			alu_d_wr_en <= 1'd1;
+			
+			if(!alu_d)
+				w_wr_en <= 1'd1;
+			else //alu_d
+				f_wr_en <= 1'd1;
 		end		
 		2'd3: begin
 			instr_rd_en <= 1'd1;
@@ -131,7 +146,11 @@ always @* begin
 			alu_sel_l <= 1'd0;
 			alu_op <= alu_op_zero;
 			alu_status_wr_en <= 1'd1;
-			alu_d_wr_en <= 1'd1;
+			
+			if(!alu_d)
+				w_wr_en <= 1'd1;
+			else //alu_d
+				f_wr_en <= 1'd1;
 		end		
 		2'd3: begin
 			instr_rd_en <= 1'd1;
@@ -146,7 +165,11 @@ always @* begin
 			alu_sel_l <= 1'd0;
 			alu_op <= alu_op_com;
 			alu_status_wr_en <= 1'd1;
-			alu_d_wr_en <= 1'd1;
+			
+			if(!alu_d)
+				w_wr_en <= 1'd1;
+			else //alu_d
+				f_wr_en <= 1'd1;
 		end		
 		2'd3: begin
 			instr_rd_en <= 1'd1;
@@ -161,7 +184,11 @@ always @* begin
 			alu_sel_l <= 1'd0;
 			alu_op <= alu_op_dec;
 			alu_status_wr_en <= 1'd1;
-			alu_d_wr_en <= 1'd1;
+			
+			if(!alu_d)
+				w_wr_en <= 1'd1;
+			else //alu_d
+				f_wr_en <= 1'd1;
 		end		
 		2'd3: begin
 			instr_rd_en <= 1'd1;
@@ -176,7 +203,11 @@ always @* begin
 			alu_sel_l <= 1'd0;
 			alu_op <= alu_op_dec;
 			alu_status_wr_en <= 1'd1;
-			alu_d_wr_en <= 1'd1;
+			
+			if(!alu_d)
+				w_wr_en <= 1'd1;
+			else //alu_d
+				f_wr_en <= 1'd1;
 		end		
 		2'd3: begin
 			instr_flush <= status_z;
@@ -192,7 +223,11 @@ always @* begin
 			alu_sel_l <= 1'd0;
 			alu_op <= alu_op_inc;
 			alu_status_wr_en <= 1'd1;
-			alu_d_wr_en <= 1'd1;
+			
+			if(!alu_d)
+				w_wr_en <= 1'd1;
+			else //alu_d
+				f_wr_en <= 1'd1;
 		end		
 		2'd3: begin
 			instr_rd_en <= 1'd1;
@@ -207,7 +242,11 @@ always @* begin
 			alu_sel_l <= 1'd0;
 			alu_op <= alu_op_inc;
 			alu_status_wr_en <= 1'd1;
-			alu_d_wr_en <= 1'd1;
+			
+			if(!alu_d)
+				w_wr_en <= 1'd1;
+			else //alu_d
+				f_wr_en <= 1'd1;
 		end		
 		2'd3: begin
 			instr_flush <= status_z;
@@ -223,7 +262,11 @@ always @* begin
 			alu_sel_l <= 1'd0;
 			alu_op <= alu_op_or;
 			alu_status_wr_en <= 1'd1;
-			alu_d_wr_en <= 1'd1;
+			
+			if(!alu_d)
+				w_wr_en <= 1'd1;
+			else //alu_d
+				f_wr_en <= 1'd1;
 		end		
 		2'd3: begin
 			instr_rd_en <= 1'd1;
@@ -238,7 +281,11 @@ always @* begin
 			alu_sel_l <= 1'd0; //pass f, not l
 			alu_status_wr_en <= 1'd1; //movf does set status bits
 			alu_op <= alu_op_passlf;
-			alu_d_wr_en <= 1'd1;
+			
+			if(!alu_d)
+				w_wr_en <= 1'd1;
+			else //alu_d
+				f_wr_en <= 1'd1;
 		end		
 		2'd3: begin
 			instr_rd_en <= 1'd1;
@@ -252,7 +299,11 @@ always @* begin
 		2'd2: begin
 			alu_op <= alu_op_passw;
 			alu_status_wr_en <= 1'd0; //movwf does NOT set status bits
-			alu_d_wr_en <= 1'd1;
+			
+			//if(!alu_d)
+			//	w_wr_en <= 1'd1;
+			//else //alu_d
+			f_wr_en <= 1'd1;
 		end		
 		2'd3: begin
 			instr_rd_en <= 1'd1;
@@ -267,7 +318,11 @@ always @* begin
 			alu_sel_l <= 1'd0;
 			alu_op <= alu_op_rlf;
 			alu_status_wr_en <= 1'd1;
-			alu_d_wr_en <= 1'd1;
+			
+			if(!alu_d)
+				w_wr_en <= 1'd1;
+			else //alu_d
+				f_wr_en <= 1'd1;
 		end		
 		2'd3: begin
 			instr_rd_en <= 1'd1;
@@ -282,7 +337,11 @@ always @* begin
 			alu_sel_l <= 1'd0;
 			alu_op <= alu_op_rrf;
 			alu_status_wr_en <= 1'd1;
-			alu_d_wr_en <= 1'd1;
+			
+			if(!alu_d)
+				w_wr_en <= 1'd1;
+			else //alu_d
+				f_wr_en <= 1'd1;
 		end		
 		2'd3: begin
 			instr_rd_en <= 1'd1;
@@ -297,7 +356,11 @@ always @* begin
 			alu_sel_l <= 1'd0;
 			alu_op <= alu_op_sub;
 			alu_status_wr_en <= 1'd1;
-			alu_d_wr_en <= 1'd1;
+			
+			if(!alu_d)
+				w_wr_en <= 1'd1;
+			else //alu_d
+				f_wr_en <= 1'd1;
 		end		
 		2'd3: begin
 			instr_rd_en <= 1'd1;
@@ -312,7 +375,11 @@ always @* begin
 			alu_sel_l <= 1'd0;
 			alu_op <= alu_op_swapf;
 			alu_status_wr_en <= 1'd0; //swapf does not affect status
-			alu_d_wr_en <= 1'd1;
+			
+			if(!alu_d)
+				w_wr_en <= 1'd1;
+			else //alu_d
+				f_wr_en <= 1'd1;
 		end		
 		2'd3: begin
 			instr_rd_en <= 1'd1;
@@ -327,7 +394,11 @@ always @* begin
 			alu_sel_l <= 1'd0;
 			alu_op <= alu_op_xor;
 			alu_status_wr_en <= 1'd1;
-			alu_d_wr_en <= 1'd1;
+			
+			if(!alu_d)
+				w_wr_en <= 1'd1;
+			else //alu_d
+				f_wr_en <= 1'd1;
 		end		
 		2'd3: begin
 			instr_rd_en <= 1'd1;
@@ -344,7 +415,8 @@ always @* begin
 			alu_sel_l <= 1'd0;
 			alu_op <= alu_op_bc;
 			alu_status_wr_en <= 1'd1;
-			alu_d_wr_en <= 1'd1;
+			
+			f_wr_en <= 1'd1;
 		end		
 		2'd3: begin
 			instr_rd_en <= 1'd1;
@@ -359,7 +431,8 @@ always @* begin
 			alu_sel_l <= 1'd0;
 			alu_op <= alu_op_bs;
 			alu_status_wr_en <= 1'd1;
-			alu_d_wr_en <= 1'd1;
+			
+			f_wr_en <= 1'd1;
 		end		
 		2'd3: begin
 			instr_rd_en <= 1'd1;
@@ -374,7 +447,6 @@ always @* begin
 			alu_sel_l <= 1'd0;
 			alu_op <= alu_op_bc;
 			alu_status_wr_en <= 1'd0; //we're just testing a bit
-			alu_d_wr_en <= 1'd0;		  //we're just testing a bit
 		end		
 		2'd3: begin
 			instr_flush <= bit_test_res;
@@ -392,7 +464,6 @@ always @* begin
 			alu_sel_l <= 1'd0;
 			alu_op <= alu_op_bs;
 			alu_status_wr_en <= 1'd0; //we're just testing a bit
-			alu_d_wr_en <= 1'd0;      //we're just testing a bit
 		end		
 		2'd3: begin
 			instr_flush <= bit_test_res;
@@ -416,9 +487,8 @@ always @* begin
 		
 		2'd2: begin
 			alu_sel_l <= 1'd1;
-			alu_d <= 1'd0;
 			alu_op <= alu_op_passlf;
-			alu_d_wr_en <= 1'd1;
+			w_wr_en <= 1'd1;
 		end		
 		2'd3: begin
 			instr_rd_en <= 1'd1;

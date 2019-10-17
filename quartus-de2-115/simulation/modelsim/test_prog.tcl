@@ -9,12 +9,10 @@ sim:/picmicro_midrange_core/pc_out \
 sim:/picmicro_midrange_core/pc_incr_en \
 sim:/picmicro_midrange_core/pc_j_en \
 sim:/picmicro_midrange_core/w_reg_out \
+sim:/picmicro_midrange_core/f_wr_en \
+sim:/picmicro_midrange_core/w_wr_en \
 sim:/picmicro_midrange_core/alu_op \
-sim:/picmicro_midrange_core/alu_d \
-sim:/picmicro_midrange_core/alu_d_wr_en \
 sim:/picmicro_midrange_core/alu_status_wr_en \
-sim:/picmicro_midrange_core/alu_out_f_wr_en \
-sim:/picmicro_midrange_core/alu_out_w_wr_en \
 sim:/picmicro_midrange_core/alu_out \
 sim:/picmicro_midrange_core/alu_out_c_wr_en \
 sim:/picmicro_midrange_core/alu_out_c \
