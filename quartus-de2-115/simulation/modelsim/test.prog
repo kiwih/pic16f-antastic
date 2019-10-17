@@ -97,6 +97,10 @@
 01111000100000 //107.   btfss 0 0x20        skip next if bit 4 is 1 in mem[0x20], which is 0x2F, so no skip
 01110000100000 //108.   btfss 4 0x20        skip next if bit 0 is 1 in mem[0x20], which is 0x2F, so skip
 11000010101011 //109.   movlw 0xAB          SKIPPED W <= 0xAB
+//test ADDLW
+11000010101011 //120.   movlw 0xAB          W         <= 0xAB
+11111000001011 //121.   addlw 0x0B          W         <= 0xAB + 0x0B = 0xB6, !Z, !C, DC
+11111001001010 //122.   addlw 0x4A           W         <= 0xB6 + 0x4A = 0x00, Z, C, DC
 
 //
 10100000000001 //xx.    goto 1              PC <= 0x01 (the first movlw instruction)

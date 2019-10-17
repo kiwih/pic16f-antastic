@@ -473,18 +473,26 @@ always @* begin
 		endcase
 	end
 	
-	////////////////
-	
-	isa_nop: begin
-		if(q_count == 2'd3) begin
-			pc_incr_en <= 1'd1;
-			instr_rd_en <= 1'd1;
-		end
-	end
-	
-	isa_movlw: begin
+	//////////////////literal operations
+	isa_addlw: begin //Add literal and W
 		case(q_count)
-		
+		2'd2: begin
+			alu_sel_l <= 1'd1;
+			alu_op <= alu_op_add;
+			w_wr_en <= 1'd1;
+			alu_status_wr_en <= 1'd1;
+		end		
+		2'd3: begin
+			instr_rd_en <= 1'd1;
+			pc_incr_en <= 1'd1;
+		end
+		endcase
+	end
+	//isa_andlw //AND literal with W
+	//isa_iorlw //Inclusive Or literal with W
+	
+	isa_movlw: begin	//Move literal to W
+		case(q_count)
 		2'd2: begin
 			alu_sel_l <= 1'd1;
 			alu_op <= alu_op_passlf;
@@ -496,9 +504,21 @@ always @* begin
 		end
 		endcase
 	end
-		
+	//isa_retlw	//Return with literal in W
+	//isa_sublw	//Subtract W from literal
+	//isa_xorlw	//Exclusive OR literal with W
 	
 	
+	///////////////////////////////
+	
+	isa_nop: begin
+		if(q_count == 2'd3) begin
+			pc_incr_en <= 1'd1;
+			instr_rd_en <= 1'd1;
+		end
+	end
+	
+
 		
 	isa_goto: begin
 		if(q_count == 2'd3) begin
