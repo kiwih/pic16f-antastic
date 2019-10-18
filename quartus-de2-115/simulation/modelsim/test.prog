@@ -115,6 +115,11 @@
 11110010111011 //151.   sublw 0xBB          W         <= 0xBB - 0xAB = 0x10, !Z, C, DC
 11110000001111 //152.   sublw 0x09          W         <= 0x0F - 0x10 = 0xFF, !Z, !C, DC
 11110011111111 //153.   sublw 0xFF          W         <= 0xFF - 0xFF = 0x00, Z, C, DC
+//text XORLW
+11000010101011 //160.   movlw 0xAB          W         <= 0xAB
+11101010100100 //161.   xorlw 0xA5          W         <= 0xAB ^ 0xA5 = 0x0F, !Z
+11101000001111 //162.   xorlw 0x0F          W         <= 0x0F ^ 0x0F = 0x00, Z
+
 
 
 //

@@ -1401,6 +1401,46 @@ if {[examine -radix hexadecimal sim:/picmicro_midrange_core/status_reg_out] != {
     abort
 }
 
+# # # # # # # # # # # # # XORLW # # # # # # # # # # # # # # # # #
+
+#test 160, 11000010101011 //160.   movlw 0xAB          W         <= 0xAB
+run
+run
+run
+run
+if {[examine -radix hexadecimal sim:/picmicro_midrange_core/w_reg_out] != {ab}} {
+    echo "FAIL TEST 160a"
+    abort
+}
+
+#test 161, 11101010100100 //161.   xorlw 0xA5          W         <= 0xAB ^ 0xA5 = 0x0F, !Z
+run
+run
+run
+run
+if {[examine -radix hexadecimal sim:/picmicro_midrange_core/w_reg_out] != {0f}} {
+    echo "FAIL TEST 161a"
+    abort
+}
+if {[examine -radix hexadecimal sim:/picmicro_midrange_core/status_z] != {0}} {
+    echo "FAIL TEST 161b"
+    abort
+}
+
+#test 162, 11101000001111 //162.   xorlw 0x0F          W         <= 0x0F ^ 0x0F = 0x00, Z
+run
+run
+run
+run
+if {[examine -radix hexadecimal sim:/picmicro_midrange_core/w_reg_out] != {00}} {
+    echo "FAIL TEST 161a"
+    abort
+}
+if {[examine -radix hexadecimal sim:/picmicro_midrange_core/status_z] != {1}} {
+    echo "FAIL TEST 161b"
+    abort
+}
+
 
 echo "ALL TESTS PASSED"
 abort
