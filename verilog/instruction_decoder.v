@@ -18,6 +18,8 @@ module instruction_decoder(
 	
 	output reg pc_incr_en,
 	output reg pc_j_en,
+	output reg pc_j_and_push_en,
+	output reg pc_j_by_pop_en,
 	
 	input wire status_z
 );
@@ -45,10 +47,6 @@ module instruction_decoder(
 
 //reg two_cycle_instruction = 1'b0; //used when configuring a two-cycle instruction
 
-reg stall = 1'b0;
-reg set_stall;
-reg clr_stall;
-
 reg [1:0] q_count = 2'd0; //used to count the 4 clock cycles of executing a command
 
 wire alu_d = instr_current[7]; //This is the default case. 0 = W register, 1 = F register
@@ -60,14 +58,6 @@ always @(posedge clk) begin
 		q_count = q_count + 2'd1;
 end
 
-always @(posedge clk) begin
-	if(rst | clr_stall) begin
-		stall = 1'b0;
-	end else if (set_stall) begin
-		stall = 1'b1;
-	end
-end
-
 always @* begin
 	alu_sel_l <= 1'd0;
 	alu_op <= 4'd0;
@@ -76,10 +66,11 @@ always @* begin
 	instr_flush <= 1'd0;
 	pc_incr_en <= 1'd0;
 	pc_j_en <= 1'd0;
-	set_stall <= 1'd0;
-	clr_stall <= 1'd0;
+	pc_j_and_push_en <= 1'd0;
+	pc_j_by_pop_en <= 1'd0;
 	f_wr_en <= 1'd0;
 	w_wr_en <= 1'd0;
+
 	
 	casez(instr_current)
 	
@@ -573,14 +564,28 @@ always @* begin
 		end
 	end
 	
-
-		
+	isa_call: begin //Call subroutine
+		if(q_count == 2'd3) begin
+			instr_flush <= 1'd1;
+			pc_j_and_push_en <= 1'd1; //the PC will load the j address
+		end
+	end
+	//isa_clrwdt //Clear Watchdog Timer
+	
 	isa_goto: begin
 		if(q_count == 2'd3) begin
 			instr_flush <= 1'd1;
 			pc_j_en <= 1'd1; //the PC will load the j address
 		end
 	end
+	
+	//isa_retfie //Return from interrupt
+	//isa_return //Retrun from Subroutine
+	//isa_sleep //Go into standby mode
+	
+
+		
+	
 	
 	endcase
 end

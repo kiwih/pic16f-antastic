@@ -10,6 +10,8 @@ sim:/picmicro_midrange_core/instr_j \
 sim:/picmicro_midrange_core/pc_out \
 sim:/picmicro_midrange_core/pc_incr_en \
 sim:/picmicro_midrange_core/pc_j_en \
+sim:/picmicro_midrange_core/pc_j_and_push_en \
+sim:/picmicro_midrange_core/pc_j_by_pop_en \
 sim:/picmicro_midrange_core/w_reg_out \
 sim:/picmicro_midrange_core/f_wr_en \
 sim:/picmicro_midrange_core/w_wr_en \
@@ -31,7 +33,11 @@ sim:/picmicro_midrange_core/status_reg_out \
 sim:/picmicro_midrange_core/control/q_count \
 {sim:/picmicro_midrange_core/regfile/gpRegistersA[0]} \
 {sim:/picmicro_midrange_core/regfile/gpRegistersA[1]} \
-{sim:/picmicro_midrange_core/regfile/gpRegistersA[2]} 
+{sim:/picmicro_midrange_core/regfile/gpRegistersA[2]} \
+{sim:/picmicro_midrange_core/pc/hs/stack[0]} \
+{sim:/picmicro_midrange_core/pc/hs/stack[1]} \
+{sim:/picmicro_midrange_core/pc/hs/stack[2]} 
+
 force -freeze sim:/picmicro_midrange_core/rst 1 0
 force -freeze sim:/picmicro_midrange_core/clk 1 25, 0 {75 ps} -r 100
 #reset the core
@@ -42,13 +48,13 @@ run
 run
 run
 
-#execute the first command
+#execute the first command: 10100001010000 //00.    goto 0x50
 run
 run
 run
 run
 if {[examine -radix binary sim:/picmicro_midrange_core/instr_flush] != 1} { 
-    echo "FAIL TEST 00a"
+    echo "FAIL TEST 53"
     abort
 }
 
@@ -58,26 +64,46 @@ run
 run
 run
 if {[examine -radix unsigned sim:/picmicro_midrange_core/instr_current] != 0} {
-    echo "FAIL TEST 00b"
+    echo "FAIL TEST 63"
     abort
 }
 if {[examine -radix hexadecimal sim:/picmicro_midrange_core/pc_out] != {0050}} {
-    echo "FAIL TEST 00c"
+    echo "FAIL TEST 67"
     abort
 }
 
-#this instruction should have been flushed
+#execute 10000000000001 //50.    call 0x01
+run
+run
+run
+run
+if {[examine -radix binary sim:/picmicro_midrange_core/instr_flush] != 1} { 
+    echo "FAIL TEST 77"
+    abort
+}
+if {[examine -radix binary sim:/picmicro_midrange_core/pc_j_and_push_en] != 1} { 
+    echo "FAIL TEST 85"
+    abort
+}
+
+#this instruction should have been flushed as we jump to 0x01
 run
 run
 run
 run
 if {[examine -radix unsigned sim:/picmicro_midrange_core/instr_current] != 0} {
-    echo "FAIL TEST 50a"
+    echo "FAIL TEST 95"
     abort
 }
-if {[examine -radix hexadecimal sim:/picmicro_midrange_core/pc_out] != {0051}} {
-    echo "FAIL TEST 50b"
+if {[examine -radix hexadecimal sim:/picmicro_midrange_core/pc_out] != {0001}} {
+    echo "FAIL TEST 99"
+    abort
+}
+if {[examine -radix hexadecimal {sim:/picmicro_midrange_core/pc/hs/stack[0]}] != {0051}} {
+    echo "FAIL TEST 103"
     abort
 }
 
 #all tests passed
+echo "ALL CONTROL TESTS PASSED"
+abort

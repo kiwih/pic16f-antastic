@@ -57,6 +57,8 @@ wire [7:0] pcon_reg_out;
 wire [12:0] pc_out;
 wire pc_incr_en;
 wire pc_j_en;
+wire pc_j_and_push_en;
+wire pc_j_by_pop_en;
 
 wire status_irp;
 wire [1:0] status_rp;
@@ -150,6 +152,8 @@ program_counter pc(
 	
 	.pc_j_addr(instr_j),
 	.pc_j_en(pc_j_en),
+	.pc_j_and_push_en(pc_j_and_push_en),
+	.pc_j_by_pop_en(pc_j_by_pop_en),
 	
 	.pclath_wr_en(pclath_reg_wr_en),
 	.pclath_in(alu_out[4:0]),
@@ -242,6 +246,8 @@ instruction_decoder control(
 	
 	.pc_incr_en(pc_incr_en),
 	.pc_j_en(pc_j_en),
+	.pc_j_and_push_en(pc_j_and_push_en),
+	.pc_j_by_pop_en(pc_j_by_pop_en),
 	
 	.status_z(status_z)
 

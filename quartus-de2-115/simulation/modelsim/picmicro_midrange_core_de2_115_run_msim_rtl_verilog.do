@@ -5,6 +5,7 @@ if {[file exists rtl_work]} {
 vlib rtl_work
 vmap work rtl_work
 
+vlog -vlog01compat -work work +incdir+/home/hammond/Documents/quartus_projs/picmicro-midrange-core-hdl/verilog {/home/hammond/Documents/quartus_projs/picmicro-midrange-core-hdl/verilog/hardware_stack.v}
 vlog -vlog01compat -work work +incdir+/home/hammond/Documents/quartus_projs/picmicro-midrange-core-hdl/verilog {/home/hammond/Documents/quartus_projs/picmicro-midrange-core-hdl/verilog/status_register.v}
 vlog -vlog01compat -work work +incdir+/home/hammond/Documents/quartus_projs/picmicro-midrange-core-hdl/verilog {/home/hammond/Documents/quartus_projs/picmicro-midrange-core-hdl/verilog/ram_file_address_mux.v}
 vlog -vlog01compat -work work +incdir+/home/hammond/Documents/quartus_projs/picmicro-midrange-core-hdl/verilog {/home/hammond/Documents/quartus_projs/picmicro-midrange-core-hdl/verilog/generic_register.v}
