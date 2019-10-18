@@ -533,7 +533,21 @@ always @* begin
 		endcase
 	end
 	//isa_retlw	//Return with literal in W
-	//isa_sublw	//Subtract W from literal
+	
+	isa_sublw: begin	//Subtract W from literal
+		case(q_count)
+		2'd2: begin
+			alu_sel_l <= 1'd1;
+			alu_op <= alu_op_sub;
+			w_wr_en <= 1'd1;
+			alu_status_wr_en <= 1'd1;
+		end		
+		2'd3: begin
+			instr_rd_en <= 1'd1;
+			pc_incr_en <= 1'd1;
+		end
+		endcase
+	end
 	//isa_xorlw	//Exclusive OR literal with W
 	
 	
