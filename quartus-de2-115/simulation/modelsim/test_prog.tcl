@@ -1254,6 +1254,45 @@ if {[examine -radix hexadecimal sim:/picmicro_midrange_core/status_reg_out] != {
     abort
 }
 
+# # # # # # # # # # # # # ANDLW # # # # # # # # # # # # # # # # #
+
+#test 130, 11000010101011 //130.   movlw 0xAB          W         <= 0xAB
+run
+run
+run
+run
+if {[examine -radix hexadecimal sim:/picmicro_midrange_core/w_reg_out] != {ab}} {
+    echo "FAIL TEST 130a"
+    abort
+}
+
+#test 131, 111100100000001 //131.   andlw 0x01          W         <= 0xAB & 0x01 = 0x01 and !Z
+run
+run
+run
+run
+if {[examine -radix hexadecimal sim:/picmicro_midrange_core/w_reg_out] != {01}} {
+    echo "FAIL TEST 131a"
+    abort
+}
+if {[examine -radix hexadecimal sim:/picmicro_midrange_core/status_z] != {0}} {
+    echo "FAIL TEST 131b"
+    abort
+}
+
+#test 132, 11100100010000 //132.   andlw 0x10          W         <= 0x01 & 0x10 = 0x00 and Z
+run
+run
+run
+run
+if {[examine -radix hexadecimal sim:/picmicro_midrange_core/w_reg_out] != {00}} {
+    echo "FAIL TEST 132a"
+    abort
+}
+if {[examine -radix hexadecimal sim:/picmicro_midrange_core/status_z] != {1}} {
+    echo "FAIL TEST 132b"
+    abort
+}
 
 
 

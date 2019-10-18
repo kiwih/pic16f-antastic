@@ -100,7 +100,12 @@
 //test ADDLW
 11000010101011 //120.   movlw 0xAB          W         <= 0xAB
 11111000001011 //121.   addlw 0x0B          W         <= 0xAB + 0x0B = 0xB6, !Z, !C, DC
-11111001001010 //122.   addlw 0x4A           W         <= 0xB6 + 0x4A = 0x00, Z, C, DC
+11111001001010 //122.   addlw 0x4A          W         <= 0xB6 + 0x4A = 0x00, Z, C, DC
+//test ANDLW
+11000010101011 //130.   movlw 0xAB          W         <= 0xAB
+11100100000001 //131.   andlw 0x01          W         <= 0xAB & 0x01 = 0x01 and !Z
+11100100010000 //132.   andlw 0x10          W         <= 0x01 & 0x10 = 0x00 and Z
+
 
 //
 10100000000001 //xx.    goto 1              PC <= 0x01 (the first movlw instruction)
