@@ -11,7 +11,10 @@ sim:/picmicro_midrange_core/pc_j_en \
 sim:/picmicro_midrange_core/w_reg_out \
 sim:/picmicro_midrange_core/f_wr_en \
 sim:/picmicro_midrange_core/w_wr_en \
-sim:/picmicro_midrange_core/alu_op \
+sim:/picmicro_midrange_core/alu_sel_l \
+sim:/picmicro_midrange_core/a/op_lf \
+sim:/picmicro_midrange_core/a/op_w \
+sim:/picmicro_midrange_core/a/op \
 sim:/picmicro_midrange_core/alu_status_wr_en \
 sim:/picmicro_midrange_core/alu_out \
 sim:/picmicro_midrange_core/alu_out_c_wr_en \
@@ -1291,6 +1294,56 @@ if {[examine -radix hexadecimal sim:/picmicro_midrange_core/w_reg_out] != {00}} 
 }
 if {[examine -radix hexadecimal sim:/picmicro_midrange_core/status_z] != {1}} {
     echo "FAIL TEST 132b"
+    abort
+}
+
+# # # # # # # # # # # # # IORLW # # # # # # # # # # # # # # # # #
+
+#test 140, 11000010101011 //140.   movlw 0xAB          W         <= 0xAB
+run
+run
+run
+run
+if {[examine -radix hexadecimal sim:/picmicro_midrange_core/w_reg_out] != {ab}} {
+    echo "FAIL TEST 140a"
+    abort
+}
+
+#test 141, 11100100000100 //141.   iorlw 0x01          W         <= 0xAB | 0x04 = 0xAF and !Z
+run
+run
+run
+run
+if {[examine -radix hexadecimal sim:/picmicro_midrange_core/w_reg_out] != {af}} {
+    echo "FAIL TEST 141a"
+    abort
+}
+if {[examine -radix hexadecimal sim:/picmicro_midrange_core/status_z] != {0}} {
+    echo "FAIL TEST 141b"
+    abort
+}
+
+#test 142, 11000000000000 //142.   movlw 0x00          W         <= 0x00
+run
+run
+run
+run
+if {[examine -radix hexadecimal sim:/picmicro_midrange_core/w_reg_out] != {00}} {
+    echo "FAIL TEST 142a"
+    abort
+}
+
+#test 143, 11100100000000 //143.   iorlw 0x00          W         <= 0x00 | 0x00 = 0x00 and Z
+run
+run
+run
+run
+if {[examine -radix hexadecimal sim:/picmicro_midrange_core/w_reg_out] != {00}} {
+    echo "FAIL TEST 143a"
+    abort
+}
+if {[examine -radix hexadecimal sim:/picmicro_midrange_core/status_z] != {1}} {
+    echo "FAIL TEST 143b"
     abort
 }
 
