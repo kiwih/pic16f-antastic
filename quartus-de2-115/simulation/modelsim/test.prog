@@ -1,3 +1,4 @@
+//this program is suitable for testing all instructions except control instructions (e.g. call, retlw). It _does_ test the skip instructions and GOTO.
 00000000000000 //0.     nop
 11000010101011 //1.     movlw 0xAB          W <= 0xAB
 00000010100000 //2.     movwf 0x20          mem[0x20] <= W = 0xAB
@@ -119,9 +120,6 @@
 11000010101011 //160.   movlw 0xAB          W         <= 0xAB
 11101010100100 //161.   xorlw 0xA5          W         <= 0xAB ^ 0xA5 = 0x0F, !Z
 11101000001111 //162.   xorlw 0x0F          W         <= 0x0F ^ 0x0F = 0x00, Z
-
-
-
-//
+//test GOTO
 10100000000001 //xx.    goto 1              PC <= 0x01 (the first movlw instruction)
 11000011101111 //xx.    movlw 0xEF    

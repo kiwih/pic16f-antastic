@@ -17,7 +17,11 @@ initial begin
 	instr = {INSTR_WIDTH{1'b0}};
 	`ifdef MODEL_TECH
 	  // code for simulation with modelsim
-	  $readmemb("test.prog", instrMemory);
+	  `ifdef testcontrol
+			$readmemb("testcontrol.prog", instrMemory);
+	  `else
+			$readmemb("test.prog", instrMemory);
+		`endif
 	`else
 	  // code for synthesis
 	  $readmemb("./simulation/modelsim/test.prog", instrMemory);

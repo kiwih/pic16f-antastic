@@ -1441,9 +1441,8 @@ if {[examine -radix hexadecimal sim:/picmicro_midrange_core/status_z] != {1}} {
     abort
 }
 
-
-echo "ALL TESTS PASSED"
-abort
+#echo "ALL TESTS PASSED"
+#abort
 
 #address xx, which is 10100000000001 //xx.	goto 1 		PC <= 0x01 (the first movlw instruction)
 run
