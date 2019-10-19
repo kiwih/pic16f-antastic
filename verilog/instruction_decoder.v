@@ -523,7 +523,17 @@ always @* begin
 		end
 		endcase
 	end
-	//isa_retlw	//Return with literal in W
+	
+	isa_retlw: begin	//Return with literal in W
+		if(q_count == 2'd2) begin
+			alu_sel_l <= 1'd1;
+			alu_op <= alu_op_passlf;
+			w_wr_en <= 1'd1;
+		end else if(q_count == 2'd3) begin
+			instr_flush <= 1'd1;
+			pc_j_by_pop_en <= 1'd1; 
+		end
+	end
 	
 	isa_sublw: begin	//Subtract W from literal
 		case(q_count)
