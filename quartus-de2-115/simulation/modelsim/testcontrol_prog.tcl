@@ -34,9 +34,17 @@ sim:/picmicro_midrange_core/control/q_count \
 {sim:/picmicro_midrange_core/regfile/gpRegistersA[0]} \
 {sim:/picmicro_midrange_core/regfile/gpRegistersA[1]} \
 {sim:/picmicro_midrange_core/regfile/gpRegistersA[2]} \
+sim:/picmicro_midrange_core/pc/hs/tos \
 {sim:/picmicro_midrange_core/pc/hs/stack[0]} \
 {sim:/picmicro_midrange_core/pc/hs/stack[1]} \
 {sim:/picmicro_midrange_core/pc/hs/stack[2]} 
+
+
+
+
+
+
+
 
 force -freeze sim:/picmicro_midrange_core/rst 1 0
 force -freeze sim:/picmicro_midrange_core/clk 1 25, 0 {75 ps} -r 100
@@ -54,7 +62,7 @@ run
 run
 run
 if {[examine -radix binary sim:/picmicro_midrange_core/instr_flush] != 1} { 
-    echo "FAIL TEST 53"
+    echo "FAIL TEST 65"
     abort
 }
 
@@ -64,11 +72,11 @@ run
 run
 run
 if {[examine -radix unsigned sim:/picmicro_midrange_core/instr_current] != 0} {
-    echo "FAIL TEST 63"
+    echo "FAIL TEST 75"
     abort
 }
 if {[examine -radix hexadecimal sim:/picmicro_midrange_core/pc_out] != {0050}} {
-    echo "FAIL TEST 67"
+    echo "FAIL TEST 79"
     abort
 }
 
@@ -78,11 +86,11 @@ run
 run
 run
 if {[examine -radix binary sim:/picmicro_midrange_core/instr_flush] != 1} { 
-    echo "FAIL TEST 77"
+    echo "FAIL TEST 89"
     abort
 }
 if {[examine -radix binary sim:/picmicro_midrange_core/pc_j_and_push_en] != 1} { 
-    echo "FAIL TEST 85"
+    echo "FAIL TEST 93"
     abort
 }
 
@@ -92,15 +100,159 @@ run
 run
 run
 if {[examine -radix unsigned sim:/picmicro_midrange_core/instr_current] != 0} {
-    echo "FAIL TEST 95"
+    echo "FAIL TEST 103"
     abort
 }
 if {[examine -radix hexadecimal sim:/picmicro_midrange_core/pc_out] != {0001}} {
-    echo "FAIL TEST 99"
+    echo "FAIL TEST 107"
     abort
 }
 if {[examine -radix hexadecimal {sim:/picmicro_midrange_core/pc/hs/stack[0]}] != {0051}} {
-    echo "FAIL TEST 103"
+    echo "FAIL TEST 111"
+    abort
+}
+
+#execute 10000000000101 //01.    call 0x05 
+run
+run
+run
+run
+if {[examine -radix binary sim:/picmicro_midrange_core/instr_flush] != 1} { 
+    echo "FAIL TEST 121"
+    abort
+}
+if {[examine -radix binary sim:/picmicro_midrange_core/pc_j_and_push_en] != 1} { 
+    echo "FAIL TEST 125"
+    abort
+}
+
+#this instruction should have been flushed as we jump to 0x05
+run
+run
+run
+run
+if {[examine -radix unsigned sim:/picmicro_midrange_core/instr_current] != 0} {
+    echo "FAIL TEST 135"
+    abort
+}
+if {[examine -radix hexadecimal sim:/picmicro_midrange_core/pc_out] != {0005}} {
+    echo "FAIL TEST 139"
+    abort
+}
+if {[examine -radix hexadecimal {sim:/picmicro_midrange_core/pc/hs/stack[1]}] != {0002}} {
+    echo "FAIL TEST 143"
+    abort
+}
+if {[examine -radix hexadecimal sim:/picmicro_midrange_core/pc/hs/tos] != {2}} {
+    echo "FAIL TEST 147"
+    abort
+}
+if {[examine -radix hexadecimal sim:/picmicro_midrange_core/pc/hs/out] != {0002}} {
+    echo "FAIL TEST 151"
+    abort
+}
+
+#execute 11000000000101 //05.    movlw 0x05    
+run
+run
+run
+run
+if {[examine -radix hexadecimal sim:/picmicro_midrange_core/w_reg_out] != {05}} {
+    echo "FAIL TEST 161"
+    abort
+}
+
+#execute 00000000001000 //06.    return
+run
+run
+run
+run
+if {[examine -radix binary sim:/picmicro_midrange_core/instr_flush] != 1} { 
+    echo "FAIL TEST 171"
+    abort
+}
+if {[examine -radix hexadecimal sim:/picmicro_midrange_core/pc/hs/out] != {0002}} {
+    echo "FAIL TEST 201"
+    abort
+}
+if {[examine -radix binary sim:/picmicro_midrange_core/pc_j_by_pop_en] != 1} { 
+    echo "FAIL TEST 175"
+    abort
+}
+
+#this instruction should have been flushed as we return to 0x02
+run
+run
+run
+run
+if {[examine -radix unsigned sim:/picmicro_midrange_core/instr_current] != 0} {
+    echo "FAIL TEST 185"
+    abort
+}
+if {[examine -radix hexadecimal sim:/picmicro_midrange_core/pc_out] != {0002}} {
+    echo "FAIL TEST 189"
+    abort
+}
+if {[examine -radix hexadecimal {sim:/picmicro_midrange_core/pc/hs/stack[1]}] != {0002}} {
+    echo "FAIL TEST 193"
+    abort
+}
+if {[examine -radix hexadecimal sim:/picmicro_midrange_core/pc/hs/tos] != {1}} {
+    echo "FAIL TEST 197"
+    abort
+}
+if {[examine -radix hexadecimal sim:/picmicro_midrange_core/pc/hs/out] != {0051}} {
+    echo "FAIL TEST 201"
+    abort
+}
+
+#execute 11000000000010 //02.    movlw 0x02   
+run
+run
+run
+run
+if {[examine -radix hexadecimal sim:/picmicro_midrange_core/w_reg_out] != {02}} {
+    echo "FAIL TEST 215"
+    abort
+}
+
+#execute 00000000001000 //03.    return
+run
+run
+run
+run
+if {[examine -radix binary sim:/picmicro_midrange_core/instr_flush] != 1} { 
+    echo "FAIL TEST 225"
+    abort
+}
+if {[examine -radix hexadecimal sim:/picmicro_midrange_core/pc/hs/out] != {0051}} {
+    echo "FAIL TEST 229"
+    abort
+}
+if {[examine -radix binary sim:/picmicro_midrange_core/pc_j_by_pop_en] != 1} { 
+    echo "FAIL TEST 233"
+    abort
+}
+
+#this instruction should have been flushed as we return to 0x51
+run
+run
+run
+run
+if {[examine -radix unsigned sim:/picmicro_midrange_core/instr_current] != 0} {
+    echo "FAIL TEST 243"
+    abort
+}
+if {[examine -radix hexadecimal sim:/picmicro_midrange_core/pc_out] != {0051}} {
+    echo "FAIL TEST 247"
+    abort
+}
+if {[examine -radix hexadecimal sim:/picmicro_midrange_core/pc/hs/tos] != {0}} {
+    echo "FAIL TEST 251"
+    abort
+}
+if {[examine -radix hexadecimal sim:/picmicro_midrange_core/pc/hs/out] != {0000}} {
+    echo "FAIL TEST 255"
     abort
 }
 

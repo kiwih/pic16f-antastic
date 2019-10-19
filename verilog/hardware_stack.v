@@ -30,7 +30,7 @@ always @(posedge clk) begin
 	end
 end
 		
-assign out = stack[tos];
+assign out = stack[tos - 1'd1];
 //todo: finish
 endmodule
 	

@@ -570,6 +570,7 @@ always @* begin
 			pc_j_and_push_en <= 1'd1; //the PC will load the j address
 		end
 	end
+	
 	//isa_clrwdt //Clear Watchdog Timer
 	
 	isa_goto: begin
@@ -580,7 +581,14 @@ always @* begin
 	end
 	
 	//isa_retfie //Return from interrupt
-	//isa_return //Retrun from Subroutine
+	
+	isa_return: begin	//Retrun from Subroutine
+		if(q_count == 2'd3) begin
+			instr_flush <= 1'd1;
+			pc_j_by_pop_en <= 1'd1; 
+		end
+	end
+	
 	//isa_sleep //Go into standby mode
 	
 
