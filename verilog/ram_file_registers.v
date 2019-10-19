@@ -45,38 +45,54 @@ module ram_file_registers (
 reg [8:0] addr_reg = 9'd0;
 
 reg gpRegistersA_wr_en;
+reg [7:0] gpRegistersA_out;
+wire [8:0] gpRegistersA_addr = addr_reg - gpRegistersAStart;
 reg [7:0] gpRegistersA [gpRegistersALength - 1:0];
 
 reg gpRegistersB_wr_en;
+reg [7:0] gpRegistersB_out;
+wire [8:0] gpRegistersB_addr = addr_reg - gpRegistersBStart;
 reg [7:0] gpRegistersB [gpRegistersBLength - 1:0];
 
 reg gpRegistersC_wr_en;
+reg [7:0] gpRegistersC_out;
+wire [8:0] gpRegistersC_addr = addr_reg - gpRegistersCStart;
 reg [7:0] gpRegistersC [gpRegistersCLength - 1:0];
 
 reg gpRegistersShared_wr_en;
+reg [7:0] gpRegistersShared_out;
+wire [8:0] gpRegistersShared_addr = {3'b0, addr_reg[6:0]} - gpRegistersSharedStart;
 reg [7:0] gpRegistersShared [gpRegistersSharedLength - 1:0];
 
+always @(posedge clk)
+	addr_reg = addr;
+	
 always @(posedge clk) begin
-	if(rst)
-		addr_reg = 9'd0;
-	else
-		addr_reg = addr;
-		
 	if(gpRegistersA_wr_en) begin
-		gpRegistersA[addr_reg - gpRegistersAStart] <= data_in;
+		gpRegistersA[gpRegistersA_addr] <= data_in;
 	end
-	
+	gpRegistersA_out = gpRegistersA[gpRegistersA_addr];
+end
+
+always @(posedge clk) begin
 	if(gpRegistersB_wr_en) begin
-		gpRegistersB[addr_reg - gpRegistersBStart] <= data_in;
+		gpRegistersB[gpRegistersB_addr] <= data_in;
 	end
-	
+	gpRegistersB_out = gpRegistersB[gpRegistersB_addr];
+end
+
+always @(posedge clk) begin
 	if(gpRegistersC_wr_en) begin
-		gpRegistersC[addr_reg - gpRegistersCStart] <= data_in;
+		gpRegistersC[gpRegistersC_addr] <= data_in;
 	end
-	
+	gpRegistersC_out = gpRegistersC[gpRegistersC_addr];
+end
+
+always @(posedge clk) begin
 	if(gpRegistersShared_wr_en) begin
-		gpRegistersShared[addr_reg - gpRegistersSharedStart] <= data_in;
+		gpRegistersShared[gpRegistersShared_addr] <= data_in;
 	end
+	gpRegistersShared_out = gpRegistersShared[gpRegistersShared_addr];
 end
 
 always @* begin
@@ -134,16 +150,16 @@ always @* begin
 	default: 
 		if(addr_reg >= gpRegistersAStart && addr_reg < gpRegistersAStart + gpRegistersALength) begin
 			gpRegistersA_wr_en <= wr_en;
-			data_out <= gpRegistersA[addr_reg - gpRegistersAStart];
+			data_out <= gpRegistersA_out;
 		end else if(addr_reg >= gpRegistersBStart && addr_reg < gpRegistersBStart + gpRegistersBLength) begin
 			gpRegistersB_wr_en <= wr_en;
-			data_out <= gpRegistersB[addr_reg - gpRegistersBStart];
+			data_out <= gpRegistersB_out;
 		end else if(addr_reg >= gpRegistersCStart && addr_reg < gpRegistersCStart + gpRegistersCLength) begin
 			gpRegistersC_wr_en <= wr_en;
-			data_out <= gpRegistersC[addr_reg - gpRegistersCStart];
+			data_out <= gpRegistersC_out;
 		end else if({3'b0, addr_reg[6:0]} >= gpRegistersSharedStart && {3'b0, addr_reg[6:0]} < gpRegistersSharedStart + gpRegistersCLength) begin
 			gpRegistersShared_wr_en <= wr_en;
-			data_out <= gpRegistersShared[{3'b0, addr_reg[6:0]} - gpRegistersSharedStart];
+			data_out <= gpRegistersShared_out;
 		end else begin
 			data_out <= extern_peripherals_out;
 		end
