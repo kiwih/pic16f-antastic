@@ -4,7 +4,7 @@ module ram_file_registers (
 	input wire [8:0] addr,
 	input wire wr_en,
 	input wire [7:0] data_in,
-	output reg [7:0] data_out,
+	output reg [7:0] data_out, //can be thought of as "f"
 	
 	//pc inputs to ram_file_registers so they can be muxed on to the regfile_data_out
 	output reg pcl_reg_wr_en,
@@ -48,31 +48,26 @@ module ram_file_registers (
 
 `include "memory_map.vh"
 
-reg [8:0] addr_reg = 9'd0;
-
 reg gpRegistersA_wr_en;
 reg [7:0] gpRegistersA_out;
-wire [8:0] gpRegistersA_addr = addr_reg - gpRegistersAStart;
+wire [8:0] gpRegistersA_addr = addr - gpRegistersAStart;
 reg [7:0] gpRegistersA [gpRegistersALength - 1:0];
 
 reg gpRegistersB_wr_en;
 reg [7:0] gpRegistersB_out;
-wire [8:0] gpRegistersB_addr = addr_reg - gpRegistersBStart;
+wire [8:0] gpRegistersB_addr = addr - gpRegistersBStart;
 reg [7:0] gpRegistersB [gpRegistersBLength - 1:0];
 
 reg gpRegistersC_wr_en;
 reg [7:0] gpRegistersC_out;
-wire [8:0] gpRegistersC_addr = addr_reg - gpRegistersCStart;
+wire [8:0] gpRegistersC_addr = addr - gpRegistersCStart;
 reg [7:0] gpRegistersC [gpRegistersCLength - 1:0];
 
 reg gpRegistersShared_wr_en;
 reg [7:0] gpRegistersShared_out;
-wire [8:0] gpRegistersShared_addr = {2'b0, addr_reg[6:0]} - gpRegistersSharedStart;
+wire [8:0] gpRegistersShared_addr = {2'b0, addr[6:0]} - gpRegistersSharedStart;
 reg [7:0] gpRegistersShared [gpRegistersSharedLength - 1:0];
 
-always @(posedge clk)
-	addr_reg = addr;
-	
 always @(posedge clk) begin
 	if(gpRegistersA_wr_en) begin
 		gpRegistersA[gpRegistersA_addr] <= data_in;
@@ -101,7 +96,12 @@ always @(posedge clk) begin
 	gpRegistersShared_out = gpRegistersShared[gpRegistersShared_addr];
 end
 
-always @* begin
+reg [7:0] data_out_tmp = 8'd0;
+
+always @(posedge clk) 
+	data_out <= data_out_tmp;
+
+always @(*) begin
 	tmr0_reg_wr_en <= 1'b0;
 	option_reg_wr_en <= 1'b0;
 	pcl_reg_wr_en <= 1'b0;
@@ -117,69 +117,70 @@ always @* begin
 	gpRegistersB_wr_en <= 1'b0;
 	gpRegistersC_wr_en <= 1'b0;
 	gpRegistersShared_wr_en <= 1'b0;
+	data_out_tmp <= 8'd0;
 	
 	//indirect address handled at earlier stage
-	casez(addr_reg)
+	casez(addr)
 	tmr0_address: begin
 		tmr0_reg_wr_en <= wr_en;
-		data_out <= tmr0_reg_val;
+		data_out_tmp <= tmr0_reg_val;
 	end
 	
 	option_address: begin
 		option_reg_wr_en <= wr_en;
-		data_out <= option_reg_val;
+		data_out_tmp <= option_reg_val;
 	end
 	
 	pcl_address: begin
 		pcl_reg_wr_en <= wr_en;
-		data_out <= pcl_reg_val;
+		data_out_tmp <= pcl_reg_val;
 	end
 	
 	pclath_address: begin
 		pclath_reg_wr_en <= wr_en;
-		data_out <= pclath_reg_val;
+		data_out_tmp <= pclath_reg_val;
 	end
 	
 	status_address: begin
 		status_reg_wr_en <= wr_en;
-		data_out <= status_reg_val;
+		data_out_tmp <= status_reg_val;
 	end
 	
 	fsr_address: begin
 		fsr_reg_wr_en <= wr_en;
-		data_out <= fsr_reg_val;
+		data_out_tmp <= fsr_reg_val;
 	end
 	
 	intcon_address: begin
 		intcon_reg_wr_en <= wr_en;
-		data_out <= intcon_reg_val;
+		data_out_tmp <= intcon_reg_val;
 	end
 	
 	pir1_address: begin
 		pir1_reg_wr_en <= wr_en;
-		data_out <= pir1_reg_val;
+		data_out_tmp <= pir1_reg_val;
 	end
 	
 	pie1_address: begin
 		pie1_reg_wr_en <= wr_en;
-		data_out <= pie1_reg_val;
+		data_out_tmp <= pie1_reg_val;
 	end	
 	
 	default: 
-		if(addr_reg >= gpRegistersAStart && addr_reg < gpRegistersAStart + gpRegistersALength) begin
+		if(addr >= gpRegistersAStart && addr < gpRegistersAStart + gpRegistersALength) begin
 			gpRegistersA_wr_en <= wr_en;
-			data_out <= gpRegistersA_out;
-		end else if(addr_reg >= gpRegistersBStart && addr_reg < gpRegistersBStart + gpRegistersBLength) begin
+			data_out_tmp <= gpRegistersA_out;
+		end else if(addr >= gpRegistersBStart && addr < gpRegistersBStart + gpRegistersBLength) begin
 			gpRegistersB_wr_en <= wr_en;
-			data_out <= gpRegistersB_out;
-		end else if(addr_reg >= gpRegistersCStart && addr_reg < gpRegistersCStart + gpRegistersCLength) begin
+			data_out_tmp <= gpRegistersB_out;
+		end else if(addr >= gpRegistersCStart && addr < gpRegistersCStart + gpRegistersCLength) begin
 			gpRegistersC_wr_en <= wr_en;
-			data_out <= gpRegistersC_out;
-		end else if({3'b0, addr_reg[6:0]} >= gpRegistersSharedStart && {3'b0, addr_reg[6:0]} < gpRegistersSharedStart + gpRegistersCLength) begin
+			data_out_tmp <= gpRegistersC_out;
+		end else if({3'b0, addr[6:0]} >= gpRegistersSharedStart && {3'b0, addr[6:0]} < gpRegistersSharedStart + gpRegistersCLength) begin
 			gpRegistersShared_wr_en <= wr_en;
-			data_out <= gpRegistersShared_out;
+			data_out_tmp <= gpRegistersShared_out;
 		end else begin
-			data_out <= extern_peripherals_out;
+			data_out_tmp <= extern_peripherals_out;
 		end
 	endcase
 end

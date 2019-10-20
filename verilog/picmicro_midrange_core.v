@@ -326,8 +326,6 @@ generic_register #(
 
 
 alu a( 
-	.clk(clk),
-
 	.op_w(w_reg_out),  
 	.op_lf(alu_sel_l ? instr_l : regfile_data_out), 
 	.op(alu_op),	

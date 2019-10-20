@@ -1,6 +1,4 @@
 module alu (
-	input wire clk,
-	
 	input wire [7:0] op_w,  //this is always the w register
 	input wire [7:0] op_lf, //this is either a literal or a regfile register f
 	input wire [3:0] op,
@@ -33,7 +31,6 @@ reg [5:0] temp_add_low;
 reg [8:0] temp_add;
 
 always @(op_w, op_lf, op, alu_status_wr_en, alu_c_in, alu_b_in) begin
-//always @(posedge clk) begin
 	//default behaviour for ALU out
 	//alu_out_w_wr_en <= 1'b0;
 	//alu_out_f_wr_en <= 1'b0;
