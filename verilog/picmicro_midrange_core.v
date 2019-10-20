@@ -209,7 +209,7 @@ generic_register option(
 	.rst(rst),
 	.wr_en(option_reg_wr_en),
 	.d(alu_out),
-	.q(option_reg_out),
+	.q(option_reg_out)
 );
 
 generic_register fsrreg(
@@ -325,7 +325,9 @@ generic_register #(
 
 
 
-alu a( //TODO: add a bit test field
+alu a( 
+	.clk(clk),
+
 	.op_w(w_reg_out),  
 	.op_lf(alu_sel_l ? instr_l : regfile_data_out), 
 	.op(alu_op),	
