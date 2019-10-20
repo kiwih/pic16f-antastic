@@ -9,6 +9,8 @@ module generic_register #(
 	output reg [WIDTH - 1:0] q
 );
 
+initial q = RESET_VALUE;
+
 always @(posedge clk) begin
 	if(rst) begin
 		q <= RESET_VALUE;

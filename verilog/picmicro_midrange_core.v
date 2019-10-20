@@ -204,7 +204,9 @@ status_register streg (
 	.c_in(alu_out_c)
 );
 
-generic_register option(
+generic_register #(
+	.RESET_VALUE(8'hff)
+) option (
 	.clk(clk),
 	.rst(rst),
 	.wr_en(option_reg_wr_en),
@@ -253,6 +255,7 @@ generic_register pconreg(
 );
 
 tmr0wdt tmr0wdt(
+	.clk(clk),
 	.clkout(clkout),
 	.clk_t0cki(1'd0),				//the external tmr0 clock, T0CKI
 	.t0cs(option_reg_out[5]),	//trm0 clock source select bit, 1 = transition on t0cki, 0 = transition on clkout

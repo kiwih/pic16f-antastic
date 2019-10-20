@@ -20,7 +20,11 @@ initial begin
 	  `ifdef testcontrol
 			$readmemb("testcontrol.prog", instrMemory);
 	  `else
-			$readmemb("test.prog", instrMemory);
+			`ifdef test_tmr0
+				$readmemb("test_tmr0.prog", instrMemory);
+			`else
+				$readmemb("test.prog", instrMemory);
+			`endif
 		`endif
 	`else
 	  // code for synthesis
