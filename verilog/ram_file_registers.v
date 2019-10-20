@@ -19,6 +19,12 @@ module ram_file_registers (
 	
 	//core register outputs
 	//when the regfile_addr points at an internal register (e.g. STATUS) we'll need to load from them instead
+	output reg tmr0_reg_wr_en,
+	input wire [7:0] tmr0_reg_val,
+	
+	output reg option_reg_wr_en,
+	input wire [7:0] option_reg_val,
+	
 	output reg fsr_reg_wr_en,
 	input wire [7:0] fsr_reg_val,
 
@@ -61,7 +67,7 @@ reg [7:0] gpRegistersC [gpRegistersCLength - 1:0];
 
 reg gpRegistersShared_wr_en;
 reg [7:0] gpRegistersShared_out;
-wire [8:0] gpRegistersShared_addr = {3'b0, addr_reg[6:0]} - gpRegistersSharedStart;
+wire [8:0] gpRegistersShared_addr = {2'b0, addr_reg[6:0]} - gpRegistersSharedStart;
 reg [7:0] gpRegistersShared [gpRegistersSharedLength - 1:0];
 
 always @(posedge clk)
@@ -96,6 +102,8 @@ always @(posedge clk) begin
 end
 
 always @* begin
+	tmr0_reg_wr_en <= 1'b0;
+	option_reg_wr_en <= 1'b0;
 	pcl_reg_wr_en <= 1'b0;
 	pclath_reg_wr_en <= 1'b0;
 	status_reg_wr_en <= 1'b0;
@@ -112,6 +120,16 @@ always @* begin
 	
 	//indirect address handled at earlier stage
 	casez(addr_reg)
+	tmr0_address: begin
+		tmr0_reg_wr_en <= wr_en;
+		data_out <= tmr0_reg_val;
+	end
+	
+	option_address: begin
+		option_reg_wr_en <= wr_en;
+		data_out <= option_reg_val;
+	end
+	
 	pcl_address: begin
 		pcl_reg_wr_en <= wr_en;
 		data_out <= pcl_reg_val;

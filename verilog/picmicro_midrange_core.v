@@ -2,6 +2,7 @@
 
 module picmicro_midrange_core(
 	input wire clk,
+	input wire clk_wdt,
 	input wire rst,
 	
 	output wire [8:0] extern_peripherals_addr,
@@ -20,6 +21,10 @@ module picmicro_midrange_core(
 //
 
 `include "memory_map.vh"
+
+wire clkout; //this is the internally-generated clk/4 signal. Used for many peripherals.
+wire wdt_timeout;
+wire wdt_clr;
 
 wire instr_rd_en;
 wire instr_flush;
@@ -53,6 +58,12 @@ wire pie1_reg_wr_en;
 wire [7:0] pie1_reg_out;
 wire pcon_reg_wr_en;
 wire [7:0] pcon_reg_out;
+wire option_reg_wr_en;
+wire [7:0] option_reg_out;
+wire tmr0_reg_wr_en;
+wire [7:0] tmr0_reg_out;
+
+wire tmr0if_set_en;
 
 wire [12:0] pc_out;
 wire pc_incr_en;
@@ -128,6 +139,12 @@ ram_file_registers regfile (
 	.status_reg_wr_en(status_reg_wr_en),
 	.status_reg_val(status_reg_out),
 	
+	.tmr0_reg_wr_en(tmr0_reg_wr_en),
+	.tmr0_reg_val(tmr0_reg_out),
+	
+	.option_reg_wr_en(option_reg_wr_en),
+	.option_reg_val(option_reg_out),
+	
 	.fsr_reg_wr_en(fsr_reg_wr_en),
 	.fsr_reg_val(fsr_reg_out),		
 	.intcon_reg_wr_en(intcon_reg_wr_en),
@@ -187,6 +204,14 @@ status_register streg (
 	.c_in(alu_out_c)
 );
 
+generic_register option(
+	.clk(clk),
+	.rst(rst),
+	.wr_en(option_reg_wr_en),
+	.d(alu_out),
+	.q(option_reg_out),
+);
+
 generic_register fsrreg(
 	.clk(clk),
 	.rst(rst),
@@ -226,10 +251,33 @@ generic_register pconreg(
 	.d(alu_out), 
 	.q(pcon_reg_out)
 );
+
+tmr0wdt tmr0wdt(
+	.clkout(clkout),
+	.clk_t0cki(1'd0),				//the external tmr0 clock, T0CKI
+	.t0cs(option_reg_out[5]),	//trm0 clock source select bit, 1 = transition on t0cki, 0 = transition on clkout
+	.t0se(option_reg_out[4]),	//tmr0 source edge select bit, 1 = high-to-low transition on T0CKI, 0 = low-to-high
+	.clk_wdt(clk_wdt),			//the watchdog timer clock (usually independent)
+	.rst(rst),						//reset all counters
+	
+	.wdt_en(1'd1),					//enable the watchdog timer, 1=yes
+	.psa(option_reg_out[3]),	//psa bit chooses the purpose of the internal prescaler, 1=wdt postscaler, 0=tmr0 prescaler
+	.ps(option_reg_out[2:0]),	//ps chooses scaling of prescaler
+	
+	.tmr0_reg_in(alu_out),
+	.tmr0_reg_out(tmr0_reg_out),
+	
+	.wdt_clr(wdt_clr),
+	
+	.tmr0if_set_en(tmr0if_set_en), 	//set flag bit T0IF on tmr0 overflow
+	.wdt_timeout(wdt_timeout)			//set if wdt overflows
+);
 	
 instruction_decoder control(
 	.clk(clk),
 	.rst(rst),
+	
+	.clkout(clkout),
 	
 	.instr_current(instr_current),
 	
@@ -248,6 +296,8 @@ instruction_decoder control(
 	.pc_j_en(pc_j_en),
 	.pc_j_and_push_en(pc_j_and_push_en),
 	.pc_j_by_pop_en(pc_j_by_pop_en),
+	
+	.wdt_clr(wdt_clr),
 	
 	.status_z(status_z)
 

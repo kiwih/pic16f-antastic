@@ -1,6 +1,7 @@
 module instruction_decoder(
 	input wire clk,
 	input wire rst,
+	output reg clkout,
 	
 	input wire [13:0] instr_current,
 	
@@ -20,6 +21,8 @@ module instruction_decoder(
 	output reg pc_j_en,
 	output reg pc_j_and_push_en,
 	output reg pc_j_by_pop_en,
+	
+	output reg wdt_clr,
 	
 	input wire status_z
 );
@@ -70,6 +73,12 @@ always @* begin
 	pc_j_by_pop_en <= 1'd0;
 	f_wr_en <= 1'd0;
 	w_wr_en <= 1'd0;
+	wdt_clr <= 1'd0;
+	
+	clkout <= 1'd0; //generate clkout, which has frequency Fosc/4 (clk/4)
+	if(q_count == 2'd0 | q_count == 2'd1) begin
+		clkout <= 1'd1;
+	end
 
 	
 	casez(instr_current)
