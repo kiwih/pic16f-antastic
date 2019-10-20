@@ -40,6 +40,20 @@ always @(posedge clk_wdt) begin
 	wdt_reg <= wdt_reg + 8'd1;
 end
 
+//wire ext_clk = clk_t0cki;
+//reg ext_clk_prev = 1'd0;
+//reg ext_clk_edge;
+//
+//always @(posedge clkout)
+//	ext_clk_prev <= ext_clk;
+//	
+//always @* begin
+//	if(t0se) //high to low
+//		ext_clk_edge <= ext_clk_prev & !ext_clk;
+//	else //low to high
+//		ext_clk_edge <= !ext_clk_prev & ext_clk;
+//end
+
 always @* begin
 	if(t0cs) begin
 		tmr0_upcount_in = clk_t0cki ^ t0se;
@@ -90,7 +104,11 @@ always @* begin
 		wdt_timeout <= wdt_ovf;
 end
 
-//synchronisation for tmr0
+//the implementation of the sync module in the documentation block diagram is very odd and confusing
+//I struggled to get the timing characteristics correct when clocking it at clkout
+//Therefore, I have diverged from the documentation's block diagram and instead built something that operates to the
+//textual description
+
 reg tmr0_cnt_en;
 always @(posedge clk) begin
 	if(psa)
@@ -98,21 +116,23 @@ always @(posedge clk) begin
 	else
 		tmr0_cnt_en <= pres_out;
 end
+//
+//reg tmr0_cnt_en_prev = 1'd0;
+//wire tmr0_cnt_en_strobe;
+//always @(posedge clk)
+//	tmr0_cnt_en_prev <= tmr0_cnt_en;
 
-reg tmr0_cnt_en_prev = 1'd0;
-wire tmr0_cnt_en_strobe;
-always @(posedge clk)
-	tmr0_cnt_en_prev <= tmr0_cnt_en;
+//wire tmr0_cnt_en = 1'd1;
 
-assign tmr0_cnt_en_strobe = !	tmr0_cnt_en_prev & tmr0_cnt_en;
+//assign tmr0_cnt_en_strobe = !	tmr0_cnt_en_prev & tmr0_cnt_en;
 //tmr0
-always @(posedge clk) begin
+always @(posedge clkout) begin
 	tmr0if_set_en <= 1'd0;
 	if(rst)
 		tmr0_reg <= 8'd0;
 	else if(tmr0_reg_wr_en)
 		tmr0_reg <= tmr0_reg_in;
-	else if(tmr0_cnt_en_strobe) begin
+	else if(tmr0_cnt_en) begin
 		if(tmr0_reg == 8'hff) begin
 			tmr0if_set_en <= 1'd1;
 		end
