@@ -58,7 +58,7 @@ always @* begin
 	if(t0cs) begin
 		tmr0_upcount_in = clk_t0cki ^ t0se;
 	end else begin
-		tmr0_upcount_in = clkout;
+		tmr0_upcount_in = !clkout;
 	end
 end
 
@@ -109,13 +109,19 @@ end
 //Therefore, I have diverged from the documentation's block diagram and instead built something that operates to the
 //textual description
 
-reg tmr0_cnt_en;
+reg tmr0_cnt_en_in_prev = 1'd0;
+reg tmr0_cnt_en_in = 1'd0;
+reg tmr0_cnt_en = 1'd0;
+
 always @(posedge clk) begin
+	tmr0_cnt_en_in_prev = tmr0_cnt_en_in;
 	if(psa)
-		tmr0_cnt_en <= tmr0_upcount_in;
+		tmr0_cnt_en_in = tmr0_upcount_in;
 	else
-		tmr0_cnt_en <= pres_out;
+		tmr0_cnt_en_in = pres_out;
+	tmr0_cnt_en = !tmr0_cnt_en_in_prev & tmr0_cnt_en_in;
 end
+
 //
 //reg tmr0_cnt_en_prev = 1'd0;
 //wire tmr0_cnt_en_strobe;
@@ -126,7 +132,7 @@ end
 
 //assign tmr0_cnt_en_strobe = !	tmr0_cnt_en_prev & tmr0_cnt_en;
 //tmr0
-always @(posedge clkout) begin
+always @(posedge clk) begin
 	tmr0if_set_en <= 1'd0;
 	if(rst)
 		tmr0_reg <= 8'd0;
