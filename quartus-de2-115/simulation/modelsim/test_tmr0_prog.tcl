@@ -56,12 +56,59 @@ run
 run
 run
 
-#execute the first command
+#execute 01011010000011 //00.    bsf STATUS, RP0     change to bank 1
 run
 run
 run
 run
+if {[examine -radix unsigned {sim:/picmicro_midrange_core/status_reg_out[5]}] != 1} {
+    echo "FAIL TEST 65"
+    abort
+}
 
+#execute 01001010000001 //01.    bcf OPTION, T0CS    clr bit 5 of OPTION
+run
+run
+run
+run
+if {[examine -radix unsigned {sim:/picmicro_midrange_core/option_reg_out[5]}] != 0} {
+    echo "FAIL TEST 75"
+    abort
+}
+if {[examine -radix unsigned {sim:/picmicro_midrange_core/tmr0_reg_out}] != 0} {
+    echo "FAIL TEST 79"
+    abort
+}
+
+#execute 00000000000000 //02.    nop      
+run
+run
+run
+run
+if {[examine -radix unsigned {sim:/picmicro_midrange_core/tmr0_reg_out}] != 1} {
+    echo "FAIL TEST 89"
+    abort
+}
+
+#execute 00000000000000 //03.    nop      
+run
+run
+run
+run
+if {[examine -radix unsigned {sim:/picmicro_midrange_core/tmr0_reg_out}] != 2} {
+    echo "FAIL TEST 99"
+    abort
+}
+
+#execute 00000000000000 //04.    nop      
+run
+run
+run
+run
+if {[examine -radix unsigned {sim:/picmicro_midrange_core/tmr0_reg_out}] != 3} {
+    echo "FAIL TEST 109"
+    abort
+}
 
 
 
