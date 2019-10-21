@@ -80,7 +80,7 @@ if {[examine -radix unsigned {sim:/picmicro_midrange_core/tmr0_reg_out}] != 0} {
     abort
 }
 
-#execute 00000000000000 //02.    nop      
+#execute 00000000000000 //02.    nop       //TMR0 should increase by 1 for each cycle of the clock
 run
 run
 run
@@ -90,7 +90,7 @@ if {[examine -radix unsigned {sim:/picmicro_midrange_core/tmr0_reg_out}] != 1} {
     abort
 }
 
-#execute 00000000000000 //03.    nop      
+#execute 01000000000001 //03.    bcf OPTION, PS0 //clear the prescaler select bits, setting it to div/2  
 run
 run
 run
@@ -100,13 +100,123 @@ if {[examine -radix unsigned {sim:/picmicro_midrange_core/tmr0_reg_out}] != 2} {
     abort
 }
 
-#execute 00000000000000 //04.    nop      
+#execute 01000010000001 //04.    bcf OPTION, PS1   
 run
 run
 run
 run
 if {[examine -radix unsigned {sim:/picmicro_midrange_core/tmr0_reg_out}] != 3} {
     echo "FAIL TEST 109"
+    abort
+}
+
+#execute 01000100000001 //05.    bcf OPTION, PS2    
+run
+run
+run
+run
+if {[examine -radix unsigned {sim:/picmicro_midrange_core/tmr0_reg_out}] != 4} {
+    echo "FAIL TEST 119"
+    abort
+}
+
+#execute 01000110000001 //06.    bcf OPTION, PSA    clr bit 3 of OPTION, enabling the prescaler 
+run
+run
+run
+run
+if {[examine -radix unsigned {sim:/picmicro_midrange_core/tmr0_reg_out}] != 5} {
+    echo "FAIL TEST 129"
+    abort
+}
+
+#execute 00000000000000 //07.    nop       //now the timer should increase every second instruction
+run
+run
+run
+run
+if {[examine -radix unsigned {sim:/picmicro_midrange_core/tmr0_reg_out}] != 5} {
+    echo "FAIL TEST 139"
+    abort
+}
+
+#execute 00000000000000 //08.    nop       
+run
+run
+run
+run
+if {[examine -radix unsigned {sim:/picmicro_midrange_core/tmr0_reg_out}] != 6} {
+    echo "FAIL TEST 149"
+    abort
+}
+
+#execute 00000000000000 //09.    nop       
+run
+run
+run
+run
+if {[examine -radix unsigned {sim:/picmicro_midrange_core/tmr0_reg_out}] != 6} {
+    echo "FAIL TEST 159"
+    abort
+}
+
+#execute 01010000000001 //0A.    bsf OPTION, PS0 //set the prescaler PS0, setting it to div/4 
+run
+run
+run
+run
+if {[examine -radix unsigned {sim:/picmicro_midrange_core/tmr0_reg_out}] != 7} {
+    echo "FAIL TEST 169"
+    abort
+}
+
+#execute 00000000000000 //0B.    nop       
+run
+run
+run
+run
+if {[examine -radix unsigned {sim:/picmicro_midrange_core/tmr0_reg_out}] != 7} {
+    echo "FAIL TEST 179"
+    abort
+}
+
+#execute 00000000000000 //0C.    nop       
+run
+run
+run
+run
+if {[examine -radix unsigned {sim:/picmicro_midrange_core/tmr0_reg_out}] != 7} {
+    echo "FAIL TEST 189"
+    abort
+}
+
+#execute 00000000000000 //0D.    nop       
+run
+run
+run
+run
+if {[examine -radix unsigned {sim:/picmicro_midrange_core/tmr0_reg_out}] != 7} {
+    echo "FAIL TEST 199"
+    abort
+}
+
+#execute 00000000000000 //0E.    nop       
+run
+run
+run
+run
+if {[examine -radix unsigned {sim:/picmicro_midrange_core/tmr0_reg_out}] != 8} {
+    echo "FAIL TEST 209"
+    abort
+}
+
+#execute 00000000000000 //0F.    nop       
+run
+run
+run
+run
+if {[examine -radix unsigned {sim:/picmicro_midrange_core/tmr0_reg_out}] != 8} {
+    echo "FAIL TEST 219"
     abort
 }
 

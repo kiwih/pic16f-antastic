@@ -9,15 +9,15 @@
 //
 01011010000011 //00.    bsf STATUS, RP0     change to bank 1
 01001010000001 //01.    bcf OPTION, T0CS    clr bit 5 of OPTION
-00000000000000 //02.    nop      
-00000000000000 //03.    nop
-00000000000000 //04.    nop
-00000000000000 //05.    nop      //alter from here   
-00000000000000 //06.    nop
-00000000000000 //07.    nop
-00000000000000 //08.    nop
+00000000000000 //02.    nop      //TMR0 should increase by 1 for each cycle of the clock
+01000000000001 //03.    bcf OPTION, PS0 //clear the prescaler select bits, setting it to div/2
+01000010000001 //04.    bcf OPTION, PS1
+01000100000001 //05.    bcf OPTION, PS2
+01000110000001 //06.    bcf OPTION, PSA    clr bit 3 of OPTION, enabling the prescaler
+00000000000000 //07.    nop //now the timer should increase every second instruction
+00000000000000 //08.    nop 
 00000000000000 //09.    nop
-00000000000000 //0A.    nop
+01010000000001 //0A.    bsf OPTION, PS0 //set the prescaler PS0, setting it to div/4
 00000000000000 //0B.    nop
 00000000000000 //0C.    nop
 00000000000000 //0D.    nop
