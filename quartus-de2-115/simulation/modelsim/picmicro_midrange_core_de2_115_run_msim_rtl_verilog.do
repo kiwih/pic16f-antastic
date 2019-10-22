@@ -12,6 +12,7 @@ vlog -vlog01compat -work work +incdir+/home/hammond/Documents/quartus_projs/picm
 vlog -vlog01compat -work work +incdir+/home/hammond/Documents/quartus_projs/picmicro-midrange-core-hdl/verilog {/home/hammond/Documents/quartus_projs/picmicro-midrange-core-hdl/verilog/program_counter.v}
 vlog -vlog01compat -work work +incdir+/home/hammond/Documents/quartus_projs/picmicro-midrange-core-hdl/verilog {/home/hammond/Documents/quartus_projs/picmicro-midrange-core-hdl/verilog/generic_prescaler.v}
 vlog -vlog01compat -work work +incdir+/home/hammond/Documents/quartus_projs/picmicro-midrange-core-hdl/verilog {/home/hammond/Documents/quartus_projs/picmicro-midrange-core-hdl/verilog/tmr0wdt.v}
+vlog -vlog01compat -work work +incdir+/home/hammond/Documents/quartus_projs/picmicro-midrange-core-hdl/verilog {/home/hammond/Documents/quartus_projs/picmicro-midrange-core-hdl/verilog/resetmanager.v}
 vlog -vlog01compat -work work +incdir+/home/hammond/Documents/quartus_projs/picmicro-midrange-core-hdl/verilog {/home/hammond/Documents/quartus_projs/picmicro-midrange-core-hdl/verilog/picmicro_midrange_core.v}
 vlog -vlog01compat -work work +incdir+/home/hammond/Documents/quartus_projs/picmicro-midrange-core-hdl/verilog {/home/hammond/Documents/quartus_projs/picmicro-midrange-core-hdl/verilog/program_memory.v}
 vlog -vlog01compat -work work +incdir+/home/hammond/Documents/quartus_projs/picmicro-midrange-core-hdl/verilog {/home/hammond/Documents/quartus_projs/picmicro-midrange-core-hdl/verilog/ram_file_registers.v}

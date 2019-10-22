@@ -3,7 +3,7 @@
 module picmicro_midrange_core(
 	input wire clk,
 	input wire clk_wdt,
-	input wire rst,
+	input wire rst_ext,
 	
 	output wire [8:0] extern_peripherals_addr,
 	output wire [7:0] extern_peripherals_data_in,
@@ -25,6 +25,7 @@ module picmicro_midrange_core(
 wire clkout; //this is the internally-generated clk/4 signal. Used for many peripherals.
 wire wdt_timeout;
 wire wdt_clr;
+wire rst;
 
 wire instr_rd_en;
 wire instr_flush;
@@ -98,6 +99,13 @@ wire alu_out_c_wr_en;
 wire alu_bit_test_res;
 
 wire bit_test_reg_out;
+
+resetmanager rm (
+	.clk(clk),
+	.rst_ext(rst_ext),
+	.wdt_timeout(wdt_timeout),
+	.rst(rst)
+);
 
 //includes a register to save the current output(and only update upon rd_en)
 program_memory progmem (
