@@ -12,8 +12,8 @@
 00010100100000 //10.    andwf 0 0x20        W <= W & mem[0x20] = 0x89 & 0xAB = 0x89 and !Z
 00010110100000 //11.    andwf 1 0x20        mem[0x20] <= W & mem[0x20] = 0x89 & 0xAB = 0x89 and !Z
 00010100100010 //12.    andwf 0 0x22        W <= W & mem[0x22] = 0x89 & 0x00 = 0x00 and Z
-00000110000011 //13.    clrf STATUS         STATUS <= 0x00 and Z = 0x04
-00100000000011 //14.    movfw 0 STATUS      W <= STATUS = 0x04 and !Z
+00000110000011 //13.    clrf STATUS         STATUS <= 0x00 and Z = 0x1c (the power bits are still set)
+00100000000011 //14.    movfw 0 STATUS      W <= STATUS = 0x1c and !Z
 00000100000000 //15.    clrw                W <= 0x00 and Z
 00100110100000 //16.    comf 1 0x20         mem[0x20] <= ~mem[0x20] = 0x76
 00100100100001 //17.    comf 0 0x21         W <= ~mem[0x21] = 0xFF

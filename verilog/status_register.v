@@ -16,10 +16,14 @@ module status_register(
 									//10 = Bank 2   (100h-17Fh)
 									//11 = Bank 3   (180h-1FFh)
 	
+	input wire n_to_wr_en,
+	input wire n_to_in,
 	output wire n_to,			//not Time Out bit (read only)
 									//1 = After power-up, CLRWDT instruction or SLEEP instruction
 									//0 = a WDT time out occurred
-									
+	
+	input wire n_pd_wr_en,
+	input wire n_pd_in,	
 	output wire n_pd,			//not Power-down bit (read only)
 									//1 = After power-up or by the CLRWDT instruction
 									//0 = By execution of the SLEEP instruction
@@ -47,13 +51,19 @@ module status_register(
 
 reg [7:0] internalStatus;
 
-//todo: finish this properly
+//todo: finish this properly with regard to PD and TO bits
 always @(posedge clk) begin
 	if(rst)
-		internalStatus <= 8'd0;
+		internalStatus <= 8'b00011000;
 	else begin
-		if(status_wr)
-			internalStatus <= status_reg_in;
+		if(status_wr) begin
+			internalStatus[7:5] <= status_reg_in[7:5];
+			internalStatus[2:0] <= status_reg_in[2:0];
+		end
+		if(n_to_wr_en)
+			internalStatus[4] <= n_to_in;
+		if(n_pd_wr_en)
+			internalStatus[3] <= n_pd_in;
 		if(z_wr_en)
 			internalStatus[2] <= z_in;
 		if(dc_wr_en)

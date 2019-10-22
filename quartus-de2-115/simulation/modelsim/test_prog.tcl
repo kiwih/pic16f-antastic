@@ -243,12 +243,12 @@ if {[examine -radix binary sim:/picmicro_midrange_core/status_z] != 1} {
     abort
 }
 
-#address 13, which is 00000110000011 //13.	clrf STATUS	STATUS <= 0x00 and Z (since the clrf sets the Z) = 0x04
+#address 13, which is 00000110000011 //13.	clrf STATUS	STATUS <= 0x00 and Z (since the clrf sets the Z) = 0x1c (the power bits are still set)
 run
 run
 run
 run
-if {[examine -radix binary sim:/picmicro_midrange_core/status_reg_out] != 00000100} {
+if {[examine -radix binary {sim:/picmicro_midrange_core/status_reg_out[2:0]}] != 100} {
     echo "FAIL TEST 13a"
     abort
 }
@@ -258,11 +258,11 @@ run
 run
 run
 run
-if {[examine -radix hexadecimal sim:/picmicro_midrange_core/w_reg_out] != {04}} {
+if {[examine -radix hexadecimal sim:/picmicro_midrange_core/w_reg_out] != {1c}} {
     echo "FAIL TEST 14a"
     abort
 }
-if {[examine -radix hexadecimal sim:/picmicro_midrange_core/status_reg_out] != {00}} {
+if {[examine -radix binary {sim:/picmicro_midrange_core/status_reg_out[2:0]}] != 000} {
     echo "FAIL TEST 14b"
     abort
 }
@@ -276,7 +276,7 @@ if {[examine -radix hexadecimal sim:/picmicro_midrange_core/w_reg_out] != {00}} 
     echo "FAIL TEST 15a"
     abort
 }
-if {[examine -radix hexadecimal sim:/picmicro_midrange_core/status_reg_out] != {04}} {
+if {[examine -radix binary {sim:/picmicro_midrange_core/status_reg_out[2:0]}] != 100} {
     echo "FAIL TEST 15b"
     abort
 }
@@ -300,7 +300,7 @@ if {[examine -radix hexadecimal sim:/picmicro_midrange_core/w_reg_out] != {ff}} 
     echo "FAIL TEST 17a"
     abort
 }
-if {[examine -radix hexadecimal sim:/picmicro_midrange_core/status_reg_out] != {00}} {
+if {[examine -radix binary {sim:/picmicro_midrange_core/status_reg_out[2:0]}] != 000} {
     echo "FAIL TEST 17b"
     abort
 }
@@ -314,7 +314,7 @@ if {[examine -radix hexadecimal {sim:/picmicro_midrange_core/regfile/gpRegisters
     echo "FAIL TEST 18a"
     abort
 }
-if {[examine -radix hexadecimal sim:/picmicro_midrange_core/status_reg_out] != {00}} {
+if {[examine -radix binary {sim:/picmicro_midrange_core/status_reg_out[2:0]}] != 000} {
     echo "FAIL TEST 18b"
     abort
 }
@@ -328,7 +328,7 @@ if {[examine -radix hexadecimal {sim:/picmicro_midrange_core/regfile/gpRegisters
     echo "FAIL TEST 19a"
     abort
 }
-if {[examine -radix hexadecimal sim:/picmicro_midrange_core/status_reg_out] != {00}} {
+if {[examine -radix binary {sim:/picmicro_midrange_core/status_reg_out[2:0]}] != 000} {
     echo "FAIL TEST 19b"
     abort
 }
@@ -346,7 +346,7 @@ if {[examine -radix hexadecimal {sim:/picmicro_midrange_core/regfile/gpRegisters
     echo "FAIL TEST 20b"
     abort
 }
-if {[examine -radix hexadecimal sim:/picmicro_midrange_core/status_reg_out] != {04}} {
+if {[examine -radix binary {sim:/picmicro_midrange_core/status_reg_out[2:0]}] != 100} {
     echo "FAIL TEST 20c"
     abort
 }
@@ -380,7 +380,7 @@ if {[examine -radix hexadecimal {sim:/picmicro_midrange_core/regfile/gpRegisters
     echo "FAIL TEST 23a"
     abort
 }
-if {[examine -radix hexadecimal sim:/picmicro_midrange_core/status_reg_out] != {00}} {
+if {[examine -radix binary {sim:/picmicro_midrange_core/status_reg_out[2:0]}] != 000} {
     echo "FAIL TEST 23b"
     abort
 }
@@ -394,7 +394,7 @@ if {[examine -radix hexadecimal sim:/picmicro_midrange_core/w_reg_out] != {00}} 
     echo "FAIL TEST 24a"
     abort
 }
-if {[examine -radix hexadecimal sim:/picmicro_midrange_core/status_reg_out] != {04}} {
+if {[examine -radix binary {sim:/picmicro_midrange_core/status_reg_out[2:0]}] != 100} {
     echo "FAIL TEST 24b"
     abort
 }
@@ -408,7 +408,7 @@ if {[examine -radix hexadecimal sim:/picmicro_midrange_core/w_reg_out] != {76}} 
     echo "FAIL TEST 25a"
     abort
 }
-if {[examine -radix hexadecimal sim:/picmicro_midrange_core/status_reg_out] != {00}} {
+if {[examine -radix binary {sim:/picmicro_midrange_core/status_reg_out[2:0]}] != 000} {
     echo "FAIL TEST 25b"
     abort
 }
@@ -422,7 +422,7 @@ if {[examine -radix hexadecimal sim:/picmicro_midrange_core/w_reg_out] != {77}} 
     echo "FAIL TEST 26a"
     abort
 }
-if {[examine -radix hexadecimal sim:/picmicro_midrange_core/status_reg_out] != {00}} {
+if {[examine -radix binary {sim:/picmicro_midrange_core/status_reg_out[2:0]}] != 000} {
     echo "FAIL TEST 26b"
     abort
 }
@@ -438,7 +438,7 @@ if {[examine -radix hexadecimal {sim:/picmicro_midrange_core/regfile/gpRegisters
     echo "FAIL TEST 27a"
     abort
 }
-if {[examine -radix hexadecimal sim:/picmicro_midrange_core/status_reg_out] != {00}} {
+if {[examine -radix binary {sim:/picmicro_midrange_core/status_reg_out[2:0]}] != 000} {
     echo "FAIL TEST 27b"
     abort
 }
@@ -452,7 +452,7 @@ if {[examine -radix hexadecimal {sim:/picmicro_midrange_core/regfile/gpRegisters
     echo "FAIL TEST 28a"
     abort
 }
-if {[examine -radix hexadecimal sim:/picmicro_midrange_core/status_reg_out] != {00}} {
+if {[examine -radix binary {sim:/picmicro_midrange_core/status_reg_out[2:0]}] != 000} {
     echo "FAIL TEST 28b"
     abort
 }
@@ -480,7 +480,7 @@ if {[examine -radix hexadecimal sim:/picmicro_midrange_core/w_reg_out] != {00}} 
     echo "FAIL TEST 29a"
     abort
 }
-if {[examine -radix hexadecimal sim:/picmicro_midrange_core/status_reg_out] != {04}} {
+if {[examine -radix binary {sim:/picmicro_midrange_core/status_reg_out[2:0]}] != 100} {
     echo "FAIL TEST 30b"
     abort
 }
@@ -512,7 +512,7 @@ if {[examine -radix hexadecimal {sim:/picmicro_midrange_core/regfile/gpRegisters
     echo "FAIL TEST 32a"
     abort
 }
-if {[examine -radix hexadecimal sim:/picmicro_midrange_core/status_reg_out] != {04}} {
+if {[examine -radix binary {sim:/picmicro_midrange_core/status_reg_out[2:0]}] != 100} {
     echo "FAIL TEST 32b"
     abort
 }
@@ -544,7 +544,7 @@ if {[examine -radix hexadecimal {sim:/picmicro_midrange_core/regfile/gpRegisters
     echo "FAIL TEST 34a"
     abort
 }
-if {[examine -radix hexadecimal sim:/picmicro_midrange_core/status_reg_out] != {00}} {
+if {[examine -radix binary {sim:/picmicro_midrange_core/status_reg_out[2:0]}] != 000} {
     echo "FAIL TEST 34b"
     abort
 }
@@ -574,7 +574,7 @@ if {[examine -radix hexadecimal sim:/picmicro_midrange_core/w_reg_out] != {76}} 
     echo "FAIL TEST 36a"
     abort
 }
-if {[examine -radix hexadecimal sim:/picmicro_midrange_core/status_reg_out] != {00}} {
+if {[examine -radix binary {sim:/picmicro_midrange_core/status_reg_out[2:0]}] != 000} {
     echo "FAIL TEST 36b"
     abort
 }
@@ -612,7 +612,7 @@ if {[examine -radix hexadecimal sim:/picmicro_midrange_core/w_reg_out] != {00}} 
     echo "FAIL TEST 39a"
     abort
 }
-if {[examine -radix hexadecimal sim:/picmicro_midrange_core/status_reg_out] != {04}} {
+if {[examine -radix binary {sim:/picmicro_midrange_core/status_reg_out[2:0]}] != 100} {
     echo "FAIL TEST 39b"
     abort
 }
@@ -644,7 +644,7 @@ if {[examine -radix hexadecimal {sim:/picmicro_midrange_core/regfile/gpRegisters
     echo "FAIL TEST 41a"
     abort
 }
-if {[examine -radix hexadecimal sim:/picmicro_midrange_core/status_reg_out] != {04}} {
+if {[examine -radix binary {sim:/picmicro_midrange_core/status_reg_out[2:0]}] != 100} {
     echo "FAIL TEST 41b"
     abort
 }
@@ -676,7 +676,7 @@ if {[examine -radix hexadecimal {sim:/picmicro_midrange_core/regfile/gpRegisters
     echo "FAIL TEST 43a"
     abort
 }
-if {[examine -radix hexadecimal sim:/picmicro_midrange_core/status_reg_out] != {00}} {
+if {[examine -radix binary {sim:/picmicro_midrange_core/status_reg_out[2:0]}] != 000} {
     echo "FAIL TEST 43b"
     abort
 }
@@ -716,7 +716,7 @@ if {[examine -radix hexadecimal {sim:/picmicro_midrange_core/regfile/gpRegisters
     echo "FAIL TEST 46a"
     abort
 }
-if {[examine -radix hexadecimal sim:/picmicro_midrange_core/status_reg_out] != {01}} {
+if {[examine -radix binary {sim:/picmicro_midrange_core/status_reg_out[2:0]}] != 001} {
     echo "FAIL TEST 46b"
     abort
 }
@@ -730,7 +730,7 @@ if {[examine -radix hexadecimal sim:/picmicro_midrange_core/w_reg_out] != {ad}} 
     echo "FAIL TEST 47a"
     abort
 }
-if {[examine -radix hexadecimal sim:/picmicro_midrange_core/status_reg_out] != {00}} {
+if {[examine -radix binary {sim:/picmicro_midrange_core/status_reg_out[2:0]}] != 000} {
     echo "FAIL TEST 47b"
     abort
 }
@@ -766,7 +766,7 @@ if {[examine -radix hexadecimal {sim:/picmicro_midrange_core/regfile/gpRegisters
     echo "FAIL TEST 50a"
     abort
 }
-if {[examine -radix hexadecimal sim:/picmicro_midrange_core/status_reg_out] != {01}} {
+if {[examine -radix binary {sim:/picmicro_midrange_core/status_reg_out[2:0]}] != 001} {
     echo "FAIL TEST 50b"
     abort
 }
@@ -780,7 +780,7 @@ if {[examine -radix hexadecimal {sim:/picmicro_midrange_core/regfile/gpRegisters
     echo "FAIL TEST 51a"
     abort
 }
-if {[examine -radix hexadecimal sim:/picmicro_midrange_core/status_reg_out] != {01}} {
+if {[examine -radix binary {sim:/picmicro_midrange_core/status_reg_out[2:0]}] != 001} {
     echo "FAIL TEST 51b"
     abort
 }
@@ -794,7 +794,7 @@ if {[examine -radix hexadecimal sim:/picmicro_midrange_core/w_reg_out] != {d5}} 
     echo "FAIL TEST 52a"
     abort
 }
-if {[examine -radix hexadecimal sim:/picmicro_midrange_core/status_reg_out] != {00}} {
+if {[examine -radix binary {sim:/picmicro_midrange_core/status_reg_out[2:0]}] != 000} {
     echo "FAIL TEST 52b"
     abort
 }
@@ -830,7 +830,7 @@ if {[examine -radix hexadecimal sim:/picmicro_midrange_core/w_reg_out] != {15}} 
     echo "FAIL TEST 53c_a"
     abort
 }
-if {[examine -radix hexadecimal sim:/picmicro_midrange_core/status_reg_out] != {00}} {
+if {[examine -radix binary {sim:/picmicro_midrange_core/status_reg_out[2:0]}] != 000} {
     echo "FAIL TEST 53c_b"
     abort
 }
@@ -1064,7 +1064,7 @@ if {[examine -radix hexadecimal sim:/picmicro_midrange_core/w_reg_out] != {40}} 
     echo "FAIL TEST 83a"
     abort
 }
-if {[examine -radix hexadecimal sim:/picmicro_midrange_core/status_reg_out] != {02}} {
+if {[examine -radix binary {sim:/picmicro_midrange_core/status_reg_out[2:0]}] != 010} {
     echo "FAIL TEST 83b"
     abort
 }
@@ -1110,7 +1110,7 @@ if {[examine -radix hexadecimal sim:/picmicro_midrange_core/w_reg_out] != {18}} 
     echo "FAIL TEST 93a"
     abort
 }
-if {[examine -radix hexadecimal sim:/picmicro_midrange_core/status_reg_out] != {01}} {
+if {[examine -radix binary {sim:/picmicro_midrange_core/status_reg_out[2:0]}] != 001} {
     echo "FAIL TEST 93b"
     abort
 }
@@ -1238,7 +1238,7 @@ if {[examine -radix hexadecimal sim:/picmicro_midrange_core/w_reg_out] != {b6}} 
     echo "FAIL TEST 121a"
     abort
 }
-if {[examine -radix hexadecimal sim:/picmicro_midrange_core/status_reg_out] != {02}} {
+if {[examine -radix binary {sim:/picmicro_midrange_core/status_reg_out[2:0]}] != 010} {
     echo "FAIL TEST 121b"
     abort
 }
@@ -1252,7 +1252,7 @@ if {[examine -radix hexadecimal sim:/picmicro_midrange_core/w_reg_out] != {00}} 
     echo "FAIL TEST 122a"
     abort
 }
-if {[examine -radix hexadecimal sim:/picmicro_midrange_core/status_reg_out] != {07}} {
+if {[examine -radix binary {sim:/picmicro_midrange_core/status_reg_out[2:0]}] != 111} {
     echo "FAIL TEST 122b"
     abort
 }
@@ -1368,7 +1368,7 @@ if {[examine -radix hexadecimal sim:/picmicro_midrange_core/w_reg_out] != {10}} 
     echo "FAIL TEST 151a"
     abort
 }
-if {[examine -radix hexadecimal sim:/picmicro_midrange_core/status_reg_out] != {03}} {
+if {[examine -radix binary {sim:/picmicro_midrange_core/status_reg_out[2:0]}] != 011} {
     echo "FAIL TEST 151b"
     abort
 }
@@ -1382,7 +1382,7 @@ if {[examine -radix hexadecimal sim:/picmicro_midrange_core/w_reg_out] != {ff}} 
     echo "FAIL TEST 152a"
     abort
 }
-if {[examine -radix hexadecimal sim:/picmicro_midrange_core/status_reg_out] != {02}} {
+if {[examine -radix binary {sim:/picmicro_midrange_core/status_reg_out[2:0]}] != 010} {
     echo "FAIL TEST 152b"
     abort
 }
@@ -1396,7 +1396,7 @@ if {[examine -radix hexadecimal sim:/picmicro_midrange_core/w_reg_out] != {00}} 
     echo "FAIL TEST 153a"
     abort
 }
-if {[examine -radix hexadecimal sim:/picmicro_midrange_core/status_reg_out] != {07}} {
+if {[examine -radix binary {sim:/picmicro_midrange_core/status_reg_out[2:0]}] != 111} {
     echo "FAIL TEST 153b"
     abort
 }
