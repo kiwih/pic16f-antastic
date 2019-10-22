@@ -40,13 +40,12 @@ sim:/picmicro_midrange_core/pc/hs/tos \
 {sim:/picmicro_midrange_core/pc/hs/stack[1]} \
 {sim:/picmicro_midrange_core/pc/hs/stack[2]} \
 sim:/picmicro_midrange_core/option_reg_out \
-sim:/picmicro_midrange_core/tmr0wdt/tmr0_reg_out
-
-
-
-
-
-
+sim:/picmicro_midrange_core/tmr0wdt/tmr0_cnt_en \
+sim:/picmicro_midrange_core/tmr0wdt/tmr0_reg_in \
+sim:/picmicro_midrange_core/tmr0wdt/tmr0_reg_wr_en \
+sim:/picmicro_midrange_core/tmr0wdt/tmr0_reg_out \
+sim:/picmicro_midrange_core/tmr0wdt/* \
+sim:/picmicro_midrange_core/tmr0wdt/wdt_post_tmr0_pre/*
 force -freeze sim:/picmicro_midrange_core/rst_ext 1 0
 force -freeze sim:/picmicro_midrange_core/clk 1 25, 0 {75 ps} -r 100
 #reset the core
@@ -57,22 +56,22 @@ run
 run
 run
 
-#execute 01011010000011 //00.    bsf STATUS, RP0     change to bank 1
+#execute 00000110000001 //00.    clrf TMR0 //reset TMR0, tmr0 should not increment
+run
+run
+run
+run
+if {[examine -radix unsigned {sim:/picmicro_midrange_core/tmr0_reg_out[5]}] != 0} {
+    echo "FAIL TEST 65"
+    abort
+}
+
+#execute 01011010000011 //01.    bsf STATUS, RP0     change to bank 1
 run
 run
 run
 run
 if {[examine -radix unsigned {sim:/picmicro_midrange_core/status_reg_out[5]}] != 1} {
-    echo "FAIL TEST 65"
-    abort
-}
-
-#execute 01001010000001 //01.    bcf OPTION, T0CS    clr bit 5 of OPTION
-run
-run
-run
-run
-if {[examine -radix unsigned {sim:/picmicro_midrange_core/option_reg_out[5]}] != 0} {
     echo "FAIL TEST 75"
     abort
 }
@@ -81,93 +80,97 @@ if {[examine -radix unsigned {sim:/picmicro_midrange_core/tmr0_reg_out}] != 0} {
     abort
 }
 
-#execute 00000000000000 //02.    nop       //TMR0 should increase by 1 for each cycle of the clock
+#execute 01001010000001 //02.    bcf OPTION, T0CS    clr bit 5 of OPTION
+run
+run
+run
+run
+if {[examine -radix unsigned {sim:/picmicro_midrange_core/option_reg_out[5]}] != 0} {
+    echo "FAIL TEST 89"
+    abort
+}
+if {[examine -radix unsigned {sim:/picmicro_midrange_core/tmr0_reg_out}] != 0} {
+    echo "FAIL TEST 93"
+    abort
+}
+
+#execute 00000000000000 //03.    nop //tmr0 should increment
 run
 run
 run
 run
 if {[examine -radix unsigned {sim:/picmicro_midrange_core/tmr0_reg_out}] != 1} {
-    echo "FAIL TEST 89"
+    echo "FAIL TEST 103"
     abort
 }
 
-#execute 01000000000001 //03.    bcf OPTION, PS0 //clear the prescaler select bits, setting it to div/2  
+#execute 00000000000000 //04.    nop //tmr0 should increment
 run
 run
 run
 run
 if {[examine -radix unsigned {sim:/picmicro_midrange_core/tmr0_reg_out}] != 2} {
-    echo "FAIL TEST 99"
+    echo "FAIL TEST 113"
     abort
 }
 
-#execute 01000010000001 //04.    bcf OPTION, PS1   
+#execute 00000000000000 //05.    nop       //TMR0 should increase by 1 for each cycle of the clock
 run
 run
 run
 run
 if {[examine -radix unsigned {sim:/picmicro_midrange_core/tmr0_reg_out}] != 3} {
-    echo "FAIL TEST 109"
+    echo "FAIL TEST 123"
     abort
 }
 
-#execute 01000100000001 //05.    bcf OPTION, PS2    
+#execute 01000000000001 //06.    bcf OPTION, PS0 //clear the prescaler select bits, setting it to div/2  
 run
 run
 run
 run
 if {[examine -radix unsigned {sim:/picmicro_midrange_core/tmr0_reg_out}] != 4} {
-    echo "FAIL TEST 119"
+    echo "FAIL TEST 133"
     abort
 }
 
-#execute 01000110000001 //06.    bcf OPTION, PSA    clr bit 3 of OPTION, enabling the prescaler 
+#execute 01000010000001 //07.    bcf OPTION, PS1   
 run
 run
 run
 run
 if {[examine -radix unsigned {sim:/picmicro_midrange_core/tmr0_reg_out}] != 5} {
-    echo "FAIL TEST 129"
+    echo "FAIL TEST 143"
     abort
 }
 
-#execute 00000000000000 //07.    nop       //now the timer should increase every second instruction
-run
-run
-run
-run
-if {[examine -radix unsigned {sim:/picmicro_midrange_core/tmr0_reg_out}] != 5} {
-    echo "FAIL TEST 139"
-    abort
-}
-
-#execute 00000000000000 //08.    nop       
+#execute 01000100000001 //08.    bcf OPTION, PS2    
 run
 run
 run
 run
 if {[examine -radix unsigned {sim:/picmicro_midrange_core/tmr0_reg_out}] != 6} {
-    echo "FAIL TEST 149"
+    echo "FAIL TEST 153"
     abort
 }
 
-#execute 00000000000000 //09.    nop       
-run
-run
-run
-run
-if {[examine -radix unsigned {sim:/picmicro_midrange_core/tmr0_reg_out}] != 6} {
-    echo "FAIL TEST 159"
-    abort
-}
-
-#execute 01010000000001 //0A.    bsf OPTION, PS0 //set the prescaler PS0, setting it to div/4 
+#execute 01000110000001 //09.    bcf OPTION, PSA    clr bit 3 of OPTION, enabling the prescaler 
 run
 run
 run
 run
 if {[examine -radix unsigned {sim:/picmicro_midrange_core/tmr0_reg_out}] != 7} {
-    echo "FAIL TEST 169"
+    echo "FAIL TEST 163"
+    abort
+}
+
+#execute 00000000000000 //0A.    nop       //now the timer should increase every second instruction
+run
+run
+run
+run
+if {[examine -radix unsigned {sim:/picmicro_midrange_core/tmr0_reg_out}] != 8} {
+    echo "FAIL TEST 173"
     abort
 }
 
@@ -176,18 +179,18 @@ run
 run
 run
 run
-if {[examine -radix unsigned {sim:/picmicro_midrange_core/tmr0_reg_out}] != 7} {
-    echo "FAIL TEST 179"
+if {[examine -radix unsigned {sim:/picmicro_midrange_core/tmr0_reg_out}] != 8} {
+    echo "FAIL TEST 183"
     abort
 }
 
-#execute 00000000000000 //0C.    nop       
+#execute 01010000000001 //0C.    bsf OPTION, PS0 //set the prescaler PS0, setting it to div/4 . However, it will be only 3 cycles to the next increment due to current value of prescaler
 run
 run
 run
 run
-if {[examine -radix unsigned {sim:/picmicro_midrange_core/tmr0_reg_out}] != 7} {
-    echo "FAIL TEST 189"
+if {[examine -radix unsigned {sim:/picmicro_midrange_core/tmr0_reg_out}] != 9} { 
+    echo "FAIL TEST 193"
     abort
 }
 
@@ -196,8 +199,8 @@ run
 run
 run
 run
-if {[examine -radix unsigned {sim:/picmicro_midrange_core/tmr0_reg_out}] != 7} {
-    echo "FAIL TEST 199"
+if {[examine -radix unsigned {sim:/picmicro_midrange_core/tmr0_reg_out}] != 9} {
+    echo "FAIL TEST 203"
     abort
 }
 
@@ -206,8 +209,8 @@ run
 run
 run
 run
-if {[examine -radix unsigned {sim:/picmicro_midrange_core/tmr0_reg_out}] != 8} {
-    echo "FAIL TEST 209"
+if {[examine -radix unsigned {sim:/picmicro_midrange_core/tmr0_reg_out}] != 9} {
+    echo "FAIL TEST 213"
     abort
 }
 
@@ -216,11 +219,129 @@ run
 run
 run
 run
-if {[examine -radix unsigned {sim:/picmicro_midrange_core/tmr0_reg_out}] != 8} {
-    echo "FAIL TEST 219"
+if {[examine -radix unsigned {sim:/picmicro_midrange_core/tmr0_reg_out}] != 10} {
+    echo "FAIL TEST 215"
     abort
 }
 
+#execute 00000000000000 //10.    nop       
+run
+run
+run
+run
+if {[examine -radix unsigned {sim:/picmicro_midrange_core/tmr0_reg_out}] != 10} {
+    echo "FAIL TEST 225"
+    abort
+}
+
+#execute 00000000000000 //11.    nop       
+run
+run
+run
+run
+if {[examine -radix unsigned {sim:/picmicro_midrange_core/tmr0_reg_out}] != 10} {
+    echo "FAIL TEST 235"
+    abort
+}
+
+#execute 00000000000000 //12.    nop       
+run
+run
+run
+run
+if {[examine -radix unsigned {sim:/picmicro_midrange_core/tmr0_reg_out}] != 10} {
+    echo "FAIL TEST 245"
+    abort
+}
+
+#execute 01010110000001 //13.    bsf OPTION, PSA    clr bit 3 of OPTION, disabling the prescaler
+run
+run
+run
+run
+
+
+#execute 01001010000011 //14.    bcf STATUS, RP0    change to bank 0
+run
+run
+run
+run
+
+
+#execute 11000011111101 //15.    movlw 0xFD
+run
+run
+run
+run
+
+
+#execute 00000010000001 //16.    movwf TMR0 //tmr0 should not increment
+run
+run
+run
+run
+if {[examine -radix hexadecimal {sim:/picmicro_midrange_core/tmr0_reg_out}] != {fd}} {
+    echo "FAIL TEST 276"
+    abort
+}
+
+#execute 00000000000000 //17.    nop //tmr0 should not increment
+run
+run
+run
+run
+if {[examine -radix hexadecimal {sim:/picmicro_midrange_core/tmr0_reg_out}] != {fd}} {
+    echo "FAIL TEST 286"
+    abort
+}
+
+#execute 00000000000000 //18.    nop //tmr0 should not increment
+run
+run
+run
+run
+if {[examine -radix hexadecimal {sim:/picmicro_midrange_core/tmr0_reg_out}] != {fd}} {
+    echo "FAIL TEST 296"
+    abort
+}
+
+#execute 00000000000000 //19.    nop //tmr0 should increment
+run
+run
+run
+run
+if {[examine -radix hexadecimal {sim:/picmicro_midrange_core/tmr0_reg_out}] != {fe}} {
+    echo "FAIL TEST 306"
+    abort
+}
+
+#execute 00000000000000 //1A.    nop //tmr0 should increment
+run
+run
+run
+run
+if {[examine -radix hexadecimal {sim:/picmicro_midrange_core/tmr0_reg_out}] != {ff}} {
+    echo "FAIL TEST 316"
+    abort
+}
+if {[examine -radix unsigned {sim:/picmicro_midrange_core/tmr0if_set_en}] != 0} {
+    echo "FAIL TEST 320"
+    abort
+}
+
+#execute 00000000000000 //1B.    nop //tmr0 should overflow
+run
+run
+run
+run
+if {[examine -radix hexadecimal {sim:/picmicro_midrange_core/tmr0_reg_out}] != {00}} {
+    echo "FAIL TEST 330"
+    abort
+}
+if {[examine -radix unsigned {sim:/picmicro_midrange_core/tmr0if_set_en}] != 1} {
+    echo "FAIL TEST 334"
+    abort
+}
 
 
 #all tests passed

@@ -7,34 +7,35 @@
 //
 //
 //
-01011010000011 //00.    bsf STATUS, RP0     change to bank 1
-01001010000001 //01.    bcf OPTION, T0CS    clr bit 5 of OPTION
-00000000000000 //02.    nop      //TMR0 should increase by 1 for each cycle of the clock
-01000000000001 //03.    bcf OPTION, PS0 //clear the prescaler select bits, setting it to div/2
-01000010000001 //04.    bcf OPTION, PS1
-01000100000001 //05.    bcf OPTION, PS2
-01000110000001 //06.    bcf OPTION, PSA    clr bit 3 of OPTION, enabling the prescaler
-00000000000000 //07.    nop //now the timer should increase every second instruction
-00000000000000 //08.    nop 
-00000000000000 //09.    nop
-01010000000001 //0A.    bsf OPTION, PS0 //set the prescaler PS0, setting it to div/4
-00000000000000 //0B.    nop
-00000000000000 //0C.    nop
+
+00000110000001 //00.    clrf TMR0 //reset TMR0, tmr0 should not increment
+01011010000011 //01.    bsf STATUS, RP0     change to bank 1 //tmr0 should not increment
+01001010000001 //02.    bcf OPTION, T0CS    clr bit 5 of OPTION //tmr0 should not increment
+00000000000000 //03.    nop //tmr0 should increment
+00000000000000 //04.    nop //tmr0 should increment
+00000000000000 //05.    nop      //TMR0 should increase by 1 for each cycle of the clock
+01000000000001 //06.    bcf OPTION, PS0 //clear the prescaler select bits, setting it to div/2
+01000010000001 //07.    bcf OPTION, PS1
+01000100000001 //08.    bcf OPTION, PS2
+01000110000001 //09.    bcf OPTION, PSA    clr bit 3 of OPTION, enabling the prescaler
+00000000000000 //0A.    nop //now the timer should increase every second instruction
+00000000000000 //0B.    nop 
+01010000000001 //0C.    bsf OPTION, PS0 //set the prescaler PS0, setting it to div/4
 00000000000000 //0D.    nop
 00000000000000 //0E.    nop
 00000000000000 //0F.    nop
 00000000000000 //10.    nop
 00000000000000 //11.    nop
 00000000000000 //12.    nop
-00000000000000 //13.    nop
-00000000000000 //14.    nop
-00000000000000 //15.    nop
-00000000000000 //16.    nop
-00000000000000 //17.    nop
-00000000000000 //18.    nop
-00000000000000 //19.    nop
-00000000000000 //1A.    nop
-00000000000000 //1B.    nop
+01010110000001 //13.    bsf OPTION, PSA    clr bit 3 of OPTION, disabling the prescaler
+01001010000011 //14.    bcf STATUS, RP0    change to bank 0
+11000011111101 //15.    movlw 0xFD
+00000010000001 //16.    movwf TMR0 //tmr0 should not increment
+00000000000000 //17.    nop //tmr0 should not increment
+00000000000000 //18.    nop //tmr0 should not increment
+00000000000000 //19.    nop //tmr0 should increment
+00000000000000 //1A.    nop //tmr0 should increment
+00000000000000 //1B.    nop //tmr0 should overflow
 00000000000000 //1C.    nop
 00000000000000 //1D.    nop
 00000000000000 //1E.    nop

@@ -58,7 +58,7 @@ always @* begin
 	if(t0cs) begin
 		tmr0_upcount_in = clk_t0cki ^ t0se;
 	end else begin
-		tmr0_upcount_in = !clkout;
+		tmr0_upcount_in = clkout;
 	end
 end
 
@@ -77,7 +77,7 @@ always @* begin
 	if(psa)
 		pres_clr = rst | wdt_clr;
 	else
-		pres_clr = rst | (tmr0_reg_wr_en & tmr0_reg_in == 8'd0);
+		pres_clr = rst | tmr0_reg_wr_en;
 end
 
 //reg pres_clk;
@@ -114,13 +114,15 @@ reg tmr0_cnt_en_in = 1'd0;
 reg tmr0_cnt_en = 1'd0;
 
 always @(posedge clk) begin
-	tmr0_cnt_en_in_prev = tmr0_cnt_en_in;
+	tmr0_cnt_en_in_prev <= tmr0_cnt_en_in;
 	if(psa)
-		tmr0_cnt_en_in = tmr0_upcount_in;
+		tmr0_cnt_en_in <= tmr0_upcount_in;
 	else
-		tmr0_cnt_en_in = pres_out;
-	tmr0_cnt_en = !tmr0_cnt_en_in_prev & tmr0_cnt_en_in;
+		tmr0_cnt_en_in <= pres_out;
 end
+
+always @(posedge clk)
+	tmr0_cnt_en <= !tmr0_cnt_en_in_prev & tmr0_cnt_en_in;
 
 //
 //reg tmr0_cnt_en_prev = 1'd0;
@@ -132,12 +134,17 @@ end
 
 //assign tmr0_cnt_en_strobe = !	tmr0_cnt_en_prev & tmr0_cnt_en;
 //tmr0
+reg [3:0] suppress_counting = 4'd0;
+
 always @(posedge clk) begin
 	tmr0if_set_en <= 1'd0;
 	if(rst)
 		tmr0_reg <= 8'd0;
-	else if(tmr0_reg_wr_en)
+	else if(tmr0_reg_wr_en) begin
 		tmr0_reg <= tmr0_reg_in;
+		suppress_counting <= 4'd8;
+	end else if(suppress_counting != 4'd0)
+		suppress_counting <= suppress_counting - 4'd1;
 	else if(tmr0_cnt_en) begin
 		if(tmr0_reg == 8'hff) begin
 			tmr0if_set_en <= 1'd1;

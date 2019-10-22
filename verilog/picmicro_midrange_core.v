@@ -275,6 +275,7 @@ tmr0wdt tmr0wdt(
 	.psa(option_reg_out[3]),	//psa bit chooses the purpose of the internal prescaler, 1=wdt postscaler, 0=tmr0 prescaler
 	.ps(option_reg_out[2:0]),	//ps chooses scaling of prescaler
 	
+	.tmr0_reg_wr_en(tmr0_reg_wr_en),
 	.tmr0_reg_in(alu_out),
 	.tmr0_reg_out(tmr0_reg_out),
 	
