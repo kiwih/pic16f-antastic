@@ -14,22 +14,22 @@ reg [INSTR_WIDTH - 1:0] instrReg;
 reg [INSTR_WIDTH - 1:0] instrMemory [2**ADDR_WIDTH - 1:0];
 
 initial begin
-	instr = {INSTR_WIDTH{1'b0}};
-	`ifdef MODEL_TECH
-	  // code for simulation with modelsim
-	  `ifdef testcontrol
-			$readmemb("testcontrol.prog", instrMemory);
-	  `else
-			`ifdef test_tmr0
-				$readmemb("test_tmr0.prog", instrMemory);
-			`else
-				$readmemb("test.prog", instrMemory);
-			`endif
-		`endif
-	`else
+//	instr = {INSTR_WIDTH{1'b0}};
+//	`ifdef MODEL_TECH
+//	  // code for simulation with modelsim
+//	  `ifdef testcontrol
+//			$readmemb("testcontrol.prog", instrMemory);
+//	  `else
+//			`ifdef test_tmr0
+//				$readmemb("test_tmr0.prog", instrMemory);
+//			`else
+//				$readmemb("test.prog", instrMemory);
+//			`endif
+//		`endif
+//	`else
 	  // code for synthesis
 	  $readmemb("./simulation/modelsim/test.prog", instrMemory);
-	`endif
+//	`endif
 	
 //   instrMemory[0] = 14'b00_0000_0000_0000; //nop
 //	instrMemory[1] = 14'b11_0000_1010_1011; //movlw 0xAB
