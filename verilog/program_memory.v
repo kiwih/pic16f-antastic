@@ -27,8 +27,10 @@ initial begin
 //			`endif
 //		`endif
 //	`else
+	`ifndef MODEL_TECH
 	  // code for synthesis
 	  $readmemb("./simulation/modelsim/test.prog", instrMemory);
+	 `endif
 //	`endif
 	
 //   instrMemory[0] = 14'b00_0000_0000_0000; //nop
