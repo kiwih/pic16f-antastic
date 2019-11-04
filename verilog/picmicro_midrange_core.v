@@ -57,12 +57,15 @@ wire intcon_reg_wr_en;
 wire [7:0] intcon_reg_out;
 wire intcon_gie;	 	//global interrupt enable
 wire intcon_peie; 	//peripheral interrupt enable
-wire intcon_tmr0ie;	//tmr0 interrupt enable
+wire intcon_t0ie;		//tmr0 interrupt enable
 wire intcon_inte;		//rb0/int external interrupt enable
 wire intcon_rbie;		//rb port change interrupt enable
-wire intcon_tmr0if;	//tmr0 interrupt flag
+wire intcon_t0if;		//tmr0 interrupt flag
 wire intcon_intf;		//rb0/int external interrupt flag
 wire intcon_rbif;		//rb port change interrupt flag 
+wire intcon_gie_set_en;
+wire intcon_gie_clr_en;
+wire intcon_t0if_set_en;
 
 wire pir1_reg_wr_en;
 wire [7:0] pir1_reg_out;
@@ -75,18 +78,17 @@ wire [7:0] option_reg_out;
 wire tmr0_reg_wr_en;
 wire [7:0] tmr0_reg_out;
 
-wire tmr0if_set_en;
-
 wire peripheral_interrupt; //if a peripheral interrupt has happened and is enabled
 wire core_interrupt;
 wire interrupt_wake_up;
-wire interrupt_now;
+wire interrupt_flag; //the global interrupt flag
 
 wire [12:0] pc_out;
 wire pc_incr_en;
 wire pc_j_en;
 wire pc_j_and_push_en;
 wire pc_j_by_pop_en;
+wire pc_j_to_isr;
 
 wire status_irp;
 wire [1:0] status_rp;
@@ -115,6 +117,7 @@ wire alu_out_c_wr_en;
 wire alu_bit_test_res;
 
 wire bit_test_reg_out;
+
 
 resetmanager rm (
 	.clk(clk),
@@ -195,6 +198,7 @@ program_counter pc(
 	.pc_j_en(pc_j_en),
 	.pc_j_and_push_en(pc_j_and_push_en),
 	.pc_j_by_pop_en(pc_j_by_pop_en),
+	.pc_j_to_isr(pc_j_to_isr),
 	
 	.pclath_wr_en(pclath_reg_wr_en),
 	.pclath_in(alu_out[4:0]),
@@ -246,22 +250,29 @@ generic_register fsrreg(
 	.q(fsr_reg_out)
 );
 
-generic_register intconreg(
+core_interrupt_register intconreg(
 	.clk(clk),
 	.rst(rst),
 	.wr_en(intcon_reg_wr_en),
 	.d(alu_out), 
-	.q(intcon_reg_out)
+	.q(intcon_reg_out),
+	
+	.intcon_gie_clr_en(intcon_gie_clr_en),
+	.intcon_gie_set_en(intcon_gie_set_en),
+	
+	.intcon_t0if_set_en(intcon_t0if_set_en),	
+	
+	.intcon_gie(intcon_gie),
+	.intcon_peie(intcon_peie),
+	.intcon_t0ie(intcon_t0ie),
+	.intcon_inte(intcon_inte),
+	.intcon_rbie(intcon_rbie),
+	.intcon_t0if(intcon_t0if),
+	.intcon_intf(intcon_intf),
+	.intcon_rbif(intcon_rbif)
 );
 
-assign intcon_gie 	= intcon_reg_out[7];	//global interrupt enable
-assign intcon_peie 	= intcon_reg_out[6]; //peripheral interrupt enable
-assign intcon_tmr0ie = intcon_reg_out[5];	//tmr0 interrupt enable
-assign intcon_inte 	= intcon_reg_out[4];	//rb0/int external interrupt enable
-assign intcon_rbie 	= intcon_reg_out[3];	//rb port change interrupt enable
-assign intcon_tmr0if = intcon_reg_out[2];	//tmr0 interrupt flag
-assign intcon_intf 	= intcon_reg_out[1];	//rb0/int external interrupt flag
-assign intcon_rbif 	= intcon_reg_out[0];	//rb port change interrupt flag 
+
 
 peripheral_interrupt_register pir1reg(
 	.clk(clk),
@@ -289,13 +300,13 @@ assign peripheral_interrupt = |{	pir1_reg_out[7] & pie1_reg_out[7],
 											pir1_reg_out[1] & pie1_reg_out[1],
 											pir1_reg_out[0] & pie1_reg_out[0] } & intcon_peie;
 
-assign core_interrupt = |{ intcon_tmr0ie 	& intcon_tmr0if,
+assign core_interrupt = |{ intcon_t0ie 	& intcon_t0if,
 									intcon_inte 	& intcon_intf,
 									intcon_rbie		& intcon_rbif  };
 
 
 assign interrupt_wake_up = peripheral_interrupt | core_interrupt;
-assign interrupt_now = interrupt_wake_up & intcon_gie;
+assign interrupt_flag = interrupt_wake_up & intcon_gie;
 									
 generic_register pconreg(
 	.clk(clk),
@@ -324,7 +335,7 @@ tmr0wdt tmr0wdt(
 	
 	.wdt_clr(wdt_clr),
 	
-	.tmr0if_set_en(tmr0if_set_en), 	//set flag bit T0IF on tmr0 overflow
+	.tmr0if_set_en(intcon_t0if_set_en), 	//set flag bit T0IF on tmr0 overflow
 	.wdt_timeout(wdt_timeout)			//set if wdt overflows
 );
 	
@@ -333,6 +344,8 @@ instruction_decoder control(
 	.rst(rst),
 	
 	.clkout(clkout),
+	
+	.interrupt_flag(interrupt_flag),
 	
 	.instr_current(instr_current),
 	
@@ -351,8 +364,12 @@ instruction_decoder control(
 	.pc_j_en(pc_j_en),
 	.pc_j_and_push_en(pc_j_and_push_en),
 	.pc_j_by_pop_en(pc_j_by_pop_en),
+	.pc_j_to_isr(pc_j_to_isr),
 	
 	.wdt_clr(wdt_clr),
+	
+	.gie_set_en(intcon_gie_set_en),
+	.gie_clr_en(intcon_gie_clr_en),
 	
 	.status_z(status_z)
 
