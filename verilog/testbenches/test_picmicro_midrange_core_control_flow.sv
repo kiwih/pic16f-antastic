@@ -30,7 +30,6 @@ initial begin
 	$readmemb("testcontrol.prog", core.progmem.instrMemory);
 	#20 //end of reset
 	assert(core.pc_out == 0) else $fatal();
-	assert(core.control.q_count == 0) else $fatal();
 	#30
 	
 	//execute the first command: 10100001010000 //00.    goto 0x50
