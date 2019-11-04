@@ -14,26 +14,13 @@ reg [INSTR_WIDTH - 1:0] instrReg;
 reg [INSTR_WIDTH - 1:0] instrMemory [2**ADDR_WIDTH - 1:0];
 
 initial begin
-//	instr = {INSTR_WIDTH{1'b0}};
-//	`ifdef MODEL_TECH
-//	  // code for simulation with modelsim
-//	  `ifdef testcontrol
-//			$readmemb("testcontrol.prog", instrMemory);
-//	  `else
-//			`ifdef test_tmr0
-//				$readmemb("test_tmr0.prog", instrMemory);
-//			`else
-//				$readmemb("test.prog", instrMemory);
-//			`endif
-//		`endif
-//	`else
 	`ifndef MODEL_TECH
-	  // code for synthesis
-	  $readmemb("./simulation/modelsim/test.prog", instrMemory);
-	 `endif
-//	`endif
-	
-//   instrMemory[0] = 14'b00_0000_0000_0000; //nop
+		//code for synthesis. Testbenches will override this initialisation.
+		$readmemb("./simulation/modelsim/test.prog", instrMemory);
+	`endif
+
+//alternatively, you can manually specify instructions, e.g.:
+// instrMemory[0] = 14'b00_0000_0000_0000; //nop
 //	instrMemory[1] = 14'b11_0000_1010_1011; //movlw 0xAB
 //	instrMemory[2] = 14'b00_0000_1010_0000; //movwf 0x20
 //	instrMemory[3] = 14'b11_0000_1100_1101; //movlw 0xCD
@@ -41,8 +28,6 @@ initial begin
 //	instrMemory[5] = 14'b10_1000_0000_0001; //goto 0x001 (the movlw instruction)
 //	instrMemory[6] = 14'b11_0000_1110_1111; //movlw 0xEF
 end
-
-//TODO: mif
 
 always @(posedge clk)
 	instrReg = instrMemory[addr];
