@@ -51,7 +51,7 @@
 *.sopc_builder
 *example*
 *~
-*.sdc
+# *.sdc We actually like sdc files, they're used for time constraints
 *.tcl
 *.pin
 *.mif

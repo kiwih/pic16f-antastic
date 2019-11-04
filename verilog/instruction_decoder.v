@@ -34,8 +34,8 @@ module instruction_decoder(
 //
 
 //most instructions take 4 clock cycles
-//1: instruction decode cycle or forced nop
-//2: instruction read or nop
+//1: instruction decode cycle or forced nop, also decodes ram file memory addresses
+//2: data read from memory thru mux network or nop 
 //3: process data
 //4: instruction write cycle or nop
 

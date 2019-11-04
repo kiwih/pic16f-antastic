@@ -7,7 +7,9 @@ module picmicro_midrange_core(
 	
 	output wire [8:0] extern_peripherals_addr,
 	output wire [7:0] extern_peripherals_data_in,
-	input wire [7:0] extern_peripherals_data_out
+	input wire [7:0] extern_peripherals_data_out,
+	
+	input wire [7:0] extern_peripherals_interrupt_strobes
 );
 
 //most instructions take 4 clock cycles
@@ -53,6 +55,15 @@ wire fsr_reg_wr_en;
 wire [7:0] fsr_reg_out;
 wire intcon_reg_wr_en;
 wire [7:0] intcon_reg_out;
+wire intcon_gie;	 	//global interrupt enable
+wire intcon_peie; 	//peripheral interrupt enable
+wire intcon_tmr0ie;	//tmr0 interrupt enable
+wire intcon_inte;		//rb0/int external interrupt enable
+wire intcon_rbie;		//rb port change interrupt enable
+wire intcon_tmr0if;	//tmr0 interrupt flag
+wire intcon_intf;		//rb0/int external interrupt flag
+wire intcon_rbif;		//rb port change interrupt flag 
+
 wire pir1_reg_wr_en;
 wire [7:0] pir1_reg_out;
 wire pie1_reg_wr_en;
@@ -65,6 +76,11 @@ wire tmr0_reg_wr_en;
 wire [7:0] tmr0_reg_out;
 
 wire tmr0if_set_en;
+
+wire peripheral_interrupt; //if a peripheral interrupt has happened and is enabled
+wire core_interrupt;
+wire interrupt_wake_up;
+wire interrupt_now;
 
 wire [12:0] pc_out;
 wire pc_incr_en;
@@ -238,9 +254,19 @@ generic_register intconreg(
 	.q(intcon_reg_out)
 );
 
-generic_register pir1reg(
+assign intcon_gie 	= intcon_reg_out[7];	//global interrupt enable
+assign intcon_peie 	= intcon_reg_out[6]; //peripheral interrupt enable
+assign intcon_tmr0ie = intcon_reg_out[5];	//tmr0 interrupt enable
+assign intcon_inte 	= intcon_reg_out[4];	//rb0/int external interrupt enable
+assign intcon_rbie 	= intcon_reg_out[3];	//rb port change interrupt enable
+assign intcon_tmr0if = intcon_reg_out[2];	//tmr0 interrupt flag
+assign intcon_intf 	= intcon_reg_out[1];	//rb0/int external interrupt flag
+assign intcon_rbif 	= intcon_reg_out[0];	//rb port change interrupt flag 
+
+peripheral_interrupt_register pir1reg(
 	.clk(clk),
 	.rst(rst),
+	.interrupt_strobes(extern_peripherals_interrupt_strobes),
 	.wr_en(pir1_reg_wr_en),
 	.d(alu_out), 
 	.q(pir1_reg_out)
@@ -254,6 +280,23 @@ generic_register pie1reg(
 	.q(pie1_reg_out)
 );
 
+assign peripheral_interrupt = |{	pir1_reg_out[7] & pie1_reg_out[7], 
+											pir1_reg_out[6] & pie1_reg_out[6],
+											pir1_reg_out[5] & pie1_reg_out[5],
+											pir1_reg_out[4] & pie1_reg_out[4],
+											pir1_reg_out[3] & pie1_reg_out[3],
+											pir1_reg_out[2] & pie1_reg_out[2],
+											pir1_reg_out[1] & pie1_reg_out[1],
+											pir1_reg_out[0] & pie1_reg_out[0] } & intcon_peie;
+
+assign core_interrupt = |{ intcon_tmr0ie 	& intcon_tmr0if,
+									intcon_inte 	& intcon_intf,
+									intcon_rbie		& intcon_rbif  };
+
+
+assign interrupt_wake_up = peripheral_interrupt | core_interrupt;
+assign interrupt_now = interrupt_wake_up & intcon_gie;
+									
 generic_register pconreg(
 	.clk(clk),
 	.rst(rst),
