@@ -3,7 +3,9 @@
 //also there are no ADCs
 `default_nettype none
 
-module pic16fantastic_on_de2_115(
+module pic16fantastic_on_de2_115 #(
+	parameter PROGRAM_FILE_NAME = "swap_sw_led.mem"
+) (
 	input wire CLOCK_50,
 	
 	input wire [3:0] KEY,
@@ -39,7 +41,9 @@ wire [7:0] porta_port;
 reg porta_tris_wr_en;
 reg porta_port_wr_en;
 
-picmicro_midrange_core core(
+picmicro_midrange_core #(
+	.PROGRAM_FILE_NAME(PROGRAM_FILE_NAME)
+) core (
 	.clk(clk),
 	.clk_wdt(clk_wdt),
 	.rst_ext(rst_ext),

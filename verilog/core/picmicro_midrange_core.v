@@ -1,6 +1,8 @@
 `default_nettype none
 
-module picmicro_midrange_core(
+module picmicro_midrange_core #(
+	parameter PROGRAM_FILE_NAME = "default.mem"
+) (
 	input wire clk,
 	input wire clk_wdt,
 	input wire rst_ext,
@@ -132,7 +134,9 @@ resetmanager rm (
 assign rst_peripherals = rst; //we'll export rst to the peripherals external to this module
 
 //includes a register to save the current output(and only update upon rd_en)
-program_memory progmem (
+program_memory #(
+	.PROGRAM_FILE_NAME(PROGRAM_FILE_NAME)
+) progmem (
 	.clk(clk),
 	.rst(rst),
 	.rd_en(instr_rd_en),
