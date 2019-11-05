@@ -41,7 +41,7 @@ module ram_file_registers (
 	input wire [7:0] pcon_reg_val,
 	
 	//when the regfile_addr points at something non-core we'll attempt to load it externally
-	output reg extern_peripherals_en,
+	output reg extern_peripherals_wr_en,
 	input wire [7:0] extern_peripherals_out
 
 );
@@ -112,7 +112,7 @@ always @(*) begin
 	pir1_reg_wr_en <= 1'b0;
 	pie1_reg_wr_en <= 1'b0;
 	pcon_reg_wr_en <= 1'b0;
-	extern_peripherals_en <= 1'b0;
+	extern_peripherals_wr_en <= 1'b0;
 	gpRegistersA_wr_en <= 1'b0;
 	gpRegistersB_wr_en <= 1'b0;
 	gpRegistersC_wr_en <= 1'b0;
@@ -180,6 +180,7 @@ always @(*) begin
 			gpRegistersShared_wr_en <= wr_en;
 			data_out_tmp <= gpRegistersShared_out;
 		end else begin
+			extern_peripherals_wr_en <= wr_en;
 			data_out_tmp <= extern_peripherals_out;
 		end
 	endcase

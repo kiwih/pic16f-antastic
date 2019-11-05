@@ -5,7 +5,10 @@ module picmicro_midrange_core(
 	input wire clk_wdt,
 	input wire rst_ext,
 	
+	output wire rst_peripherals,
+	
 	output wire [8:0] extern_peripherals_addr,
+	output wire extern_peripherals_wr_en,
 	output wire [7:0] extern_peripherals_data_in,
 	input wire [7:0] extern_peripherals_data_out,
 	
@@ -126,6 +129,8 @@ resetmanager rm (
 	.rst(rst)
 );
 
+assign rst_peripherals = rst; //we'll export rst to the peripherals external to this module
+
 //includes a register to save the current output(and only update upon rd_en)
 program_memory progmem (
 	.clk(clk),
@@ -186,6 +191,7 @@ ram_file_registers regfile (
 	.pcon_reg_wr_en(pcon_reg_wr_en),
 	.pcon_reg_val(pcon_reg_out),
 	
+	.extern_peripherals_wr_en(extern_peripherals_wr_en),
 	.extern_peripherals_out(extern_peripherals_data_out) //when the regfile_addr points at something non-core we'll attempt to load it externally
 );
 
