@@ -13,10 +13,10 @@ module pic16fantastic_on_de2_115 #(
 	
 	output wire [7:0] LEDG,
 	
-	output wire [7:0] LCD_DATA,
-	output wire LCD_RS,
-	output wire LCD_RW,
-	output wire LCD_EN,
+	inout wire [7:0] LCD_DATA,
+	inout wire LCD_RS,
+	inout wire LCD_RW,
+	inout wire LCD_EN,
 	
 	output wire [7:0] LEDR,
 	
@@ -112,7 +112,7 @@ fake_bidir_port porta(
 	.port_wr_en(porta_port_wr_en)
 );
 
-wire [7:0] portb_phy_in;
+reg [7:0] portb_phy_in;
 reg [7:0] portb_phy_out;
 wire [7:0] portb_phy_contr = portb_tris;
 
@@ -132,49 +132,19 @@ fake_bidir_port portb(
 	.port_wr_en(portb_port_wr_en)
 );
 
-//assign LCD_DATA[0] = portb_phy_contr[0] ? 1'bz : portb_phy_out[0];
-//assign LCD_DATA[1] = portb_phy_contr[1] ? 1'bz : portb_phy_out[1];
-//assign LCD_DATA[2] = portb_phy_contr[2] ? 1'bz : portb_phy_out[2];
-//assign LCD_DATA[3] = portb_phy_contr[3] ? 1'bz : portb_phy_out[3];
-//assign LCD_RS		 = portb_phy_contr[4] ? 1'bz : portb_phy_out[4];
-//assign LCD_RW		 = portb_phy_contr[6] ? 1'bz : portb_phy_out[6];
-//assign LCD_EN		 = portb_phy_contr[7] ? 1'bz : portb_phy_out[7];
-
-assign LCD_DATA[7:4] = portb_phy_out[3:0];
 assign LCD_DATA[3:0] = 4'h0;
-
-assign LCD_RS		 = portb_phy_out[4];
-assign LCD_RW		 = portb_phy_out[6];
-assign LCD_EN		 = portb_phy_out[7];
+assign LCD_DATA[4] = portb_phy_contr[0] ? 1'bz : portb_phy_out[0];
+assign LCD_DATA[5] = portb_phy_contr[1] ? 1'bz : portb_phy_out[1];
+assign LCD_DATA[6] = portb_phy_contr[2] ? 1'bz : portb_phy_out[2];
+assign LCD_DATA[7] = portb_phy_contr[3] ? 1'bz : portb_phy_out[3];
+assign LCD_RS		 = portb_phy_contr[4] ? 1'bz : portb_phy_out[4];
+assign LCD_RW		 = portb_phy_contr[6] ? 1'bz : portb_phy_out[6];
+assign LCD_EN		 = portb_phy_contr[7] ? 1'bz : portb_phy_out[7];
 
 assign LEDR[7:0] = portb_phy_out[7:0];
 
-
 always @(posedge clk) 
-	portb_phy_in <= portb_phy_out;
-//portb_phy_in <= {LCD_E, LCD_RW, 1'b0, LCD_RS, LCD_DATA[3:0]};
-
-//PORTA0 = LCD_DATA[0]
-//PORTA1 = LCD_DATA[1]
-//PORTA2 = LCD_DATA[2]
-//PORTA3 = LCD_DATA[3]
-//PORTA4 = LCD_RS
-//PORTA5 = unused input
-//PORTA6 = LCD_RW
-//PORTA7 = LCD_E
-
-
-//PORTA0 = KEY[0], LEDG[0]
-//PORTA1 = KEY[1], LEDG[1]
-//PORTA2 = KEY[2], LEDG[2]
-//PORTA3 = KEY[3], LEDG[3]
-//PORTA4 = SW[0], LEDR[0]
-//PORTA5 = SW[1], LEDR[1]
-//PORTA6 = SW[2], LEDR[2]
-//PORTA7 = SW[3], LEDR[3]
-
-//i have demapped the UART so that it is always available on UART_TXD and UART_RXD
-
+	portb_phy_in <= {LCD_EN, LCD_RW, 1'b0, LCD_RS, LCD_DATA[3:0]};
 
 endmodule
 

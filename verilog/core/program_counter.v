@@ -53,7 +53,10 @@ always @(posedge clk) begin
 	end
 end
 
-assign pc_out = pc;
+assign pc_out = pcl_wr_en ? {pc[12:8], pcl_in} : pc; //this line is very important. It enables data-forwarding of the incoming PCL value during PCL write
+																		//as PCL writes occour in the same tick as PC is read into the address register
+																		//essentially, this mitigates a pipeline hazard
+																		//TODO: do we need one of these for pclath as well?
 assign pclath_out = pc[12:8];
 assign pcl_out = pc[7:0];
 

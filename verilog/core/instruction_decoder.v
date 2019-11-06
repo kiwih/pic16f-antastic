@@ -54,8 +54,6 @@ module instruction_decoder(
 
 //branch instructions take 8
 
-//reg two_cycle_instruction = 1'b0; //used when configuring a two-cycle instruction
-
 reg [1:0] q_count = 2'd0; //used to count the 4 clock cycles of executing a command
 
 wire alu_d = instr_current[7]; //This is the default case. 0 = W register, 1 = F register

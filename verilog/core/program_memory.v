@@ -7,6 +7,7 @@ module program_memory #(
 	input wire rst,
 	input wire flush,
 	input wire rd_en,
+	
 	input wire [ADDR_WIDTH - 1:0] addr,
 	output reg [INSTR_WIDTH - 1:0] instr
 );
