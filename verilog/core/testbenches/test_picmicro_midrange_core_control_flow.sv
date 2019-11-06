@@ -47,25 +47,25 @@ initial begin
 	core.progmem.instrMemory[13'h000f] = 14'b00_0000_0000_0000; //nop
 	
 	core.progmem.instrMemory[13'h0010] = 14'b11_0100_1111_0001; //retlw 0xF1
-	core.progmem.instrMemory[13'h0011] = 14'b00_0000_0000_0000; //nop
-	core.progmem.instrMemory[13'h0012] = 14'b00_0000_0000_0000; //nop
-	core.progmem.instrMemory[13'h0013] = 14'b00_0000_0000_0000; //nop
-	core.progmem.instrMemory[13'h0014] = 14'b00_0000_0000_0000; //nop
-	core.progmem.instrMemory[13'h0015] = 14'b00_0000_0000_0000; //nop
-	core.progmem.instrMemory[13'h0016] = 14'b00_0000_0000_0000; //nop
-	core.progmem.instrMemory[13'h0017] = 14'b00_0000_0000_0000; //nop
-	core.progmem.instrMemory[13'h0018] = 14'b00_0000_0000_0000; //nop
+	core.progmem.instrMemory[13'h0011] = 14'b00_0001_1010_0000; //clrf 0x20
+	core.progmem.instrMemory[13'h0012] = 14'b00_1000_0010_0000; //movf 0x20 w	
+	core.progmem.instrMemory[13'h0013] = 14'b10_0000_0001_1010; //call 0x1a  ;get a character
+	core.progmem.instrMemory[13'h0014] = 14'b11_1010_0000_0000; //xorlw 0x00 ;is it zero?
+	core.progmem.instrMemory[13'h0015] = 14'b01_1001_0000_0011; //btfsc STATUS, Z 
+	core.progmem.instrMemory[13'h0016] = 14'b00_0000_0000_1000; //return		 ;return if zero
+	core.progmem.instrMemory[13'h0017] = 14'b00_1010_1010_0000; //incf 0x20, f ;increment 0x20 if not and
+	core.progmem.instrMemory[13'h0018] = 14'b10_1000_0001_0010; //goto 0x12  ;..repeat
 	core.progmem.instrMemory[13'h0019] = 14'b00_0000_0000_0000; //nop
-	core.progmem.instrMemory[13'h001a] = 14'b00_0000_0000_0000; //nop
-	core.progmem.instrMemory[13'h001b] = 14'b00_0000_0000_0000; //nop
-	core.progmem.instrMemory[13'h001c] = 14'b00_0000_0000_0000; //nop
-	core.progmem.instrMemory[13'h001d] = 14'b00_0000_0000_0000; //nop
+	core.progmem.instrMemory[13'h001a] = 14'b00_0111_1000_0010; //addwf pcl, f
+	core.progmem.instrMemory[13'h001b] = 14'b11_0100_0000_1010; //retlw 0x0a
+	core.progmem.instrMemory[13'h001c] = 14'b11_0100_0000_1011; //retlw 0x0b
+	core.progmem.instrMemory[13'h001d] = 14'b11_0100_0000_0000; //retlw 0x00
 	core.progmem.instrMemory[13'h001e] = 14'b00_0000_0000_0000; //nop
 	core.progmem.instrMemory[13'h001f] = 14'b00_0000_0000_0000; //nop
 	
 	core.progmem.instrMemory[13'h0020] = 14'b10_0000_0000_0001; //call 0x01   //test CALL and RETURN
 	core.progmem.instrMemory[13'h0021] = 14'b10_0000_0001_0000; //call 0x10   //test CALL and RETLW
-	core.progmem.instrMemory[13'h0022] = 14'b00_0000_0000_0000; //nop
+	core.progmem.instrMemory[13'h0022] = 14'b10_0000_0001_0001; //call 0x11	  //test CALL with other things
 	core.progmem.instrMemory[13'h0023] = 14'b00_0000_0000_0000; //nop
 	core.progmem.instrMemory[13'h0029] = 14'b00_0000_0000_0000; //nop
 	core.progmem.instrMemory[13'h002a] = 14'b00_0000_0000_0000; //nop
@@ -181,6 +181,207 @@ initial begin
 	assert(core.pc.hs.tos == 0) else $fatal();
 	assert(core.pc.hs.out == 13'h0000) else $fatal();
 	assert(core.w_reg_out == 8'hf1) else $fatal();
+	
+	//----------------------------------------------------------------------------------------------------------------------------
+	
+	//execute [13'h0022] = 14'b10_0000_0001_0001; //call 0x11	  //test CALL with other things
+	#40
+	assert(core.instr_flush == 1) else $fatal();
+	assert(core.pc_j_and_push_en == 1) else $fatal();
+
+	//this instruction should have been flushed as we jump to 0x11
+	#40
+	assert(core.instr_current == 0) else $fatal();
+	assert(core.pc_out == 13'h0011) else $fatal();
+	assert(core.pc.hs.stack[0] ==  13'h0023) else $fatal();
+	assert(core.pc.hs.tos == 1) else $fatal();
+	assert(core.pc.hs.out == 13'h0023) else $fatal();
+	
+	//execute [13'h0011] = 14'b00_0001_1010_0000; //clrf 0x20
+	#40
+	assert(core.regfile.gpRegistersA[0] == 8'h00) else $fatal();
+	
+	//--------------------------------------------------------------------------------
+	//iteration 0
+	
+	//execute [13'h0012] = 14'b00_1000_0010_0000; //movf 0x20 w	
+	#40
+	assert(core.w_reg_out == 8'h00) else $fatal();
+	
+	//execute [13'h0013] = 14'b10_0000_0001_1010; //call 0x1a  ;get a character
+	#40
+	assert(core.instr_flush == 1) else $fatal();
+	assert(core.pc_j_and_push_en == 1) else $fatal();
+	
+	//this instruction should have been flushed as we jump to 0x1a
+	#40
+	assert(core.instr_current == 0) else $fatal();
+	assert(core.pc_out == 13'h001a) else $fatal();
+	assert(core.pc.hs.out == 13'h0014) else $fatal();
+	
+	//execute [13'h001a] = 14'b00_0111_1000_0010; //addwf pcl, f //note that in the first iteration, w is 0
+	#40
+	assert(core.pc_out == 13'h001b) else $fatal();
+	
+	//execute [13'h001b] = 14'b11_0100_0000_1010; //retlw 0x0a
+	#40
+	assert(core.w_reg_out == 8'h0a) else $fatal();
+	assert(core.instr_flush == 1) else $fatal();
+	assert(core.pc.hs.out == 13'h0014) else $fatal();
+	assert(core.pc_j_by_pop_en == 1) else $fatal();
+
+	//this instruction should have been flushed as we return to 0x14
+	#40
+	assert(core.instr_current == 0) else $fatal();
+	assert(core.pc_out == 13'h0014) else $fatal();
+	assert(core.pc.hs.out == 13'h0023) else $fatal();
+	
+	//execute [13'h0014] = 14'b11_1010_0000_0000; //xorlw 0x00 ;is it zero?
+	#40
+	assert(core.w_reg_out == 8'h0a) else $fatal();
+	assert(core.status_z == 0) else $fatal();
+	
+	//execute [13'h0015] = 14'b01_1001_0000_0011; //btfsc STATUS, Z , Z not clear so we flush next
+	#40
+	assert(core.instr_flush == 1) else $fatal();
+	
+	//flushed
+	#40
+	assert(core.instr_current == 0) else $fatal();
+	
+	//execute [13'h0017] = 14'b00_1010_1010_0000; //incf 0x20, f ;increment 0x20 if not and
+	#40
+	assert(core.regfile.gpRegistersA[0] == 8'h01) else $fatal();
+	
+	//execute [13'h0018] = 14'b10_1000_0001_0010; //goto 0x12  ;..repeat
+	#40
+	assert(core.instr_flush == 1) else $fatal();
+	assert(core.pc_j_en == 1) else $fatal();
+
+	//this instruction should have been flushed as we jump to 0x11
+	#40
+	assert(core.instr_current == 0) else $fatal();
+	assert(core.pc_out == 13'h0012) else $fatal();
+	
+	//----------------------------------------------------------------------
+	//iteration 1
+	
+	//execute [13'h0012] = 14'b00_1000_0010_0000; //movf 0x20 w	
+	#40
+	assert(core.w_reg_out == 8'h01) else $fatal();
+	
+	//execute [13'h0013] = 14'b10_0000_0001_1010; //call 0x1a  ;get a character
+	#40
+	assert(core.instr_flush == 1) else $fatal();
+	assert(core.pc_j_and_push_en == 1) else $fatal();
+	
+	//this instruction should have been flushed as we jump to 0x1a
+	#40
+	assert(core.instr_current == 0) else $fatal();
+	assert(core.pc_out == 13'h001a) else $fatal();
+	assert(core.pc.hs.out == 13'h0014) else $fatal();
+	
+	//execute [13'h001a] = 14'b00_0111_1000_0010; //addwf pcl, f //note that in the second iteration, w is 1
+	#40
+	assert(core.pc_out == 13'h001c) else $fatal();
+	
+	//execute [13'h001c] = 14'b11_0100_0000_1010; //retlw 0x0b
+	#40
+	assert(core.w_reg_out == 8'h0b) else $fatal();
+	assert(core.instr_flush == 1) else $fatal();
+	assert(core.pc.hs.out == 13'h0014) else $fatal();
+	assert(core.pc_j_by_pop_en == 1) else $fatal();
+
+	//this instruction should have been flushed as we return to 0x14
+	#40
+	assert(core.instr_current == 0) else $fatal();
+	assert(core.pc_out == 13'h0014) else $fatal();
+	assert(core.pc.hs.out == 13'h0023) else $fatal();
+	
+	//execute [13'h0014] = 14'b11_1010_0000_0000; //xorlw 0x00 ;is it zero?
+	#40
+	assert(core.w_reg_out == 8'h0b) else $fatal();
+	assert(core.status_z == 0) else $fatal();
+	
+	//execute [13'h0015] = 14'b01_1001_0000_0011; //btfsc STATUS, Z , Z not clear so we flush next
+	#40
+	assert(core.instr_flush == 1) else $fatal();
+	
+	//flushed
+	#40
+	assert(core.instr_current == 0) else $fatal();
+	
+	//execute [13'h0017] = 14'b00_1010_1010_0000; //incf 0x20, f ;increment 0x20 if not and
+	#40
+	assert(core.regfile.gpRegistersA[0] == 8'h02) else $fatal();
+	
+	//execute [13'h0018] = 14'b10_1000_0001_0010; //goto 0x12  ;..repeat
+	#40
+	assert(core.instr_flush == 1) else $fatal();
+	assert(core.pc_j_en == 1) else $fatal();
+
+	//this instruction should have been flushed as we jump to 0x11
+	#40
+	assert(core.instr_current == 0) else $fatal();
+	assert(core.pc_out == 13'h0012) else $fatal();
+	
+	//----------------------------------------------------------------------
+	//iteration 2
+	
+	//execute [13'h0012] = 14'b00_1000_0010_0000; //movf 0x20 w	
+	#40
+	assert(core.w_reg_out == 8'h02) else $fatal();
+	
+	//execute [13'h0013] = 14'b10_0000_0001_1010; //call 0x1a  ;get a character
+	#40
+	assert(core.instr_flush == 1) else $fatal();
+	assert(core.pc_j_and_push_en == 1) else $fatal();
+	
+	//this instruction should have been flushed as we jump to 0x1a
+	#40
+	assert(core.instr_current == 0) else $fatal();
+	assert(core.pc_out == 13'h001a) else $fatal();
+	assert(core.pc.hs.out == 13'h0014) else $fatal();
+	
+	//execute [13'h001a] = 14'b00_0111_1000_0010; //addwf pcl, f //note that in the second iteration, w is 1
+	#40
+	assert(core.pc_out == 13'h001d) else $fatal();
+	
+	//execute [13'h001d] = 14'b11_0100_0000_0000; //retlw 0x00
+	#40
+	assert(core.w_reg_out == 8'h00) else $fatal();
+	assert(core.instr_flush == 1) else $fatal();
+	assert(core.pc.hs.out == 13'h0014) else $fatal();
+	assert(core.pc_j_by_pop_en == 1) else $fatal();
+
+	//this instruction should have been flushed as we return to 0x14
+	#40
+	assert(core.instr_current == 0) else $fatal();
+	assert(core.pc_out == 13'h0014) else $fatal();
+	assert(core.pc.hs.out == 13'h0023) else $fatal();
+	
+	//execute [13'h0014] = 14'b11_1010_0000_0000; //xorlw 0x00 ;is it zero?
+	#40
+	assert(core.w_reg_out == 8'h00) else $fatal();
+	assert(core.status_z == 1) else $fatal();
+	
+	//execute [13'h0015] = 14'b01_1001_0000_0011; //btfsc STATUS, Z , Z not clear so we don't skip
+	#40
+	
+	//execute [13'h0016] = 14'b00_0000_0000_1000; //return		 ;return if zero
+	#40
+	assert(core.instr_flush == 1) else $fatal();
+	assert(core.pc.hs.out == 13'h0023) else $fatal();
+	assert(core.pc_j_by_pop_en == 1) else $fatal();
+
+	//this instruction should have been flushed as we return to 0x21
+	#40
+	assert(core.instr_current == 0) else $fatal();
+	assert(core.pc_out == 13'h0023) else $fatal();
+	assert(core.pc.hs.tos == 0) else $fatal();
+	assert(core.pc.hs.out == 13'h0000) else $fatal();
+	
+	
 	
 	$display("ALL TESTS PASSED SUCCESSFULLY");
 	$finish();

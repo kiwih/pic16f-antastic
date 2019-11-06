@@ -215,6 +215,8 @@ program_counter pc(
 	.pcl_wr_en(pcl_reg_wr_en),
 	.pcl_in(alu_out),
 	
+	.pcl_out(pcl_reg_out),
+	
 	.pc_incr_en(pc_incr_en)
 );
 

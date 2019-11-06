@@ -17,7 +17,8 @@ module program_counter (
 	output wire [4:0] pclath_out,
 	
 	input wire pcl_wr_en,
-	input wire [7:0] pcl_in
+	input wire [7:0] pcl_in,
+	output wire [7:0] pcl_out
 );
 
 reg [4:0] pclath = 5'd0;
@@ -54,6 +55,7 @@ end
 
 assign pc_out = pc;
 assign pclath_out = pc[12:8];
+assign pcl_out = pc[7:0];
 
 hardware_stack hs(
 	.clk(clk),
