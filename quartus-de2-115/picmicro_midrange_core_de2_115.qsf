@@ -39,7 +39,7 @@
 
 set_global_assignment -name FAMILY "Cyclone IV E"
 set_global_assignment -name DEVICE EP4CE115F29C7
-set_global_assignment -name TOP_LEVEL_ENTITY uart
+set_global_assignment -name TOP_LEVEL_ENTITY pic16fantastic_on_de2_115
 set_global_assignment -name ORIGINAL_QUARTUS_VERSION 16.0.0
 set_global_assignment -name PROJECT_CREATION_TIME_DATE "15:41:05  OCTOBER 10, 2019"
 set_global_assignment -name LAST_QUARTUS_VERSION "17.0.0 Lite Edition"
@@ -578,32 +578,6 @@ set_location_assignment PIN_V22 -to HSMC_TX_D_N[16]
 set_location_assignment PIN_T22 -to HSMC_RX_D_N[16]
 set_location_assignment PIN_V24 -to HSMC_CLKOUT_N2
 set_location_assignment PIN_G24 -to HSMC_CLKOUT_N1
-set_global_assignment -name TIMEQUEST_MULTICORNER_ANALYSIS ON
-set_global_assignment -name SMART_RECOMPILE OFF
-set_global_assignment -name VERILOG_INCLUDE_FILE peripheral_memory_map.vh
-set_global_assignment -name SYSTEMVERILOG_FILE pic16fantastic_on_de2_115.sv
-set_global_assignment -name VERILOG_FILE ../verilog/core/tmr0wdt.v
-set_global_assignment -name VERILOG_FILE ../verilog/core/status_register.v
-set_global_assignment -name VERILOG_FILE ../verilog/core/resetmanager.v
-set_global_assignment -name VERILOG_FILE ../verilog/core/ram_file_registers.v
-set_global_assignment -name VERILOG_FILE ../verilog/core/ram_file_address_mux.v
-set_global_assignment -name VERILOG_FILE ../verilog/core/program_memory.v
-set_global_assignment -name VERILOG_FILE ../verilog/core/program_counter.v
-set_global_assignment -name VERILOG_FILE ../verilog/core/picmicro_midrange_core.v
-set_global_assignment -name VERILOG_FILE ../verilog/core/peripheral_interrupt_register.v
-set_global_assignment -name VERILOG_FILE ../verilog/core/instruction_decoder.v
-set_global_assignment -name VERILOG_FILE ../verilog/core/hardware_stack.v
-set_global_assignment -name VERILOG_FILE ../verilog/core/generic_register.v
-set_global_assignment -name VERILOG_FILE ../verilog/core/generic_prescaler.v
-set_global_assignment -name VERILOG_FILE ../verilog/core/core_interrupt_register.v
-set_global_assignment -name VERILOG_FILE ../verilog/core/alu.v
-set_global_assignment -name VERILOG_INCLUDE_FILE ../verilog/core/memory_map.vh
-set_global_assignment -name VERILOG_INCLUDE_FILE ../verilog/core/isa.vh
-set_global_assignment -name SYSTEMVERILOG_FILE ../verilog/core/testbenches/test_picmicro_midrange_core_tmr0.sv
-set_global_assignment -name SYSTEMVERILOG_FILE ../verilog/core/testbenches/test_picmicro_midrange_core_isr.sv
-set_global_assignment -name SYSTEMVERILOG_FILE ../verilog/core/testbenches/test_picmicro_midrange_core_control_flow.sv
-set_global_assignment -name SYSTEMVERILOG_FILE ../verilog/core/testbenches/test_picmicro_midrange_core_basic_instructions.sv
-set_global_assignment -name VERILOG_FILE ../verilog/peripherals/fake_bidir_port.v
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to AUD_ADCDAT
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to AUD_ADCLRCK
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to AUD_BCLK
@@ -1129,6 +1103,32 @@ set_instance_assignment -name IO_STANDARD LVDS -to HSMC_TX_D_N[16]
 set_instance_assignment -name IO_STANDARD LVDS -to HSMC_RX_D_N[16]
 set_instance_assignment -name IO_STANDARD LVDS -to HSMC_CLKOUT_N2
 set_instance_assignment -name IO_STANDARD LVDS -to HSMC_CLKOUT_N1
+set_global_assignment -name TIMEQUEST_MULTICORNER_ANALYSIS ON
+set_global_assignment -name SMART_RECOMPILE OFF
+set_global_assignment -name VERILOG_INCLUDE_FILE peripheral_memory_map.vh
+set_global_assignment -name SYSTEMVERILOG_FILE pic16fantastic_on_de2_115.sv
+set_global_assignment -name VERILOG_FILE ../verilog/core/tmr0wdt.v
+set_global_assignment -name VERILOG_FILE ../verilog/core/status_register.v
+set_global_assignment -name VERILOG_FILE ../verilog/core/resetmanager.v
+set_global_assignment -name VERILOG_FILE ../verilog/core/ram_file_registers.v
+set_global_assignment -name VERILOG_FILE ../verilog/core/ram_file_address_mux.v
+set_global_assignment -name VERILOG_FILE ../verilog/core/program_memory.v
+set_global_assignment -name VERILOG_FILE ../verilog/core/program_counter.v
+set_global_assignment -name VERILOG_FILE ../verilog/core/picmicro_midrange_core.v
+set_global_assignment -name VERILOG_FILE ../verilog/core/peripheral_interrupt_register.v
+set_global_assignment -name VERILOG_FILE ../verilog/core/instruction_decoder.v
+set_global_assignment -name VERILOG_FILE ../verilog/core/hardware_stack.v
+set_global_assignment -name VERILOG_FILE ../verilog/core/generic_register.v
+set_global_assignment -name VERILOG_FILE ../verilog/core/generic_prescaler.v
+set_global_assignment -name VERILOG_FILE ../verilog/core/core_interrupt_register.v
+set_global_assignment -name VERILOG_FILE ../verilog/core/alu.v
+set_global_assignment -name VERILOG_INCLUDE_FILE ../verilog/core/memory_map.vh
+set_global_assignment -name VERILOG_INCLUDE_FILE ../verilog/core/isa.vh
+set_global_assignment -name SYSTEMVERILOG_FILE ../verilog/core/testbenches/test_picmicro_midrange_core_tmr0.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../verilog/core/testbenches/test_picmicro_midrange_core_isr.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../verilog/core/testbenches/test_picmicro_midrange_core_control_flow.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../verilog/core/testbenches/test_picmicro_midrange_core_basic_instructions.sv
+set_global_assignment -name VERILOG_FILE ../verilog/peripherals/fake_bidir_port.v
 set_global_assignment -name VERILOG_FILE ../verilog/peripherals/uart/uart.v
 set_global_assignment -name VERILOG_FILE ../verilog/peripherals/uart/uart_spbrg.v
 set_global_assignment -name SYSTEMVERILOG_FILE ../verilog/peripherals/uart/testbenches/test_uart_spbrg.sv

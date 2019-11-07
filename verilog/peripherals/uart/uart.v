@@ -4,6 +4,7 @@
 // and as such the following bits are set permanently:
 // TXSTA[7] (CSRC) is read only and set to 0 permanently (async doesn't care)
 // TXSTA[4] (SYNC) is read only and set to 0 permanently (force async mode)
+// RCSTA[7] (SPEN) is read only and set to 1 permanently ("forces" UART TXD/RXD pins to be available, but we won't mux them with portb)
 // RCSTA[5] (SREN) is read only and set to 0 permanently (async doesn't care)
 
 //also, i honestly don't know if this can be represented simpler than presented. It probably can,
@@ -22,7 +23,7 @@ module uart(
 	output wire [7:0] txsta_reg_out,
 	
 	input wire rcsta_reg_wr_en, //receive status and control
-	output reg [7:0] rcsta_reg_out,
+	output wire [7:0] rcsta_reg_out,
 	
 	input wire spbrg_reg_wr_en,	//baud rate generator
 	output wire [7:0] spbrg_reg_out,
@@ -31,7 +32,7 @@ module uart(
 	output wire [7:0] txreg_reg_out,
 	
 	input wire rcreg_reg_wr_en,	//receive register
-	output reg [7:0] rcreg_reg_out,
+	output wire [7:0] rcreg_reg_out,
 	
 	output reg txif_set_en, //strobe to set transmit interrupt flag
 									//this is permanently set high unless txreg contains data that has not yet been loaded into the transmit shift register
@@ -43,11 +44,11 @@ module uart(
 //TXSTA, TXREG, and TSR registers
 
 wire csrc = 1'b0; //forced zero always, feature is unimplemented
-reg tx9 = 1'b0;
-reg txen = 1'b0;
+reg tx9 = 1'b0; //9 bit transmit mode
+reg txen = 1'b0; //transmite enabled
 wire sync = 1'b0; //forced zero always, feature is unimplemented
-reg brgh = 1'b0;
-reg tx9d = 1'b0;
+reg brgh = 1'b0; //baud rate generator high speed mode
+reg tx9d = 1'b0; //data bit for 9 bit mode
 
 
 reg [7:0] txreg = 8'd0;
@@ -186,6 +187,59 @@ always @* begin
 	endcase
 end
 
-//receiving system
+//----------------------------------------------------------receiving system-----------------------------------------
+
+//TXSTA, TXREG, and TSR registers
+
+wire spen = 1'b1; //permanently enabled (tx/rx are permanently enabled and not muxed with anything)
+reg rx9 = 1'b0; //9 bit rx mode
+wire sren = 1'b0; //permanently disabled
+reg cren = 1'b0; //continuous receive enable bit
+reg aden = 1'b0; //address detect enable bit
+reg ferr = 1'b0; //framing error
+reg oerr = 1'b0; //overrun error
+reg rx9d = 1'b0; //data bit for 9 bit mode
+
+reg [7:0] rcreg = 8'd0;
+assign rcreg_reg_out = rcreg;
+
+assign rcsta_reg_out = {spen, rx9, sren, cren, aden, ferr, oerr, rx9d};
+always @(posedge clk) begin
+	if(rst) begin
+		rx9 <= 1'd0;
+		cren <= 1'd0;
+		aden <= 1'd0;
+	end else if(txsta_reg_wr_en) begin
+		rx9 <= reg_data_in[6];
+		cren <= reg_data_in[4];
+		aden <= reg_data_in[3];
+	end
+end
+
+reg [8:0] rsr = 9'd0;
+
+always @(posedge clk) begin
+	if(rst) begin
+		rsr <= 9'd0;
+		ferr <= 1'b0;
+		oerr <= 1'b0;
+		
+		rcreg <= 8'd0;
+		rx9d <= 1'b0;
+	end else begin
+		if(!cren) begin
+			oerr <= 1'b0;
+		end else if(cren && !oerr) begin //an overrun error is supposed to inhibit functionality until cren is reset
+		
+			//todo: the rest of the functionality here
+			//the trick is timing/capturing the bits
+			//use the uart_rx_async_div16_clk to keep everything on track (probably i'll need to convert this to a strobe like the shift for the tx)
+			//rcreg is a fifo, unbelievably, which means I need a read signal - something that isn't yet propagated from the core! Unbelievable.
+		
+		end	
+	end
+end
+
+
 
 endmodule
