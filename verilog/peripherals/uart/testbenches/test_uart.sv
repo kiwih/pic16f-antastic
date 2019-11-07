@@ -9,13 +9,13 @@ initial begin: CLOCK_GENERATOR
 	end
 end
 
-reg txsta_reg_wr_en, rcsta_reg_wr_en, spbrg_reg_wr_en, txreg_reg_wr_en, rxreg_reg_wr_en;
+reg txsta_reg_wr_en, rcsta_reg_wr_en, spbrg_reg_wr_en, txreg_reg_wr_en, rcreg_reg_wr_en;
 reg [7:0] reg_data_in;
 wire [7:0] txsta_reg_out;
 wire [7:0] rcsta_reg_out;
 wire [7:0] spbrg_reg_out;
 wire [7:0] txreg_reg_out;
-wire [7:0] rxreg_reg_out;
+wire [7:0] rcreg_reg_out;
 
 wire txif_set_en, rxif_set_en;
 
@@ -42,8 +42,8 @@ uart u(
 	.txreg_reg_wr_en(txreg_reg_wr_en),	//transmit register. Setting txreg_reg_wr_en also starts a transmission
 	.txreg_reg_out(txreg_reg_out),
 	
-	.rxreg_reg_wr_en(rxreg_reg_wr_en),	//receive register
-	.rxreg_reg_out(rxreg_reg_out),
+	.rcreg_reg_wr_en(rcreg_reg_wr_en),	//receive register
+	.rcreg_reg_out(rcreg_reg_out),
 	
 	.txif_set_en(txif_set_en), //strobe to set transmit interrupt flag
 									//this is permanently set high unless txreg contains data that has not yet been loaded into the transmit shift register
@@ -61,7 +61,7 @@ initial begin
 	rcsta_reg_wr_en = 0;
 	spbrg_reg_wr_en = 0;
 	txreg_reg_wr_en = 0;
-	rxreg_reg_wr_en = 0;
+	rcreg_reg_wr_en = 0;
 	
 	#20 //end of reset
 	rst = 0;

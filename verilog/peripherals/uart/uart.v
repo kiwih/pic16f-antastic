@@ -30,8 +30,8 @@ module uart(
 	input wire txreg_reg_wr_en,	//transmit register. Setting txreg_reg_wr_en also starts a transmission
 	output wire [7:0] txreg_reg_out,
 	
-	input wire rxreg_reg_wr_en,	//receive register
-	output reg [7:0] rxreg_reg_out,
+	input wire rcreg_reg_wr_en,	//receive register
+	output reg [7:0] rcreg_reg_out,
 	
 	output reg txif_set_en, //strobe to set transmit interrupt flag
 									//this is permanently set high unless txreg contains data that has not yet been loaded into the transmit shift register

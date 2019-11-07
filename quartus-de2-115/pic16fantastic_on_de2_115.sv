@@ -46,6 +46,17 @@ wire [7:0] portb_port;
 wire portb_tris_wr_en;
 wire portb_port_wr_en;
 
+wire [7:0] txsta_reg_out;
+wire txsta_reg_wr_en;
+wire [7:0] spbrg_reg_out;
+wire spbrg_reg_wr_en;
+wire [7:0] rcsta_reg_out;
+wire rcsta_reg_wr_en;
+wire [7:0] txreg_reg_out;
+wire txreg_reg_wr_en;
+wire [7:0] rcreg_reg_out;
+wire rcreg_reg_wr_en;
+
 picmicro_midrange_core #(
 	.PROGRAM_FILE_NAME(PROGRAM_FILE_NAME)
 ) core (
@@ -59,7 +70,7 @@ picmicro_midrange_core #(
 	.extern_peripherals_data_in(extern_peripherals_data_in),
 	.extern_peripherals_data_out(extern_peripherals_data_out),
 	
-	.extern_peripherals_interrupt_strobes(8'd0)
+	.extern_peripherals_interrupt_strobes(extern_peripherals_interrupt_strobes)
 );
 
 pic16fantastic_ext_periph_mux ext_periph_mux(
@@ -76,8 +87,61 @@ pic16fantastic_ext_periph_mux ext_periph_mux(
 	.portb_tris(portb_tris),
 	.portb_port(portb_port),
 	.portb_tris_wr_en(portb_tris_wr_en),
-	.portb_port_wr_en(portb_port_wr_en)
+	.portb_port_wr_en(portb_port_wr_en),
+	
+	.txsta_reg_out(txsta_reg_out),
+	.txsta_reg_wr_en(txsta_reg_wr_en),
+
+	.spbrg_reg_out(spbrg_reg_out),
+	.spbrg_reg_wr_en(spbrg_reg_wr_en),
+
+	.rcsta_reg_out(rcsta_reg_out),
+	.rcsta_reg_wr_en(rcsta_reg_wr_en),
+
+	.txreg_reg_out(txreg_reg_out),
+	.txreg_reg_wr_en(txreg_reg_wr_en),
+
+	.rcreg_reg_out(rcreg_reg_out),
+	.rcreg_reg_wr_en(rcreg_reg_wr_en)
 );
+
+uart u(
+	.clk(clk),
+	.rst(rst_peripherals),
+	
+	.UART_TXD(UART_TXD),
+	.UART_RXD(UART_RXD),
+	
+	.reg_data_in(extern_peripherals_data_in), //the general data in bus
+	
+	.txsta_reg_wr_en(txsta_reg_wr_en), //transmit status and control
+	.txsta_reg_out(txsta_reg_out),
+	
+	.rcsta_reg_wr_en(rcsta_reg_wr_en), //receive status and control
+	.rcsta_reg_out(rcsta_reg_out),
+	
+	.spbrg_reg_wr_en(spbrg_reg_wr_en),	//baud rate generator
+	.spbrg_reg_out(spbrg_reg_out),
+	
+	.txreg_reg_wr_en(txreg_reg_wr_en),	//transmit register. Setting txreg_reg_wr_en also starts a transmission
+	.txreg_reg_out(txreg_reg_out),
+	
+	.rcreg_reg_wr_en(rcreg_reg_wr_en),	//receive register
+	.rcreg_reg_out(rcreg_reg_out),
+	
+	.txif_set_en(extern_peripherals_interrupt_strobes[4]), //strobe to set transmit interrupt flag
+									//this is permanently set high unless txreg contains data that has not yet been loaded into the transmit shift register
+									//(yes, even as a strobe it's permanently set high - TXIF shouldn't be able to be cleared in software)
+									
+	.rxif_set_en(extern_peripherals_interrupt_strobes[5])  //strobe to set receive interrupt flag
+);
+
+assign extern_peripherals_interrupt_strobes[0] = 1'b0;
+assign extern_peripherals_interrupt_strobes[1] = 1'b0;
+assign extern_peripherals_interrupt_strobes[2] = 1'b0;
+assign extern_peripherals_interrupt_strobes[3] = 1'b0;
+assign extern_peripherals_interrupt_strobes[6] = 1'b0;
+assign extern_peripherals_interrupt_strobes[7] = 1'b0;
 
 
 fake_bidir_port porta(
@@ -146,7 +210,22 @@ module pic16fantastic_ext_periph_mux(
 	input wire [7:0] portb_tris,
 	input wire [7:0] portb_port,
 	output reg portb_tris_wr_en,
-	output reg portb_port_wr_en
+	output reg portb_port_wr_en,
+
+	input wire [7:0] txsta_reg_out,
+	output reg txsta_reg_wr_en,
+
+	input wire [7:0] spbrg_reg_out,
+	output reg spbrg_reg_wr_en,
+
+	input wire [7:0] rcsta_reg_out,
+	output reg rcsta_reg_wr_en,
+
+	input wire [7:0] txreg_reg_out,
+	output reg txreg_reg_wr_en,
+
+	input wire [7:0] rcreg_reg_out,
+	output reg rcreg_reg_wr_en
 );
 
 `include "peripheral_memory_map.vh"
@@ -159,6 +238,12 @@ always @* begin
 	
 	portb_tris_wr_en <= 1'd0;
 	portb_port_wr_en <= 1'd0;
+	
+	txsta_reg_wr_en <= 1'd0;
+	spbrg_reg_wr_en <= 1'd0;
+	rcsta_reg_wr_en <= 1'd0;
+	txreg_reg_wr_en <= 1'd0;
+	rcreg_reg_wr_en <= 1'd0;
 	
 	casez(extern_peripherals_addr)
 		trisa_address: begin
@@ -176,6 +261,27 @@ always @* begin
 		portb_address: begin
 			portb_port_wr_en <= extern_peripherals_wr_en;
 			extern_peripherals_data_out <= portb_port;
+		end
+		
+		txsta_address: begin
+			txsta_reg_wr_en <= extern_peripherals_wr_en;
+			extern_peripherals_data_out <= txsta_reg_out;
+		end
+		spbrg_address: begin
+			spbrg_reg_wr_en <= extern_peripherals_wr_en;
+			extern_peripherals_data_out <= spbrg_reg_out;
+		end
+		rcsta_address: begin
+			rcsta_reg_wr_en <= extern_peripherals_wr_en;
+			extern_peripherals_data_out <= rcsta_reg_out;
+		end
+		txreg_address: begin
+			txreg_reg_wr_en <= extern_peripherals_wr_en;
+			extern_peripherals_data_out <= txreg_reg_out;
+		end
+		rcreg_address: begin
+			txsta_reg_wr_en <= extern_peripherals_wr_en;
+			extern_peripherals_data_out <= rcreg_reg_out;
 		end
 	endcase
 end

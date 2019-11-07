@@ -276,7 +276,13 @@ START
     clrf TMR0
     
     bsf STATUS, RP0 ;change to bank 1
-    bcf OPTION_REG, T0CS
+    bcf OPTION_REG, T0CS ;set up timer0
+    
+    bsf TXSTA, TXEN ;set up UART TX to be 9600 baud and enabled
+    bcf TXSTA, BRGH
+    movlw 0x50
+    movwf SPBRG
+    
     bcf STATUS, RP0 ;change to bank 0
     
     clrf PORTA
@@ -329,6 +335,8 @@ MESSAGE_HELLO_WORLD_LOOP
     goto MESSAGE_HELLO_WORLD_LOOP
     
 END_LOOP
+    movlw '!'
+    movwf TXREG
     GOTO END_LOOP                          ; loop forever
 
     
