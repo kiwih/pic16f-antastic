@@ -24,32 +24,27 @@ module pic16fantastic_on_de2_115 #(
 	output wire UART_TXD
 );
 
-`include "peripheral_memory_map.vh"
-
 wire clk = CLOCK_50;
 wire clk_wdt = 1'b0;
 wire rst_ext = ~KEY[3];
 
 wire rst_peripherals;
 
-//wire LCD_SPARE;
-//wire [7:0] LCD_BUNDLE = {LCD_E, LCD_RW, LCD_SPARE, LCD_RS, LCD_DATA[3:0]};
-
 wire [8:0] extern_peripherals_addr;
 wire extern_peripherals_wr_en;
 wire [7:0] extern_peripherals_data_in;
-reg [7:0] extern_peripherals_data_out;
+wire [7:0] extern_peripherals_data_out;
 wire [7:0] extern_peripherals_interrupt_strobes;
 
 wire [7:0] porta_tris;
 wire [7:0] porta_port;
-reg porta_tris_wr_en;
-reg porta_port_wr_en;
+wire porta_tris_wr_en;
+wire porta_port_wr_en;
 
 wire [7:0] portb_tris;
 wire [7:0] portb_port;
-reg portb_tris_wr_en;
-reg portb_port_wr_en;
+wire portb_tris_wr_en;
+wire portb_port_wr_en;
 
 picmicro_midrange_core #(
 	.PROGRAM_FILE_NAME(PROGRAM_FILE_NAME)
@@ -67,34 +62,23 @@ picmicro_midrange_core #(
 	.extern_peripherals_interrupt_strobes(8'd0)
 );
 
-always @* begin
-	extern_peripherals_data_out <= 8'd0;
+pic16fantastic_ext_periph_mux ext_periph_mux(
+	.extern_peripherals_addr(extern_peripherals_addr),
+	.extern_peripherals_wr_en(extern_peripherals_wr_en),
 	
-	porta_tris_wr_en <= 1'd0;
-	porta_port_wr_en <= 1'd0;
-	
-	portb_tris_wr_en <= 1'd0;
-	portb_port_wr_en <= 1'd0;
-	
-	casez(extern_peripherals_addr)
-		trisa_address: begin
-			porta_tris_wr_en <= extern_peripherals_wr_en;
-			extern_peripherals_data_out <= porta_tris;
-		end
-		porta_address: begin
-			porta_port_wr_en <= extern_peripherals_wr_en;
-			extern_peripherals_data_out <= porta_port;
-		end
-		trisb_address: begin
-			portb_tris_wr_en <= extern_peripherals_wr_en;
-			extern_peripherals_data_out <= portb_tris;
-		end
-		portb_address: begin
-			portb_port_wr_en <= extern_peripherals_wr_en;
-			extern_peripherals_data_out <= portb_port;
-		end
-	endcase
-end
+	.extern_peripherals_data_out(extern_peripherals_data_out),
+
+	.porta_tris(porta_tris),
+	.porta_port(porta_port),
+	.porta_tris_wr_en(porta_tris_wr_en),
+	.porta_port_wr_en(porta_port_wr_en),
+
+	.portb_tris(portb_tris),
+	.portb_port(portb_port),
+	.portb_tris_wr_en(portb_tris_wr_en),
+	.portb_port_wr_en(portb_port_wr_en)
+);
+
 
 fake_bidir_port porta(
 	.clk(clk),
@@ -148,3 +132,52 @@ always @(posedge clk)
 
 endmodule
 
+module pic16fantastic_ext_periph_mux(
+	input wire [8:0] extern_peripherals_addr,
+	input wire extern_peripherals_wr_en,
+	
+	output reg [7:0] extern_peripherals_data_out,
+
+	input wire [7:0] porta_tris,
+	input wire [7:0] porta_port,
+	output reg porta_tris_wr_en,
+	output reg porta_port_wr_en,
+
+	input wire [7:0] portb_tris,
+	input wire [7:0] portb_port,
+	output reg portb_tris_wr_en,
+	output reg portb_port_wr_en
+);
+
+`include "peripheral_memory_map.vh"
+
+always @* begin
+	extern_peripherals_data_out <= 8'd0;
+	
+	porta_tris_wr_en <= 1'd0;
+	porta_port_wr_en <= 1'd0;
+	
+	portb_tris_wr_en <= 1'd0;
+	portb_port_wr_en <= 1'd0;
+	
+	casez(extern_peripherals_addr)
+		trisa_address: begin
+			porta_tris_wr_en <= extern_peripherals_wr_en;
+			extern_peripherals_data_out <= porta_tris;
+		end
+		porta_address: begin
+			porta_port_wr_en <= extern_peripherals_wr_en;
+			extern_peripherals_data_out <= porta_port;
+		end
+		trisb_address: begin
+			portb_tris_wr_en <= extern_peripherals_wr_en;
+			extern_peripherals_data_out <= portb_tris;
+		end
+		portb_address: begin
+			portb_port_wr_en <= extern_peripherals_wr_en;
+			extern_peripherals_data_out <= portb_port;
+		end
+	endcase
+end
+
+endmodule

@@ -10,10 +10,14 @@
 	count1 ;used in delay routine
 	counta ;used in delay routine
 	countb ;used in delay routine
+	delay_400ns_count; //used in delay_routines
 	tmp1 ;temporary storage
 	tmp2 ;temporary storage
 	tmplcd ;temp store for 4 bit mode
 	tmplcd2
+	tmr0_isr_counter_l
+	tmr0_isr_counter_h
+	
     endc
 
 ; LABELS    
@@ -28,6 +32,14 @@ RES_VECT  CODE    0x0000            ; processor reset vector
     GOTO    START                   ; go to beginning of program
 
 ; TODO ADD INTERRUPTS HERE IF USED
+ISR_VECT  CODE	  0x0004
+    bcf INTCON, T0IF
+    decfsz tmr0_isr_counter_l, f
+    retfie
+    decfsz tmr0_isr_counter_h, f
+    retfie
+    comf PORTA, f
+    retfie
     
 MAIN_PROG CODE                      ; let linker place main program
 
@@ -153,6 +165,17 @@ LCD_INIT ; initialise the LCD to 4 bit mode, etc
     movlw 0x20		    ; 4 bit mode
     call LCD_CMD
     call Delay255
+    call Delay255
+    call Delay255
+    call Delay255
+    
+    movlw 0x20		    ; 4 bit mode
+    call LCD_CMD
+    call Delay255
+    call Delay255
+    call Delay255
+    call Delay255
+    
     movlw 0x28		    ; Set display shift
     call LCD_CMD
     call Delay255
@@ -219,13 +242,42 @@ Delay_0
 		goto	d1
 		retlw	0x00    
 
-    
-    
+; we are running at 50MHz
+; each instruction takes 4 cycles if it isn't a branch, so 80ns
+; branch instructions take 160ns (2 instruction counts)
+; 25 instruction counts would take 2us
+;
+;		
+;		
+;		
+;DELAY_2US   ; we need 25 instruction counts
+;				    ; call DELAY_2US = 2 counts
+;				    ; init	     = 2 counts, subtotal 2
+;				    ; each value in delay_400ns_count takes 5 cycles (including the zero cycle)
+;	movlw 0x03		    ; for 2us delay we need 25 counts, so 4 iterations plus our junk (which needs to take 5 cycles)
+;	movwf delay_2us_count	    ; 1 count
+;	nop			    ; 1 count
+;DELAY_400NS_LOOP		    ; for each loop decrement: 1+4=5 counts				    ; for final loop: 2+2+1=5 counts
+;	decfsz delay_2us_count, f   ; 1 count if not zero, 2 counts if zero (and go to nop)
+;	goto $+3		    ; 2 counts
+;	nop			    ; 1 counts
+;	retlw 0x00		    ; 2 counts
+;	goto DELAY_400NS_LOOP	    ; 2 counts
+
 START
     call Delay255
     call Delay255
     call Delay255
     call Delay255
+    
+    bsf INTCON, T0IE
+    bsf INTCON, GIE
+    
+    clrf TMR0
+    
+    bsf STATUS, RP0 ;change to bank 1
+    bcf OPTION_REG, T0CS
+    bcf STATUS, RP0 ;change to bank 0
     
     clrf PORTA
     clrf PORTB
