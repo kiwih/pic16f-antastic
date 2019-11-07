@@ -31,6 +31,7 @@ wire rst_ext = ~KEY[3];
 wire rst_peripherals;
 
 wire [8:0] extern_peripherals_addr;
+wire extern_peripherals_rd_en;
 wire extern_peripherals_wr_en;
 wire [7:0] extern_peripherals_data_in;
 wire [7:0] extern_peripherals_data_out;
@@ -55,7 +56,7 @@ wire rcsta_reg_wr_en;
 wire [7:0] txreg_reg_out;
 wire txreg_reg_wr_en;
 wire [7:0] rcreg_reg_out;
-wire rcreg_reg_wr_en;
+wire rcreg_reg_rd_en;
 
 picmicro_midrange_core #(
 	.PROGRAM_FILE_NAME(PROGRAM_FILE_NAME)
@@ -66,6 +67,7 @@ picmicro_midrange_core #(
 	.rst_peripherals(rst_peripherals),
 	
 	.extern_peripherals_addr(extern_peripherals_addr),
+	.extern_peripherals_rd_en(extern_peripherals_rd_en),
 	.extern_peripherals_wr_en(extern_peripherals_wr_en),
 	.extern_peripherals_data_in(extern_peripherals_data_in),
 	.extern_peripherals_data_out(extern_peripherals_data_out),
@@ -75,6 +77,7 @@ picmicro_midrange_core #(
 
 pic16fantastic_ext_periph_mux ext_periph_mux(
 	.extern_peripherals_addr(extern_peripherals_addr),
+	.extern_peripherals_rd_en(extern_peripherals_rd_en),
 	.extern_peripherals_wr_en(extern_peripherals_wr_en),
 	
 	.extern_peripherals_data_out(extern_peripherals_data_out),
@@ -102,7 +105,7 @@ pic16fantastic_ext_periph_mux ext_periph_mux(
 	.txreg_reg_wr_en(txreg_reg_wr_en),
 
 	.rcreg_reg_out(rcreg_reg_out),
-	.rcreg_reg_wr_en(rcreg_reg_wr_en)
+	.rcreg_reg_rd_en(rcreg_reg_rd_en)
 );
 
 uart u(
@@ -126,7 +129,7 @@ uart u(
 	.txreg_reg_wr_en(txreg_reg_wr_en),	//transmit register. Setting txreg_reg_wr_en also starts a transmission
 	.txreg_reg_out(txreg_reg_out),
 	
-	.rcreg_reg_wr_en(rcreg_reg_wr_en),	//receive register
+	.rcreg_reg_rd_en(rcreg_reg_rd_en), //receive register
 	.rcreg_reg_out(rcreg_reg_out),
 	
 	.txif_set_en(extern_peripherals_interrupt_strobes[4]), //strobe to set transmit interrupt flag
@@ -198,6 +201,7 @@ endmodule
 
 module pic16fantastic_ext_periph_mux(
 	input wire [8:0] extern_peripherals_addr,
+	input wire extern_peripherals_rd_en,
 	input wire extern_peripherals_wr_en,
 	
 	output reg [7:0] extern_peripherals_data_out,
@@ -225,7 +229,7 @@ module pic16fantastic_ext_periph_mux(
 	output reg txreg_reg_wr_en,
 
 	input wire [7:0] rcreg_reg_out,
-	output reg rcreg_reg_wr_en
+	output reg rcreg_reg_rd_en
 );
 
 `include "peripheral_memory_map.vh"
@@ -243,7 +247,7 @@ always @* begin
 	spbrg_reg_wr_en <= 1'd0;
 	rcsta_reg_wr_en <= 1'd0;
 	txreg_reg_wr_en <= 1'd0;
-	rcreg_reg_wr_en <= 1'd0;
+	rcreg_reg_rd_en <= 1'd0;
 	
 	casez(extern_peripherals_addr)
 		trisa_address: begin
@@ -280,7 +284,8 @@ always @* begin
 			extern_peripherals_data_out <= txreg_reg_out;
 		end
 		rcreg_address: begin
-			txsta_reg_wr_en <= extern_peripherals_wr_en;
+			//no write to rcreg
+			rcreg_reg_rd_en <= extern_peripherals_rd_en;
 			extern_peripherals_data_out <= rcreg_reg_out;
 		end
 	endcase

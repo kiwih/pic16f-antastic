@@ -9,7 +9,7 @@ initial begin: CLOCK_GENERATOR
 	end
 end
 
-reg txsta_reg_wr_en, rcsta_reg_wr_en, spbrg_reg_wr_en, txreg_reg_wr_en, rcreg_reg_wr_en;
+reg txsta_reg_wr_en, rcsta_reg_wr_en, spbrg_reg_wr_en, txreg_reg_wr_en, rcreg_reg_rd_en;
 reg [7:0] reg_data_in;
 wire [7:0] txsta_reg_out;
 wire [7:0] rcsta_reg_out;
@@ -42,7 +42,7 @@ uart u(
 	.txreg_reg_wr_en(txreg_reg_wr_en),	//transmit register. Setting txreg_reg_wr_en also starts a transmission
 	.txreg_reg_out(txreg_reg_out),
 	
-	.rcreg_reg_wr_en(rcreg_reg_wr_en),	//receive register
+	.rcreg_reg_rd_en(rcreg_reg_rd_en),	//receive register
 	.rcreg_reg_out(rcreg_reg_out),
 	
 	.txif_set_en(txif_set_en), //strobe to set transmit interrupt flag
@@ -54,6 +54,8 @@ uart u(
 
 integer i;
 
+assign UART_RXD = UART_TXD;
+
 initial begin
 	rst = 1;
 	reg_data_in = 8'd0;
@@ -61,7 +63,7 @@ initial begin
 	rcsta_reg_wr_en = 0;
 	spbrg_reg_wr_en = 0;
 	txreg_reg_wr_en = 0;
-	rcreg_reg_wr_en = 0;
+	rcreg_reg_rd_en = 0;
 	
 	#20 //end of reset
 	rst = 0;
@@ -72,40 +74,55 @@ initial begin
 	assert(u.tsr_state == u.tsr_state_stop) else $fatal();
 	assert(UART_TXD == 1) else $fatal();
 	assert(u.tsr_enabled == 0) else $fatal(); 
+
+	//let's set up reception
+	reg_data_in = 8'b10010000;
+	rcsta_reg_wr_en = 1;
+	#10 							//timer counter = 1
+	assert(rcsta_reg_out == 8'b10010000) else $fatal();
+	rcsta_reg_wr_en = 0;
+	#10 							//timer counter = 2
 	
 	//let's set up a transmit with the fastest baud rate
 	reg_data_in = 8'b00100100; //txen = 1, brgh = 1, shift every 16 cycles as spbrg == 0
 	txsta_reg_wr_en = 1;
-	#10							//timer counter = 1
+	#10							//timer counter = 3
 	txsta_reg_wr_en = 0;
 	assert(txsta_reg_out == 8'b00100110) else $fatal(); //txen, brgh, and trmt should be high
-	#10							//timer counter = 2
+	#10							//timer counter = 4
 	reg_data_in = 8'b11001010; //the byte to transmit
 	txreg_reg_wr_en = 1;
-	#10							//timer counter = 3
+	#10							//timer counter = 5
 	txreg_reg_wr_en = 0;
 	assert(txreg_reg_out == 8'b11001010) else $fatal();
 	assert(txif_set_en == 0) else $fatal(); //txif should have gone low
 	assert(u.tsr_state == u.tsr_state_stop) else $fatal();
-	#10							//timer counter = 4
+	#10							//timer counter = 6
 	assert(u.tsr_consumed == 1) else $fatal(); //tsr_enabled should have gone high
 	assert(u.tsr_enabled == 1) else $fatal(); //tsr_enabled should have gone high
 	assert(u.tsr_state == u.tsr_state_stop) else $fatal();
-	#10
+	#10							//timer counter = 7
 	assert(txif_set_en == 1) else $fatal(); //txif should have gone high again
-	#100							//timer counter = 15
+	#80							//timer counter = 15
 	assert(u.tsr_state == u.tsr_state_stop) else $fatal();
 	#10							//timer counter = 0, we take one more cycle to consume it in our fsm
 	assert(u.tsr_state == u.tsr_state_stop) else $fatal();
 	#10							//timer counter = 1, we now consume the enable signal, every #+160 is good to test from here
+	
 	assert(u.tsr_state == u.tsr_state_start) else $fatal();
 	assert(UART_TXD == 0) else $fatal();
+	assert(UART_RXD == 0) else $fatal(); //this just means we're doing a local echo
+	#10
+	assert(u.rsr_state == u.rsr_state_start) else $fatal();
 	
 	//now for the data bits:
-	#160
+	#150
 	assert(u.tsr_state == u.tsr_state_data) else $fatal();
 	assert(UART_TXD == 0) else $fatal();
-	#160
+	#10
+	assert(u.rsr_state == u.rsr_state_data) else $fatal();
+	
+	#150
 	assert(u.tsr_state == u.tsr_state_data) else $fatal();
 	assert(UART_TXD == 1) else $fatal();
 	#160
@@ -131,7 +148,12 @@ initial begin
 	#160
 	assert(u.tsr_state == u.tsr_state_stop) else $fatal();
 	assert(UART_TXD == 1) else $fatal();
-	
+	#10
+	assert(u.rsr_state == u.rsr_state_stop) else $fatal();
+	#110
+	assert(u.rcreg_reg_wr_en == 1) else $fatal();
+	#10
+	assert(u.rcreg[0] == 8'b11001010) else $fatal();
 	
 
 	
