@@ -13,6 +13,7 @@ reg sync, brgh, spbrg_reg_wr_en;
 reg [7:0] spbrg_reg_in;
 wire spbrg_reg_out;
 wire uart_tx_shift_en;
+wire uart_rx_async_div16_en;
 
 uart_spbrg spbrg(
 	.clk(clk),
@@ -25,7 +26,9 @@ uart_spbrg spbrg(
 	.spbrg_reg_in(spbrg_reg_in),
 	.spbrg_reg_out(spbrg_reg_out),
 	
-	.uart_tx_shift_en(uart_tx_shift_en)
+	.uart_tx_shift_en(uart_tx_shift_en),
+	
+	.uart_rx_async_div16_en(uart_rx_async_div16_en)
 );
 
 integer i;
@@ -41,6 +44,7 @@ initial begin
 	assert(spbrg.uart_clk_count_multiplier == 0) else $fatal();
 	assert(spbrg_reg_out == 0) else $fatal();
 	assert(uart_tx_shift_en == 0) else $fatal();
+	assert(uart_rx_async_div16_en == 0) else $fatal();
 	
 	//in asynchronous mode (sync = 0) the baud rate depends on the brgh bit
 	//if brgh = 0 (low speed), baud rate = Fosc/(64*(spbrg + 1))
@@ -50,15 +54,38 @@ initial begin
 	//                         baud rate = Fosc/( 4*(spbrg + 1))
 	
 	//given current settings, the uart_tx_shift_en shoul go high for 1 cycle every 64 cycles, and each cycle takes 10 cycles, so....
+	//also, the uart_rx_async_div16_en should go high for 1 cycle every 4  cycles, so...
 	//test spbrg=0 with brgh = 0
-	#630
+	#30
+	assert(uart_rx_async_div16_en == 0) else $fatal();
+	#10
+	assert(uart_rx_async_div16_en == 1) else $fatal(); 
+	#10
+	assert(uart_rx_async_div16_en == 0) else $fatal();
+	#30
+	assert(uart_rx_async_div16_en == 1) else $fatal(); 
+	#90
+	assert(uart_rx_async_div16_en == 0) else $fatal();
+	#10
+	assert(uart_rx_async_div16_en == 1) else $fatal(); 
+	#10
+	assert(uart_rx_async_div16_en == 0) else $fatal();
+	#150
+	assert(uart_rx_async_div16_en == 1) else $fatal();
+	#160
+	assert(uart_rx_async_div16_en == 1) else $fatal();
+	#150
 	assert(uart_tx_shift_en == 0) else $fatal();
+	assert(uart_rx_async_div16_en == 0) else $fatal();
 	#10
 	assert(uart_tx_shift_en == 1) else $fatal();
+	assert(uart_rx_async_div16_en == 1) else $fatal();
 	#10
 	assert(uart_tx_shift_en == 0) else $fatal();
+	assert(uart_rx_async_div16_en == 0) else $fatal();
 	#630
 	assert(uart_tx_shift_en == 1) else $fatal();
+	assert(uart_rx_async_div16_en == 1) else $fatal();
 	
 	//test spbrg=1 with brgh = 0
 	spbrg_reg_wr_en <= 1;
