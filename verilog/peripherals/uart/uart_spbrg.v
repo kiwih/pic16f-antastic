@@ -11,7 +11,7 @@ module uart_spbrg(
 	
 	output reg uart_tx_shift_en,
 	
-	output reg uart_rx_cap_en //goes high for 3 clock cycles in the middle of the operation for capturing 3x response
+	output wire rx_async_div16_clk //this divides the generated baud rate by 16
 );
 
 
@@ -30,34 +30,34 @@ always @(posedge clk)
 //                         baud rate = Fosc/( 4*(spbrg + 1))
 
 reg [7:0] uart_clk_count = 8'd0;
-reg [5:0] uart_clk_count_prescaler = 5'd0; //max value = 63
+reg [5:0] uart_clk_count_multiplier = 5'd0; //max value = 63
+
 always @(posedge clk) begin
 	uart_tx_shift_en <= 1'b0;
-	uart_rx_cap_en <= 1'b0;
 	
-	if(rst) begin
+	if(rst | spbrg_reg_wr_en) begin //on a write to spbrg we need to clear all our counters
 		uart_clk_count <= 8'd0;
-		uart_clk_count_prescaler <= 5'd0;
+		uart_clk_count_multiplier <= 5'd0;
 	end else begin
 		
-		uart_clk_count_prescaler <= uart_clk_count_prescaler + 6'd1;
+		uart_clk_count <= uart_clk_count + 8'd1;
 		
-		if((uart_clk_count_prescaler == 6'd15 && brgh == 1'b1 && sync == 1'b0) ||
-		   (uart_clk_count_prescaler == 6'd63 && brgh == 1'b0 && sync == 1'b0) ||
-			(uart_clk_count_prescaler == 6'd3 && sync == 1'b1)) begin
+		if(uart_clk_count == spbrg_reg_out) begin
+			uart_clk_count <= 8'd0;
 			
-			uart_clk_count_prescaler <= 5'd0;
+			uart_clk_count_multiplier <= uart_clk_count_multiplier + 5'd1;
 			
-			if(uart_clk_count == spbrg_reg_out) begin
+			if((uart_clk_count_multiplier == 6'd15 && brgh == 1'b1 && sync == 1'b0) ||
+				(uart_clk_count_multiplier == 6'd63 && brgh == 1'b0 && sync == 1'b0) ||
+				(uart_clk_count_multiplier == 6'd3 && sync == 1'b1)) begin
+				
+				uart_clk_count_multiplier <= 5'd0;
 				uart_tx_shift_en <= 1'b1;
-				uart_clk_count <= 8'd0;
-			end else begin
-				uart_clk_count <= uart_clk_count + 8'd1;
-			end
-		end 
-		
+			end 
+		end
 	end
 end	
 
+assign rx_async_div16_clk = brgh ? uart_clk_count_multiplier[0] : uart_clk_count_multiplier[2];
 
 endmodule

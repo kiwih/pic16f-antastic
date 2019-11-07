@@ -85,7 +85,7 @@ always @(posedge clk) begin
 end
 
 wire uart_tx_shift_en;
-wire uart_rx_cap_en;
+wire uart_rx_async_div16_clk;
 
 uart_spbrg spbrg(
 	.clk(clk),
@@ -100,7 +100,7 @@ uart_spbrg spbrg(
 	
 	.uart_tx_shift_en(uart_tx_shift_en),
 	
-	.uart_rx_cap_en(uart_rx_cap_en)
+	.rx_async_div16_clk(uart_rx_async_div16_clk)
 );
 
 //TSR shift register system
@@ -185,4 +185,7 @@ always @* begin
 		end
 	endcase
 end
+
+//receiving system
+
 endmodule

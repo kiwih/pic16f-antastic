@@ -39,6 +39,8 @@ ISR_VECT  CODE	  0x0004
     decfsz tmr0_isr_counter_h, f
     retfie
     comf PORTA, f
+    movlw '!'
+    movwf TXREG
     retfie
     
 MAIN_PROG CODE                      ; let linker place main program
@@ -335,8 +337,6 @@ MESSAGE_HELLO_WORLD_LOOP
     goto MESSAGE_HELLO_WORLD_LOOP
     
 END_LOOP
-    movlw '!'
-    movwf TXREG
     GOTO END_LOOP                          ; loop forever
 
     

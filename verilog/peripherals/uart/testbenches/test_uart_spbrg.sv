@@ -38,7 +38,7 @@ initial begin
 	#20 //end of reset
 	rst = 0;
 	assert(spbrg.uart_clk_count == 0) else $fatal();
-	assert(spbrg.uart_clk_count_prescaler == 0) else $fatal();
+	assert(spbrg.uart_clk_count_multiplier == 0) else $fatal();
 	assert(spbrg_reg_out == 0) else $fatal();
 	assert(uart_tx_shift_en == 0) else $fatal();
 	
@@ -64,8 +64,8 @@ initial begin
 	spbrg_reg_wr_en <= 1;
 	spbrg_reg_in <= 8'd1; //now it should take 128 cycles
 	#10
-	spbrg_reg_wr_en <= 0;
-	#630
+	spbrg_reg_wr_en <= 0; //being 1 reset the counters, so we now start counting again from zero to 128 cycles
+	#640
 	assert(uart_tx_shift_en == 0) else $fatal();
 	#640 
 	assert(uart_tx_shift_en == 1) else $fatal();
@@ -82,8 +82,8 @@ initial begin
 	spbrg_reg_wr_en <= 1;
 	spbrg_reg_in <= 8'd0; 
 	#10
-	spbrg_reg_wr_en <= 0;
-	#150
+	spbrg_reg_wr_en <= 0; //being 1 reset the counters, so we now start counting again from zero to 16 cycles
+	#160
 	assert(uart_tx_shift_en == 1) else $fatal();
 	
 	$display("ALL TESTS PASSED SUCCESSFULLY");
