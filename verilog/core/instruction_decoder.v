@@ -11,6 +11,7 @@ module instruction_decoder(
 	output reg alu_sel_l,
 	output reg [3:0] alu_op,
 
+	output reg f_rd_en,
 	output reg f_wr_en,
 	output reg w_wr_en,
 	
@@ -76,6 +77,7 @@ always @* begin
 	pc_j_and_push_en <= 1'd0;
 	pc_j_by_pop_en <= 1'd0;
 	pc_j_to_isr <= 1'd0;
+	f_rd_en <= 1'd0;
 	f_wr_en <= 1'd0;
 	w_wr_en <= 1'd0;
 	wdt_clr <= 1'd0;
@@ -91,6 +93,9 @@ always @* begin
 		
 		isa_addwf: begin //Add W and f	
 			case(q_count)
+			2'd0: begin
+				f_rd_en <= 1'd1;
+			end
 			2'd2: begin
 				alu_sel_l <= 1'd0;
 				alu_op <= alu_op_add;
@@ -116,6 +121,9 @@ always @* begin
 		
 		isa_andwf: begin //AND W with f		
 			case(q_count)
+			2'd0: begin
+				f_rd_en <= 1'd1;
+			end
 			2'd2: begin
 				alu_sel_l <= 1'd0;
 				alu_op <= alu_op_and;
@@ -191,6 +199,9 @@ always @* begin
 		
 		isa_comf: begin //Complement f
 			case(q_count)
+			2'd0: begin
+				f_rd_en <= 1'd1;
+			end
 			2'd2: begin
 				alu_sel_l <= 1'd0;
 				alu_op <= alu_op_com;
@@ -216,6 +227,9 @@ always @* begin
 		
 		isa_decf: begin //Decrement f
 			case(q_count)
+			2'd0: begin
+				f_rd_en <= 1'd1;
+			end
 			2'd2: begin
 				alu_sel_l <= 1'd0;
 				alu_op <= alu_op_dec;
@@ -241,6 +255,9 @@ always @* begin
 		
 		isa_decfsz: begin //Decrement f, Skip if 0	
 			case(q_count)
+			2'd0: begin
+				f_rd_en <= 1'd1;
+			end
 			2'd2: begin
 				alu_sel_l <= 1'd0;
 				alu_op <= alu_op_dec;
@@ -261,6 +278,9 @@ always @* begin
 		
 		isa_incf: begin //Increment f	
 			case(q_count)
+			2'd0: begin
+				f_rd_en <= 1'd1;
+			end
 			2'd2: begin
 				alu_sel_l <= 1'd0;
 				alu_op <= alu_op_inc;
@@ -286,6 +306,9 @@ always @* begin
 		
 		isa_incfsz: begin //Increment f, Skip if 0
 			case(q_count)
+			2'd0: begin
+				f_rd_en <= 1'd1;
+			end
 			2'd2: begin
 				alu_sel_l <= 1'd0;
 				alu_op <= alu_op_inc;
@@ -306,6 +329,9 @@ always @* begin
 		
 		isa_iorwf: begin //Inclusive OR W with f
 			case(q_count)
+			2'd0: begin
+				f_rd_en <= 1'd1;
+			end
 			2'd2: begin
 				alu_sel_l <= 1'd0;
 				alu_op <= alu_op_or;
@@ -331,6 +357,9 @@ always @* begin
 		
 		isa_movf: begin //Move f
 			case(q_count)
+			2'd0: begin
+				f_rd_en <= 1'd1;
+			end
 			2'd2: begin
 				alu_sel_l <= 1'd0; //pass f, not l
 				alu_status_wr_en <= 1'd1; //movf does set status bits
@@ -356,6 +385,9 @@ always @* begin
 		
 		isa_movwf: begin //Move W to f
 			case(q_count)
+			2'd0: begin
+				f_rd_en <= 1'd1;
+			end
 			2'd2: begin
 				alu_op <= alu_op_passw;
 				alu_status_wr_en <= 1'd0; //movwf does NOT set status bits
@@ -380,6 +412,9 @@ always @* begin
 		
 		isa_rlf: begin //Rotate Left f through Carry
 			case(q_count)
+			2'd0: begin
+				f_rd_en <= 1'd1;
+			end
 			2'd2: begin
 				alu_sel_l <= 1'd0;
 				alu_op <= alu_op_rlf;
@@ -405,6 +440,9 @@ always @* begin
 		
 		isa_rrf: begin //Rotate Right f through Carry
 			case(q_count)
+			2'd0: begin
+				f_rd_en <= 1'd1;
+			end
 			2'd2: begin
 				alu_sel_l <= 1'd0;
 				alu_op <= alu_op_rrf;
@@ -430,6 +468,9 @@ always @* begin
 		
 		isa_subwf: begin //Subtract W from f
 			case(q_count)
+			2'd0: begin
+				f_rd_en <= 1'd1;
+			end
 			2'd2: begin
 				alu_sel_l <= 1'd0;
 				alu_op <= alu_op_sub;
@@ -455,6 +496,9 @@ always @* begin
 		
 		isa_swapf: begin //Swap nibbles in f
 			case(q_count)
+			2'd0: begin
+				f_rd_en <= 1'd1;
+			end
 			2'd2: begin
 				alu_sel_l <= 1'd0;
 				alu_op <= alu_op_swapf;
@@ -480,6 +524,9 @@ always @* begin
 		
 		isa_xorwf: begin //Exclusive OR W with f
 			case(q_count)
+			2'd0: begin
+				f_rd_en <= 1'd1;
+			end
 			2'd2: begin
 				alu_sel_l <= 1'd0;
 				alu_op <= alu_op_xor;
@@ -507,6 +554,9 @@ always @* begin
 		
 		isa_bcf: begin //Bit Clear f
 			case(q_count)
+			2'd0: begin
+				f_rd_en <= 1'd1;
+			end
 			2'd2: begin
 				alu_sel_l <= 1'd0;
 				alu_op <= alu_op_bc;
@@ -529,6 +579,9 @@ always @* begin
 		
 		isa_bsf: begin //Bit Set f
 			case(q_count)
+			2'd0: begin
+				f_rd_en <= 1'd1;
+			end
 			2'd2: begin
 				alu_sel_l <= 1'd0;
 				alu_op <= alu_op_bs;
@@ -551,6 +604,9 @@ always @* begin
 		
 		isa_btfsc: begin //Bit Test f, Skip if Clear
 			case(q_count)
+			2'd0: begin
+				f_rd_en <= 1'd1;
+			end
 			2'd2: begin
 				alu_sel_l <= 1'd0;
 				alu_op <= alu_op_bc;
@@ -568,6 +624,9 @@ always @* begin
 		
 		isa_btfss: begin //Bit Test f, Skip if Set
 			case(q_count)
+			2'd0: begin
+				f_rd_en <= 1'd1;
+			end
 			2'd2: begin
 				alu_sel_l <= 1'd0;
 				alu_op <= alu_op_bs;

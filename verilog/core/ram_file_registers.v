@@ -2,6 +2,7 @@ module ram_file_registers (
 	input wire clk,
 	input wire rst,
 	input wire [8:0] addr,
+	input wire rd_en,
 	input wire wr_en,
 	input wire [7:0] data_in,
 	output reg [7:0] data_out, //can be thought of as "f"
@@ -41,6 +42,7 @@ module ram_file_registers (
 	input wire [7:0] pcon_reg_val,
 	
 	//when the regfile_addr points at something non-core we'll attempt to load it externally
+	output reg extern_peripherals_rd_en,
 	output reg extern_peripherals_wr_en,
 	input wire [7:0] extern_peripherals_out
 
@@ -98,8 +100,22 @@ end
 
 reg [7:0] data_out_tmp = 8'd0;
 
-always @(posedge clk) 
-	data_out <= data_out_tmp;
+reg rd_en_last = 1'b0;
+reg rd_en_laster = 1'b0;
+
+always @(posedge clk)
+	if(rst) begin
+		rd_en_last <= 1'b0;
+		rd_en_laster <= 1'b0;
+	end else begin
+		rd_en_last <= rd_en;
+		rd_en_laster <= rd_en_last;
+	end
+	
+always @(posedge clk)  begin
+	if(rd_en_last)
+		data_out <= data_out_tmp;
+end
 
 always @(*) begin
 	tmr0_reg_wr_en <= 1'b0;
@@ -180,6 +196,7 @@ always @(*) begin
 			gpRegistersShared_wr_en <= wr_en;
 			data_out_tmp <= gpRegistersShared_out;
 		end else begin
+			extern_peripherals_rd_en <= rd_en;
 			extern_peripherals_wr_en <= wr_en;
 			data_out_tmp <= extern_peripherals_out;
 		end

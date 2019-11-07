@@ -10,6 +10,7 @@ module picmicro_midrange_core #(
 	output wire rst_peripherals,
 	
 	output wire [8:0] extern_peripherals_addr,
+	output wire extern_peripherals_rd_en,
 	output wire extern_peripherals_wr_en,
 	output wire [7:0] extern_peripherals_data_in,
 	input wire [7:0] extern_peripherals_data_out,
@@ -107,6 +108,7 @@ wire [7:0] w_reg_out;
 
 wire alu_sel_l; //if 1, the alu selects l, if 0, it selects f
 
+wire f_rd_en;
 wire f_wr_en;
 wire w_wr_en;
 
@@ -163,6 +165,7 @@ ram_file_registers regfile (
 	.rst(rst),
 	.addr(regfile_addr),
 	.wr_en(f_wr_en),
+	.rd_en(f_rd_en),
 	.data_in(alu_out),
 	.data_out(regfile_data_out),
 	
@@ -195,6 +198,7 @@ ram_file_registers regfile (
 	.pcon_reg_wr_en(pcon_reg_wr_en),
 	.pcon_reg_val(pcon_reg_out),
 	
+	.extern_peripherals_rd_en(extern_peripherals_rd_en),
 	.extern_peripherals_wr_en(extern_peripherals_wr_en),
 	.extern_peripherals_out(extern_peripherals_data_out) //when the regfile_addr points at something non-core we'll attempt to load it externally
 );
@@ -368,6 +372,8 @@ instruction_decoder control(
 	
 	.w_wr_en(w_wr_en),
 	.f_wr_en(f_wr_en),
+	
+	.f_rd_en(f_rd_en),
 	
 	.instr_rd_en(instr_rd_en),
 	.instr_flush(instr_flush),

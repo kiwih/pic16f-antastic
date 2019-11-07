@@ -86,7 +86,7 @@ always @(posedge clk) begin
 end
 
 wire uart_tx_shift_en;
-wire uart_rx_async_div16_clk;
+wire uart_rx_async_div16_en;
 
 uart_spbrg spbrg(
 	.clk(clk),
@@ -101,7 +101,7 @@ uart_spbrg spbrg(
 	
 	.uart_tx_shift_en(uart_tx_shift_en),
 	
-	.rx_async_div16_clk(uart_rx_async_div16_clk)
+	.uart_rx_async_div16_en(uart_rx_async_div16_en)
 );
 
 //TSR shift register system
@@ -233,7 +233,7 @@ always @(posedge clk) begin
 		
 			//todo: the rest of the functionality here
 			//the trick is timing/capturing the bits
-			//use the uart_rx_async_div16_clk to keep everything on track (probably i'll need to convert this to a strobe like the shift for the tx)
+			//use the uart_rx_async_div16_en to keep everything on track (probably i'll need to convert this to a strobe like the shift for the tx)
 			//rcreg is a fifo, unbelievably, which means I need a read signal - something that isn't yet propagated from the core! Unbelievable.
 		
 		end	
