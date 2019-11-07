@@ -1,7 +1,8 @@
 `default_nettype none
 
 module picmicro_midrange_core #(
-	parameter PROGRAM_FILE_NAME = "default.mem"
+	parameter PROGRAM_FILE_NAME = "default.mem",
+	parameter EXTERN_PERIPHERALS_INTERRUPTS_AS_STROBES = 8'b11001111
 ) (
 	input wire clk,
 	input wire clk_wdt,
@@ -15,7 +16,8 @@ module picmicro_midrange_core #(
 	output wire [7:0] extern_peripherals_data_in,
 	input wire [7:0] extern_peripherals_data_out,
 	
-	input wire [7:0] extern_peripherals_interrupt_strobes
+	input wire [7:0] extern_peripherals_interrupt_strobes,
+	input wire [7:0] extern_peripherals_interrupt_readonlys
 );
 
 //most instructions take 4 clock cycles
@@ -290,10 +292,13 @@ core_interrupt_register intconreg(
 
 
 
-peripheral_interrupt_register pir1reg(
+peripheral_interrupt_register #(
+	.INTERRUPTS_AS_STROBES(EXTERN_PERIPHERALS_INTERRUPTS_AS_STROBES)
+) pir1reg (
 	.clk(clk),
 	.rst(rst),
 	.interrupt_strobes(extern_peripherals_interrupt_strobes),
+	.interrupt_readonlys(extern_peripherals_interrupt_readonlys),
 	.wr_en(pir1_reg_wr_en),
 	.d(alu_out), 
 	.q(pir1_reg_out)

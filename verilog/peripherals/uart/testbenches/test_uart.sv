@@ -152,8 +152,18 @@ initial begin
 	assert(u.rsr_state == u.rsr_state_stop) else $fatal();
 	#110
 	assert(u.rcreg_reg_wr_en == 1) else $fatal();
+	assert(rxif_set_en == 0) else $fatal();
 	#10
 	assert(u.rcreg[0] == 8'b11001010) else $fatal();
+	assert(rxif_set_en == 1) else $fatal();
+	#10
+	rcreg_reg_rd_en = 1;
+	assert(rxif_set_en == 1) else $fatal();
+	assert(u.rcreg[0] == 8'b11001010) else $fatal();
+	#10
+	rcreg_reg_rd_en = 0;
+	assert(rxif_set_en == 0) else $fatal();
+	assert(u.rcreg[0] == 8'd0) else $fatal();
 	
 
 	

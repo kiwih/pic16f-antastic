@@ -236,7 +236,7 @@ always @(posedge clk) begin
 	if(rst) begin
 		rsr_state <= rsr_state_idle;
 		
-		rsr_bit_count <= 4'd0;
+		rsr_bit_count <= 3'd0;
 		rsr_cycle_count <= 4'd0;
 		rsr_rx9d <= 1'd0;
 		rsr_ferr <= 1'd0;
@@ -256,7 +256,7 @@ always @(posedge clk) begin
 					if(UART_RXD == 1'b0 && uart_rx_async_div16_en) begin
 						rsr_state <= rsr_state_start;
 						
-						rsr_bit_count <= 4'd0;
+						rsr_bit_count <= 3'd0;
 						rsr_cycle_count <= 4'd0;
 						rsr_rx9d <= 1'b0;
 						rsr_ferr <= 1'b0;

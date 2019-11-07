@@ -101,15 +101,12 @@ end
 reg [7:0] data_out_tmp = 8'd0;
 
 reg rd_en_last = 1'b0;
-reg rd_en_laster = 1'b0;
 
 always @(posedge clk)
 	if(rst) begin
 		rd_en_last <= 1'b0;
-		rd_en_laster <= 1'b0;
 	end else begin
 		rd_en_last <= rd_en;
-		rd_en_laster <= rd_en_last;
 	end
 	
 always @(posedge clk)  begin
@@ -129,6 +126,7 @@ always @(*) begin
 	pie1_reg_wr_en <= 1'b0;
 	pcon_reg_wr_en <= 1'b0;
 	extern_peripherals_wr_en <= 1'b0;
+	extern_peripherals_rd_en <= 1'b0;
 	gpRegistersA_wr_en <= 1'b0;
 	gpRegistersB_wr_en <= 1'b0;
 	gpRegistersC_wr_en <= 1'b0;

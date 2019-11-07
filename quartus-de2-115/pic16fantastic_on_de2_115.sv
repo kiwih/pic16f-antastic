@@ -35,7 +35,7 @@ wire extern_peripherals_rd_en;
 wire extern_peripherals_wr_en;
 wire [7:0] extern_peripherals_data_in;
 wire [7:0] extern_peripherals_data_out;
-wire [7:0] extern_peripherals_interrupt_strobes;
+wire [7:0] extern_peripherals_interrupt_readonlys;
 
 wire [7:0] porta_tris;
 wire [7:0] porta_port;
@@ -59,7 +59,8 @@ wire [7:0] rcreg_reg_out;
 wire rcreg_reg_rd_en;
 
 picmicro_midrange_core #(
-	.PROGRAM_FILE_NAME(PROGRAM_FILE_NAME)
+	.PROGRAM_FILE_NAME(PROGRAM_FILE_NAME),
+	.EXTERN_PERIPHERALS_INTERRUPTS_AS_STROBES(8'b11001111)
 ) core (
 	.clk(clk),
 	.clk_wdt(clk_wdt),
@@ -72,7 +73,8 @@ picmicro_midrange_core #(
 	.extern_peripherals_data_in(extern_peripherals_data_in),
 	.extern_peripherals_data_out(extern_peripherals_data_out),
 	
-	.extern_peripherals_interrupt_strobes(extern_peripherals_interrupt_strobes)
+	.extern_peripherals_interrupt_strobes(8'd0),
+	.extern_peripherals_interrupt_readonlys(extern_peripherals_interrupt_readonlys)
 );
 
 pic16fantastic_ext_periph_mux ext_periph_mux(
@@ -132,19 +134,19 @@ uart u(
 	.rcreg_reg_rd_en(rcreg_reg_rd_en), //receive register
 	.rcreg_reg_out(rcreg_reg_out),
 	
-	.txif_set_en(extern_peripherals_interrupt_strobes[4]), //strobe to set transmit interrupt flag
+	.txif_set_en(extern_peripherals_interrupt_readonlys[4]), //strobe to set transmit interrupt flag
 									//this is permanently set high unless txreg contains data that has not yet been loaded into the transmit shift register
 									//(yes, even as a strobe it's permanently set high - TXIF shouldn't be able to be cleared in software)
 									
-	.rxif_set_en(extern_peripherals_interrupt_strobes[5])  //strobe to set receive interrupt flag
+	.rxif_set_en(extern_peripherals_interrupt_readonlys[5])  //strobe to set receive interrupt flag
 );
 
-assign extern_peripherals_interrupt_strobes[0] = 1'b0;
-assign extern_peripherals_interrupt_strobes[1] = 1'b0;
-assign extern_peripherals_interrupt_strobes[2] = 1'b0;
-assign extern_peripherals_interrupt_strobes[3] = 1'b0;
-assign extern_peripherals_interrupt_strobes[6] = 1'b0;
-assign extern_peripherals_interrupt_strobes[7] = 1'b0;
+assign extern_peripherals_interrupt_readonlys[0] = 1'b0;
+assign extern_peripherals_interrupt_readonlys[1] = 1'b0;
+assign extern_peripherals_interrupt_readonlys[2] = 1'b0;
+assign extern_peripherals_interrupt_readonlys[3] = 1'b0;
+assign extern_peripherals_interrupt_readonlys[6] = 1'b0;
+assign extern_peripherals_interrupt_readonlys[7] = 1'b0;
 
 
 fake_bidir_port porta(

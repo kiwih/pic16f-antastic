@@ -17,6 +17,7 @@
 	tmplcd2
 	tmr0_isr_counter_l
 	tmr0_isr_counter_h
+	rxchar
 	
     endc
 
@@ -39,12 +40,20 @@ ISR_VECT  CODE	  0x0004
     decfsz tmr0_isr_counter_h, f
     retfie
     comf PORTA, f
-    movlw '!'
+    btfsc PIR1, RCIF
+    call SAVE_RX
+    movfw rxchar
+    addlw 0x01
     movwf TXREG
     retfie
     
 MAIN_PROG CODE                      ; let linker place main program
 
+SAVE_RX
+    movfw RCREG
+    movwf rxchar
+    return
+ 
 ; text blocks
  
 TEXT_NAME
@@ -271,6 +280,11 @@ START
     call Delay255
     call Delay255
     call Delay255
+    
+    movlw '0'
+    movwf rxchar
+    movlw 0x90
+    movwf RCSTA
     
     bsf INTCON, T0IE
     bsf INTCON, GIE
