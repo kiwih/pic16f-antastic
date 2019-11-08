@@ -34,25 +34,30 @@ RES_VECT  CODE    0x0000            ; processor reset vector
 
 ; TODO ADD INTERRUPTS HERE IF USED
 ISR_VECT  CODE	  0x0004
+    btfsc INTCON, T0IF
+    goto ISR_TMR0
+    btfsc PIR1, RCIF
+    goto ISR_RX
+    ;not sure why we're here
+    retfie    
+    
+MAIN_PROG CODE                      ; let linker place main program
+
+ISR_TMR0
     bcf INTCON, T0IF
     decfsz tmr0_isr_counter_l, f
     retfie
     decfsz tmr0_isr_counter_h, f
     retfie
-    comf PORTA, f
-    btfsc PIR1, RCIF
-    call SAVE_RX
-    movfw rxchar
-    addlw 0x01
-    movwf TXREG
+    swapf PORTA, f
     retfie
     
-MAIN_PROG CODE                      ; let linker place main program
-
-SAVE_RX
+ISR_RX
     movfw RCREG
+    addlw 0x01
     movwf rxchar
-    return
+    movwf TXREG
+    retfie
  
 ; text blocks
  
@@ -224,10 +229,40 @@ LCD_CHAR ; function to send a character to the display
     
 CONF_SW_LED_PORT
     bsf STATUS, RP0 ;change to bank 1
-    movlw 0x00	    ;set PORTA to be half input
+    movlw 0x0F	    ;set PORTA to be half input
     movwf TRISA
     bcf STATUS, RP0 ;change to bank 0
     return
+    
+CONF_UART
+    bsf STATUS, RP0 ;change to bank 1
+   
+    bcf TXSTA, BRGH ;these three lines set baud rate as 9600
+    movlw 0x50      ;
+    movwf SPBRG     ;
+    
+    bsf TXSTA, TXEN ;set UART TX as enabled
+    
+    bsf PIE1, RCIE; enable uart rx receive
+    
+    bcf STATUS, RP0 ;change to bank 0
+    
+    movlw 0x90	    ;these two lines enable the UART and turn on receiving
+    movwf RCSTA
+    
+    bsf INTCON, PEIE
+    
+    return
+    
+
+CONF_TMR0
+    bsf INTCON, T0IE
+    clrf TMR0
+    bsf STATUS, RP0 ;change to bank 1
+    bcf OPTION_REG, T0CS ;enable timer0
+    bcf STATUS, RP0 ;change to bank 0
+    return
+    
 
 Delay255	movlw	0xff		;delay 255 mS
 		goto	d0
@@ -281,25 +316,12 @@ START
     call Delay255
     call Delay255
     
-    movlw '0'
-    movwf rxchar
-    movlw 0x90
-    movwf RCSTA
     
-    bsf INTCON, T0IE
+    call CONF_UART
+    call CONF_TMR0
+    
     bsf INTCON, GIE
     
-    clrf TMR0
-    
-    bsf STATUS, RP0 ;change to bank 1
-    bcf OPTION_REG, T0CS ;set up timer0
-    
-    bsf TXSTA, TXEN ;set up UART TX to be 9600 baud and enabled
-    bcf TXSTA, BRGH
-    movlw 0x50
-    movwf SPBRG
-    
-    bcf STATUS, RP0 ;change to bank 0
     
     clrf PORTA
     clrf PORTB

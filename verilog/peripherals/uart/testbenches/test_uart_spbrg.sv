@@ -64,7 +64,7 @@ initial begin
 	assert(uart_rx_async_div16_en == 0) else $fatal();
 	#30
 	assert(uart_rx_async_div16_en == 1) else $fatal(); 
-	#90
+	#70
 	assert(uart_rx_async_div16_en == 0) else $fatal();
 	#10
 	assert(uart_rx_async_div16_en == 1) else $fatal(); 

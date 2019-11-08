@@ -367,6 +367,18 @@ assign rcreg_reg_out = rcreg[rcreg_rd_pos][7:0];
 assign rx9d = rcreg[rcreg_rd_pos][8];
 assign ferr = rcreg[rcreg_rd_pos][9];
 
+reg rcreg_reg_rd_en_prev = 1'b0;
+
+//the presence of the read signal means it is being saved at the end of the next clock cycle
+//as a result, we can't erase the contents of rcreg until the cycle after that
+//so we delay the read signal by one clock cycle
+//and use it as our erase signal
+always @(posedge clk)
+	if(rst)
+		rcreg_reg_rd_en_prev <= 1'b0;
+	else
+		rcreg_reg_rd_en_prev <= rcreg_reg_rd_en;
+
 //rcreg
 always @(posedge clk) begin
 	if(rst) begin
@@ -380,7 +392,7 @@ always @(posedge clk) begin
 		oerr <= 1'b0;
 	end else begin
 	
-		if(rcreg_reg_rd_en) begin
+		if(rcreg_reg_rd_en_prev) begin
 			rcreg[rcreg_rd_pos] <= 10'd0;
 			rcreg_rd_pos <= rcreg_rd_pos + 1'b1;
 			if(rcreg_count > 2'd0)

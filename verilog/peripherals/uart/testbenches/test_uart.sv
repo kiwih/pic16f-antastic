@@ -162,6 +162,9 @@ initial begin
 	assert(u.rcreg[0] == 8'b11001010) else $fatal();
 	#10
 	rcreg_reg_rd_en = 0;
+	assert(rxif_set_en == 1) else $fatal(); //we don't clear things until the next clock cycle
+	assert(u.rcreg[0] == 8'b11001010) else $fatal();
+	#10
 	assert(rxif_set_en == 0) else $fatal();
 	assert(u.rcreg[0] == 8'd0) else $fatal();
 	

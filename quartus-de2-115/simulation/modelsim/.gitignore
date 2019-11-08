@@ -1,8 +1,8 @@
 # ignore everything
 *
 
-# but not things ending in *.do or *.tcl
-!*.do
+# but not things ending in *.tcl (our tests end in .tcl)
+#!*.do
 !*.tcl
 
 #and not things ending in *.prog
